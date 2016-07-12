@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>通用医院信息管理系统</title>
+	<link rel="icon" type="image/GIF" href="./src/img/favicon.ico"/>
+    <!-- Bootstrap core CSS -->
+    <link href="src/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="src/css/signin.css" rel="stylesheet">
+    <script src="src/js/jquery.min.js"></script>
+    <script src="src/js/bootstrap.min.js"></script>
+</head>
+<body id="background">
+    <div class="container">
+    	<ul class="form-sign nav nav-tabs">
+		   <li class="active">
+		      <a href="#signin" data-toggle="tab">
+		         登录
+		      </a>
+		   </li>
+		   <li><a href="#signup" data-toggle="tab">注册</a></li>
+		</ul>
+		<div class="tab-content">
+		   <div class="tab-pane fade in active" id="signin">
+		      <form class="form-sign">
+		        <!-- <h2 class="form-sign-heading">登录</h2> -->
+		        <label for="inputAccount" class="sr-only">Account</label>
+		        <input type="text" class="form-control" id="account" placeholder="账号" required autofocus>
+		        <label for="inputPassword" class="sr-only">Password</label>
+		        <input type="password" class="form-control" placeholder="密码" required>
+		        <div class="checkbox">
+		        	<br>
+		        </div>
+		        <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+		      </form>
+		   </div>
+		   <div class="tab-pane fade" id="signup">
+		      <form class="form-sign">
+		        <!-- <h2 class="form-sign-heading">注册</h2> -->
+		        <label for="inputName" class="sr-only">Name</label>
+		        <input type="text" class="form-control" placeholder="姓名" required autofocus>
+		        
+				<label for="inputSex" class="radio-inline">
+				  <input type="radio" name="inlineRadioOptions" value="male" checked> 男
+				</label>
+				<label for="inputSex" class="radio-inline">
+				  <input type="radio" name="inlineRadioOptions" value="female"> 女
+				</label>
+		        
+		        <label for="inputID" class="sr-only">ID</label>
+		        <input type="text" class="form-control" placeholder="身份证号码" required>
+		        
+		        <label for="inputBirth" class="sr-only">Birth</label>
+		        <input type="date" class="form-control" placeholder="出生日期" required>
+		        
+		        <label for="inputPassword" class="sr-only">Password</label>
+		        <input type="password" id="inputPassword" class="form-control" placeholder="密码" required>
+		        <br>
+		        <button class="btn btn-lg btn-primary btn-block" type="submit">注册</button>
+		      </form>
+		   </div>
+		</div>
+
+<!--       <form class="form-signin">
+        <h2 class="form-signin-heading">登录</h2>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="email" id="inputEmail" class="form-control" placeholder="账号" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="密码" required>
+        <div class="checkbox">
+        	<br>
+           <label>
+            <input type="checkbox" value="remember-me"> 记住密码
+          </label> 
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+      </form> -->
+
+    </div> <!-- /container -->
+
+</body>
+</html>
