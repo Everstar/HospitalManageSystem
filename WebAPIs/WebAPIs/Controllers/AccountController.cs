@@ -21,8 +21,8 @@ namespace WebAPIs.Controllers
                 //创建用户ticket信息
                 accountModel.CreateLoginUserTicket(user.account, user.passwd);
 
-                var response = Request.CreateResponse(HttpStatusCode.Moved);
-                response.Headers.Location = new Uri("http://www.bilibili.com/");
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
                 return response;
             }
             else

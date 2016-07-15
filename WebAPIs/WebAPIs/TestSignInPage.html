@@ -18,9 +18,13 @@
             var name = "sensen";
             var password = "22222";
             var postData = { userName: name, passWord: password };
-            $.post(uri, postData, function (result) {
-                $('h2').html(result);
+            $.post(uri, postData, function (data, textStatus, jqXHR) {
+                if (jqXHR.getResponseHeader('FORCE_REDIRECT') !== null) {
+                    window.location = jqXHR.getResponseHeader('FORCE_REDIRECT');
+                    return;
+                }
             })
+            
         }
     </script>
 </body>
