@@ -9,8 +9,10 @@ using System.Web.SessionState;
 
 namespace WebAPIs.Models
 {
-    public class AccountModel : IRequiresSessionState
+    public class AccountModel
     {
+        // 参考这篇文章
+        // http://blog.csdn.net/zjlovety/article/details/17095627
         /// <summary>  
         /// 创建登录用户的票据信息  
         /// </summary>  
@@ -47,6 +49,14 @@ namespace WebAPIs.Models
         {
             //bool isValid = password == passwordInDatabase;  
             return true;
+        }
+
+        /// <summary>  
+        /// 用户注销执行的操作  
+        /// </summary>  
+        internal void Logout()
+        {
+            FormsAuthentication.SignOut();
         }
     }
 }
