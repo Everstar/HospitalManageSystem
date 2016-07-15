@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h2>我的内心是拒绝的</h2>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'api/Account/SignIn';
+
+        $(document).ready(function () { testPOST(); });
+
+        // 测试另一个POST能否正确路由
+        function testPOST() {
+            var name = "sensen";
+            var password = "22222";
+            var postData = { userName: name, passWord: password };
+            $.post(uri, postData, function (data, textStatus, jqXHR) {
+                if (jqXHR.getResponseHeader('FORCE_REDIRECT') !== null) {
+                    window.location = jqXHR.getResponseHeader('FORCE_REDIRECT');
+                    return;
+                }
+            })
+            
+        }
+    </script>
+</body>
+</html>
