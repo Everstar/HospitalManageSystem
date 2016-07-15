@@ -10,6 +10,8 @@ namespace WebAPIs
 {
     public static class WebApiConfig
     {
+        public static string UrlPrefix { get { return "api"; } }
+        public static string UrlPrefixRelative { get { return "~/api"; } }
         public static void Register(HttpConfiguration config)
         {
             // Web API 配置和服务
@@ -22,7 +24,7 @@ namespace WebAPIs
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
+                routeTemplate: "api/{controller}/{action}",
                 defaults: new { id = RouteParameter.Optional }
             );
         }
