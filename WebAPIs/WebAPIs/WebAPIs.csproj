@@ -223,7 +223,7 @@
     <Compile Include="Models\DataModel\Bed.cs" />
     <Compile Include="Models\DataModel\Blood.cs" />
     <Compile Include="Models\DataModel\Clinic.cs" />
-    <Compile Include="Models\DataModel\Consultation.cs" />
+    <Compile Include="Models\DataModel\Takes.cs" />
     <Compile Include="Models\DataModel\Department.cs" />
     <Compile Include="Models\DataModel\Duty.cs" />
     <Compile Include="Models\DataModel\Employee.cs" />
@@ -239,7 +239,6 @@
     <Compile Include="Models\DataModel\Prescribe.cs" />
     <Compile Include="Models\DataModel\Room.cs" />
     <Compile Include="Models\DataModel\Surgery.cs" />
-    <Compile Include="Models\DataModel\Takes.cs" />
     <Compile Include="Models\DataModel\Treatment.cs" />
     <Compile Include="Models\DataModel\XRay.cs" />
     <Compile Include="Models\Doctor.cs" />
