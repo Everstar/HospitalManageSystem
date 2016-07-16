@@ -66,6 +66,8 @@ namespace WebAPIs.Controllers
         [HttpGet]
         public string GetStringTest()
         {
+   
+
             var user = HttpContext.Current.User;
             var a = user.Identity;
             var b = user.IsInRole("Admin");
