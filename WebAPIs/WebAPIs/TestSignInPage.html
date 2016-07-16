@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>我的内心是拒绝的</h2>
-    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script src="http://cdn.bootcss.com/jquery/3.1.0/jquery.js"></script>
     <script>
         var uri = 'api/Account/SignIn';
 
@@ -25,6 +25,17 @@
             //    data: JSON.stringify(postData),
             //    sucCESs: function (data, status) {}
             //});
+            //$.ajax({
+            //    type: "post",
+            //    url: uri,
+            //    contentType: application/json
+            //    });
+            //$.ajax(
+            //    {
+            //        type: "post",
+            //        url: 
+            //    }
+            //    );
 
             $.post(uri, postData, function (data, textStatus, jqXHR) {
                 if (jqXHR.getResponseHeader('FORCE_REDIRECT') !== null) {
