@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Web;
-using Newtonsoft.Json;
+using WebAPIs.Providers;
 
 namespace WebAPIs.Models
 {
@@ -15,7 +15,7 @@ namespace WebAPIs.Models
         public string passwd { get; set; }
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this);
+            return JsonObjectConverter.ObjectToJson(this);
         }
     }
 }

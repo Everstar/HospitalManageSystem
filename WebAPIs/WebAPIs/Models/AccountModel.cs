@@ -18,7 +18,7 @@ namespace WebAPIs.Models
         {
             //构造Form验证的票据信息  
             FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1, strUserName, DateTime.Now, DateTime.Now.AddMinutes(90),
-                true, string.Format("{0}:{1},Admin", strUserName, strPassword), FormsAuthentication.FormsCookiePath);
+                true, string.Format("{0}:{1},Patient,Admin", strUserName, strPassword), FormsAuthentication.FormsCookiePath);
 
             string ticString = FormsAuthentication.Encrypt(ticket);
 
