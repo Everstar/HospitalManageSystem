@@ -5,7 +5,9 @@ using System.Web;
 
 namespace WebAPIs.Models.DataModels
 {
-    public class Takes
+    public class Own
     {
+        public string clinic_name { get; set; }
+        public string room_num { get; set;}
     }
 }
