@@ -79,6 +79,12 @@ namespace WebAPIs.Controllers
             {
                 // Url合法
                 // 创建挂号记录
+                // 根据employeeId找到医生的科室
+                // 设置挂号金额
+                // 填充支付时间
+                // treatment 表插入一条记录
+                // 得到这条记录的主码
+                // takes表插入患者id treatment id 医生id设为空
             }
             GenerateUserInfoByCookie();
             response.Content = new StringContent(employeeId);
@@ -88,8 +94,44 @@ namespace WebAPIs.Controllers
         [Route("api/Patient/GetTreatmentID")]
         public HttpResponseMessage GetTreatmentID(dynamic obj)
         {
-            GenerateUserInfoByCookie();
-            var patientName = HttpContext.Current.User.Identity.Name;
+            bool isLogin = GenerateUserInfoByCookie();
+            // 验证权限和登陆
+            // 没登录就要转跳到相关页面
+
+            string patient_id = HttpContext.Current.User.Identity.Name;
+            string month = obj.month.Value;
+            string year = obj.year.Value;
+
+
+            
+            HttpResponseMessage response = new HttpResponseMessage();
+            return response;
+        }
+        [HttpPost]
+        [Route("api/Patient/Comment")]
+        public HttpResponseMessage Comment(dynamic obj)
+        {
+            bool isLogin = GenerateUserInfoByCookie();
+            // 验证权限和登陆
+            // 没登录就要转跳到相关页面
+            string employee_id = obj.employee_id.Value;
+            string treatment_id = obj.treatment_id.Value;
+            string rank = obj.rank.Value;
+            string text = obj.text.Value;
+            // 向数据库插入相关评价
+            // 返回评价后的界面
+            HttpResponseMessage response = new HttpResponseMessage();
+            return response;
+        }
+        [HttpPost]
+        [Route("api/Patient/GetAllConsumption")]
+        public HttpResponseMessage GetAllConsumption(dynamic obj)
+        {
+            bool isLogin = GenerateUserInfoByCookie();
+            // 验证权限和登陆
+            // 没登录就要转跳到相关页面
+            string treatment_id = obj.treatment_id.Value;
+            // 根据治疗ID返回所有相关的治疗记录
             HttpResponseMessage response = new HttpResponseMessage();
             return response;
         }
