@@ -27,7 +27,7 @@ namespace WebAPIs.Controllers
                 
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent("sss");
+                response.Content = new StringContent(user.ToString());
                 return response;
             }
             else
@@ -59,13 +59,14 @@ namespace WebAPIs.Controllers
         [HttpPost]
         public HttpResponseMessage SignUp([FromBody]SignUpUser user)
         {
-
+            // 判断用户的id是否存在
             // 数据库中插入用户信息
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
         [HttpGet]
         public string GetStringTest()
         {
+   
             var user = HttpContext.Current.User;
             var a = user.Identity;
             var b = user.IsInRole("Admin");
