@@ -27,6 +27,7 @@ namespace WebAPIs.Controllers
                 
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
+                response.Content = new StringContent("sss");
                 return response;
             }
             else
@@ -35,7 +36,7 @@ namespace WebAPIs.Controllers
             }
         }
         [HttpPost]
-        public string GetUserInfo()
+        public HttpResponseMessage GetUserInfo()
         {
             GenerateUserInfoByCookie();
             string userAccount = HttpContext.Current.User.Identity.Name;
@@ -43,16 +44,16 @@ namespace WebAPIs.Controllers
             if (userAccount.Length == 9)
             {
                 // TODO:从数据库取病人的信息
-                return "";
+                return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             else if (userAccount.Length == 5)
             {
                 // TODO:从数据库获取雇员的信息
-                return "";
+                return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             else
             {
-                return "Invalid account length";
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
         [HttpPost]
@@ -65,8 +66,6 @@ namespace WebAPIs.Controllers
         [HttpGet]
         public string GetStringTest()
         {
-   
-
             var user = HttpContext.Current.User;
             var a = user.Identity;
             var b = user.IsInRole("Admin");

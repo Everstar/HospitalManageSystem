@@ -26,6 +26,20 @@ namespace WebAPIs.Controllers
                 return null;
             }
         }
+        [Route("api/Patient/GetEmployee/{clinicName}")]
+        public IEnumerable<Doctor> GetEmployee(string clinicName)
+        {
+            GenerateUserInfoByCookie();
+            // 如果用户权限正确
+            if (HttpContext.Current.User.IsInRole(accessRoles))
+            {
+                return new Doctor[1];
+            }
+            else
+            {
+                return null;
+            }
+        }
         
     }
 }

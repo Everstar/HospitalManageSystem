@@ -18,7 +18,6 @@
             var name = "sensen";
             var password = "22222";
             var postData = { account: name, passwd: password };
-
             //$.ajax({
             //    type: "post",
             //    url: uri,
@@ -32,13 +31,24 @@
                     window.location = jqXHR.getResponseHeader('FORCE_REDIRECT');
                     return;
                 }
-
                 $.getJSON('api/Account/GetStringTest')
                 .done(function (data) {
                     console.log(data);
                 });
             })
-            
+
+            $.getJSON('api/Patient/GetEmployee/hihiih')
+                .done(function (data) {
+
+            });
+
+            //$.ajax({
+            //    url: 'api/Account/SignIn',
+            //    type: "post",
+            //    contentType: application/json,
+            //    data: postData,
+            //    success: function (data, status) {}
+            //});
         }
     </script>
 </body>
