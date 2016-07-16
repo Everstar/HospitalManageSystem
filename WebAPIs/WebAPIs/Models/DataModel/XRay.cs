@@ -7,5 +7,6 @@ namespace WebAPIs.Models.DataModels
 {
     public class XRay
     {
+
     }
 }
