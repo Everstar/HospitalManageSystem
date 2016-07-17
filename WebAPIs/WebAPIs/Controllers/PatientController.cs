@@ -12,51 +12,26 @@ using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
 {
+    // 权限设置
+    [Authorize(Roles = "Patient")]
     public class PatientController : BaseController
     {
-        public string accessRoles = "Patient";
-
         public HttpResponseMessage GetAllClinic()
         {
-            GenerateUserInfoByCookie();
             HttpResponseMessage response = new HttpResponseMessage();
             // 如果用户权限正确
-            if (HttpContext.Current.User.IsInRole(accessRoles))
-            {
-                // 数据库找数据
-                return response;
-            }
-            else
-            {
-                response.Content = new StringContent("你没有权限，拒绝访问");
-                response.StatusCode = HttpStatusCode.BadRequest;
-                return response;
-            }
+            return response;
         }
-        [BaseAuth(Roles = "Admin")]
         [Route("api/Patient/GetEmployee/{clinicName}")]
         public HttpResponseMessage GetEmployee(string clinicName)
         {
-            GenerateUserInfoByCookie();
             HttpResponseMessage response = new HttpResponseMessage();
-            // 如果用户权限正确
-            if (HttpContext.Current.User.IsInRole(accessRoles))
-            {
-                // 返回所有当前科室下所有医生的所有信息
-                return response;
-            }
-            else
-            {
-                response.Content = new StringContent("你没有权限，拒绝访问");
-                response.StatusCode = HttpStatusCode.BadRequest;
-                return response;
-            }
+            // 返回所有当前科室下所有医生的所有信息
+            return response;
         }
         [Route("api/Patient/GetEmployeeDutyTime/{employeeId}")]
         public HttpResponseMessage GetEmployeeDutyTime(string employeeId)
         {
-            GenerateUserInfoByCookie();
-            // TODO:权限判断
             HttpResponseMessage response = new HttpResponseMessage();
             // 返回医生值班的时间
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(employeeId));
@@ -97,8 +72,6 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetTreatmentID(dynamic obj)
         {
             bool isLogin = GenerateUserInfoByCookie();
-            // 验证权限和登陆
-            // 没登录就要转跳到相关页面
 
             string patient_id = HttpContext.Current.User.Identity.Name;
             string month = obj.month.Value;
@@ -113,9 +86,6 @@ namespace WebAPIs.Controllers
         [Route("api/Patient/Comment")]
         public HttpResponseMessage Comment(dynamic obj)
         {
-            bool isLogin = GenerateUserInfoByCookie();
-            // 验证权限和登陆
-            // 没登录就要转跳到相关页面
             string employee_id = obj.employee_id.Value;
             string treatment_id = obj.treatment_id.Value;
             string rank = obj.rank.Value;
@@ -129,7 +99,6 @@ namespace WebAPIs.Controllers
         [Route("api/Patient/GetAllConsumption")]
         public HttpResponseMessage GetAllConsumption(dynamic obj)
         {
-            bool isLogin = GenerateUserInfoByCookie();
             // 验证权限和登陆
             // 没登录就要转跳到相关页面
             string treatment_id = obj.treatment_id.Value;
