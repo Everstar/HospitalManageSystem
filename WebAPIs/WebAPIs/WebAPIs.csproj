@@ -34,6 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>App_Data/XmlDocument.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -209,13 +210,17 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DoctorController.cs" />
+    <Compile Include="Controllers\ExaminerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ManagementstaffController.cs" />
+    <Compile Include="Controllers\NurseController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\PharmacistController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModel.cs" />
+<<<<<<< HEAD
     <Compile Include="Models\PatientHelper.cs" />
     <Compile Include="Models\RawTable\Bed.cs" />
     <Compile Include="Models\RawTable\Blood.cs" />
@@ -242,13 +247,41 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LoginUser.cs" />
     <Compile Include="Models\Repository\IRepository.cs" />
+=======
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\LoginUser.cs" />
+    <Compile Include="Models\RawTablee\Bed.cs" />
+    <Compile Include="Models\RawTablee\Blood.cs" />
+    <Compile Include="Models\RawTablee\Clinic.cs" />
+    <Compile Include="Models\RawTablee\Department.cs" />
+    <Compile Include="Models\RawTablee\Duty.cs" />
+    <Compile Include="Models\RawTablee\Employee.cs" />
+    <Compile Include="Models\RawTablee\Evaluation.cs" />
+    <Compile Include="Models\RawTablee\Examination.cs" />
+    <Compile Include="Models\RawTablee\Examine.cs" />
+    <Compile Include="Models\RawTablee\Gastroscope.cs" />
+    <Compile Include="Models\RawTablee\Hospitalization.cs" />
+    <Compile Include="Models\RawTablee\Identity.cs" />
+    <Compile Include="Models\RawTablee\Medicine.cs" />
+    <Compile Include="Models\RawTablee\Own.cs" />
+    <Compile Include="Models\RawTablee\Patient.cs" />
+    <Compile Include="Models\RawTablee\Prescribe.cs" />
+    <Compile Include="Models\RawTablee\Room.cs" />
+    <Compile Include="Models\RawTablee\Surgery.cs" />
+    <Compile Include="Models\RawTablee\Takes.cs" />
+    <Compile Include="Models\RawTablee\Treatment.cs" />
+    <Compile Include="Models\RawTablee\XRay.cs" />
+>>>>>>> 51fbb8df3051686c6fec1516272c44f6d1e45f33
     <Compile Include="Models\SignUpUser.cs" />
     <Compile Include="Models\UnifiedTable\EmployeeInfo.cs" />
     <Compile Include="Models\UnifiedTable\PatientInfo.cs" />
     <Compile Include="Models\UserHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+<<<<<<< HEAD
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Providers\DatabaseHelper.cs" />
+=======
+>>>>>>> 51fbb8df3051686c6fec1516272c44f6d1e45f33
     <Compile Include="Providers\JsonObjectConverter.cs" />
     <Compile Include="Providers\FormatHelper.cs" />
     <Compile Include="Results\ChallengeResult.cs" />

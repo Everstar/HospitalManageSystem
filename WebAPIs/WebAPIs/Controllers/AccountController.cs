@@ -9,11 +9,18 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Security;
 using WebAPIs.Models;
+using WebAPIs.Providers;
+using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
     public class AccountController : BaseController
     {
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        /// <param name="user">用户账号、密码构成的Json</param>
+        /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage SignIn(dynamic user)
         {
@@ -44,12 +51,14 @@ namespace WebAPIs.Controllers
                 return new HttpResponseMessage(HttpStatusCode.Forbidden);
             }
         }
+        [Authorize]
         [HttpGet]
+        [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()
         {
-            GenerateUserInfoByCookie();
             string userAccount = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
             if (userAccount.Length == 9)
             {
@@ -69,12 +78,12 @@ namespace WebAPIs.Controllers
             }
         }
         [HttpPost]
-        public HttpResponseMessage SignUp([FromBody]SignUpUser user)
+        public HttpResponseMessage SignUp(dynamic user)
         {
             // 判断用户的id是否存在
             // 数据库中插入用户信息
             // 注册成功 分发cookie
-            SignIn(new LoginUser());
+            SignIn(user);
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
         [HttpGet]
@@ -86,5 +95,6 @@ namespace WebAPIs.Controllers
             var c = user.IsInRole("Hello");
             return "HHHHHHHHHHH";
         }
+
     }
 }
