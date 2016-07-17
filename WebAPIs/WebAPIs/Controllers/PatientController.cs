@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -8,18 +9,20 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Http;
 using WebAPIs.Models;
+using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
 {
     // 权限设置
-    [Authorize(Roles = "Patient")]
+    //[Authorize(Roles = "Patient")]
     public class PatientController : BaseController
     {
         public HttpResponseMessage GetAllClinic()
         {
+            // 只需要获取名字就可以了
+            // Clinic表获取所有名称
             HttpResponseMessage response = new HttpResponseMessage();
-            // 如果用户权限正确
             return response;
         }
         [Route("api/Patient/GetEmployee/{clinicName}")]
@@ -27,6 +30,11 @@ namespace WebAPIs.Controllers
         {
             HttpResponseMessage response = new HttpResponseMessage();
             // 返回所有当前科室下所有医生的所有信息
+            ArrayList list = new ArrayList();
+            list.Add(new Employee());
+            list.Add(new Employee());
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+
             return response;
         }
         [Route("api/Patient/GetEmployeeDutyTime/{employeeId}")]
@@ -34,7 +42,7 @@ namespace WebAPIs.Controllers
         {
             HttpResponseMessage response = new HttpResponseMessage();
             // 返回医生值班的时间
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(employeeId));
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Hospitalization()));
             return response;
         }
         [HttpPost]

@@ -15,13 +15,10 @@ namespace WebAPIs.Controllers
         /// 获取挂号到该医生的挂号单
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("api/Doctor/GetAllTreatment")]
         public HttpResponseMessage GetAllTreatment()
         {
-            // 验证权限和登陆
-            // 没登录就要转跳到相关页面
-
             // 在数据库treatment takes表中找当前登陆医生
             // 的与之相关的挂号单treatment_id
             HttpResponseMessage response = new HttpResponseMessage();
@@ -36,9 +33,6 @@ namespace WebAPIs.Controllers
         [Route("api/Doctor/Takes")]
         public HttpResponseMessage Takes(dynamic obj)
         {
-            // 验证权限和登陆
-            // 没登录就要转跳到相关页面
-
             // 根据相关接诊转到接诊成功的结果界面
             HttpResponseMessage response = new HttpResponseMessage();
             return response;

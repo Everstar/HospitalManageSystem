@@ -15,6 +15,11 @@ namespace WebAPIs.Controllers
 {
     public class AccountController : BaseController
     {
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage SignIn(dynamic user)
         {
@@ -45,11 +50,11 @@ namespace WebAPIs.Controllers
                 return new HttpResponseMessage(HttpStatusCode.Forbidden);
             }
         }
-        [BaseAuth(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
+        [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()
         {
-            GenerateUserInfoByCookie();
             string userAccount = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
             // 如果用户是病人
@@ -71,12 +76,12 @@ namespace WebAPIs.Controllers
             }
         }
         [HttpPost]
-        public HttpResponseMessage SignUp([FromBody]SignUpUser user)
+        public HttpResponseMessage SignUp(dynamic user)
         {
             // 判断用户的id是否存在
             // 数据库中插入用户信息
             // 注册成功 分发cookie
-            SignIn(new LoginUser());
+            SignIn(user);
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
         [HttpGet]
@@ -88,5 +93,6 @@ namespace WebAPIs.Controllers
             var c = user.IsInRole("Hello");
             return "HHHHHHHHHHH";
         }
+
     }
 }
