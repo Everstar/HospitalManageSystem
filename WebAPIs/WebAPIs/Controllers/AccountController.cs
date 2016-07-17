@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Security;
 using WebAPIs.Models;
 using WebAPIs.Providers;
+using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
@@ -57,6 +58,7 @@ namespace WebAPIs.Controllers
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
             if (userAccount.Length == 9)
             {
