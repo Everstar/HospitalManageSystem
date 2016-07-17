@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web.Http;
+using WebAPIs.Providers;
+using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
+    [Authorize(Roles = "Pharmacist")]
     public class PharmacistController : BaseController
     {
-        public string accessRoles = "Pharmacist";
         /// <summary>
         /// 查询配药单
         /// </summary>
@@ -40,8 +43,14 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage Prescribe(string pres_id)
         {
             // 某个药配好了
-            // 标记这个药物单子配好的时间
+            // prescription表中标记这个药物单子配好的时间
+            // prescription表加一条配处方的时间
+            ArrayList list = new ArrayList();
+            list.Add(new Prescribe());
+            list.Add(new Prescribe());
+            list.Add(new Prescribe());
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
     }

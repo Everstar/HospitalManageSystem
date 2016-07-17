@@ -1,27 +1,40 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using WebAPIs.Providers;
+using WebAPIs.Models;
+using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
+    //[Authorize(Roles = "Doctor")]
     public class DoctorController : BaseController
     {
-        public string accessRoles = "Doctor";
         /// <summary>
         /// 获取挂号到该医生的挂号单
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Doctor/GetAllTreatment")]
+        //[Route("api/Doctor/GetAllTreatment")]
         public HttpResponseMessage GetAllTreatment()
         {
-            // 在数据库treatment takes表中找当前登陆医生
-            // 的与之相关的挂号单treatment_id
+            string doc_id = HttpContext.Current.User.Identity.Name;
+            // 在数据库treatment表找到所有与当前医生doc_id相关的所有挂号记录
+            // treatment natural join takes using(treat_id)
+            // tekes.doc_id若为空 取出这条数据组成数组
+            // 设置takes表treat_id对应记录的doc_id为当前doc_id
+            ArrayList list = new ArrayList();
+            list.Add(new Treatment());
+            list.Add(new Treatment());
+            list.Add(new Treatment());
+
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
         /// <summary>
@@ -33,6 +46,9 @@ namespace WebAPIs.Controllers
         [Route("api/Doctor/Takes")]
         public HttpResponseMessage Takes(dynamic obj)
         {
+            string treatment_id = obj.treatment_id.Value;
+            string doc_id = HttpContext.Current.User.Identity.Name;
+            // tekes表填充treatment_id对应的doc_id
             // 根据相关接诊转到接诊成功的结果界面
             HttpResponseMessage response = new HttpResponseMessage();
             return response;
@@ -65,8 +81,13 @@ namespace WebAPIs.Controllers
         [Route("api/Doctor/GetAllMedicine")]
         public HttpResponseMessage GetAllMedicine()
         {
-            // 从数据库获取所有的药品的名称
+            // 从medicine表获取所有的药品的数据
+            ArrayList list = new ArrayList();
+            list.Add(new Medicine());
+            list.Add(new Medicine());
+            list.Add(new Medicine());
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
         /// <summary>
@@ -78,8 +99,9 @@ namespace WebAPIs.Controllers
         [Route("api/Doctor/GetMedicine/{name}")]
         public HttpResponseMessage GetMedicine(string name)
         {
-            // 从数据库拿到相关药品的id
+            // 从medicine拿到相关药品的id
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent("123斯达舒321");
             return response;
         }
         /// <summary>
