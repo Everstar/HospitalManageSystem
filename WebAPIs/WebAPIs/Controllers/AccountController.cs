@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Security;
 using WebAPIs.Models;
+using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
 {
@@ -44,6 +45,7 @@ namespace WebAPIs.Controllers
                 return new HttpResponseMessage(HttpStatusCode.Forbidden);
             }
         }
+        [BaseAuth(Roles = "Admin")]
         [HttpGet]
         public HttpResponseMessage GetUserInfo()
         {
