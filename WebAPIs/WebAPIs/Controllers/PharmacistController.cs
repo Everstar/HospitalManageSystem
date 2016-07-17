@@ -11,7 +11,7 @@ using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
-    [Authorize(Roles = "Pharmacist")]
+    //[Authorize(Roles = "Pharmacist")]
     public class PharmacistController : BaseController
     {
         /// <summary>
@@ -30,7 +30,12 @@ namespace WebAPIs.Controllers
             // 处方ID对应的所有药品的名称 量
             // 开方时间等
             // prescription prescribe表联合
+            ArrayList list = new ArrayList();
+            list.Add(new Prescribe());
+            list.Add(new Prescribe());
+            list.Add(new Prescribe());
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
         /// <summary>
@@ -45,12 +50,8 @@ namespace WebAPIs.Controllers
             // 某个药配好了
             // prescription表中标记这个药物单子配好的时间
             // prescription表加一条配处方的时间
-            ArrayList list = new ArrayList();
-            list.Add(new Prescribe());
-            list.Add(new Prescribe());
-            list.Add(new Prescribe());
+
             HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
     }

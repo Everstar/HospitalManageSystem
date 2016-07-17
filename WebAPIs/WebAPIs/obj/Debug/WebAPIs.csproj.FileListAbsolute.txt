@@ -152,3 +152,4 @@ C:\Users\20728\OneDrive\Documents\HospitalProj\HospitalManageSystem\WebAPIs\WebA
 C:\Users\20728\OneDrive\Documents\HospitalProj\HospitalManageSystem\WebAPIs\WebAPIs\obj\Debug\WebAPIs.csprojResolveAssemblyReference.cache
 C:\Users\20728\OneDrive\Documents\HospitalProj\HospitalManageSystem\WebAPIs\WebAPIs\obj\Debug\WebAPIs.dll
 C:\Users\20728\OneDrive\Documents\HospitalProj\HospitalManageSystem\WebAPIs\WebAPIs\obj\Debug\WebAPIs.pdb
+C:\Users\Novemser\OneDrive\Documents\HospitalProj\HospitalManageSystem\WebAPIs\WebAPIs\bin\XmlDocument.xml

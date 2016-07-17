@@ -7,7 +7,7 @@ using System.Web.Http;
 
 namespace WebAPIs.Controllers
 {
-    [Authorize(Roles = "Managementstaff")]
+    //[Authorize(Roles = "Managementstaff")]
     public class ManagementstaffController : BaseController
     {
         /// <summary>

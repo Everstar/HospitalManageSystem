@@ -19,7 +19,7 @@ namespace WebAPIs.Controllers
         /// <summary>
         /// 登陆
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="user">用户账号、密码构成的Json</param>
         /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage SignIn(dynamic user)

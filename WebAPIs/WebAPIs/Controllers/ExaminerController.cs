@@ -9,7 +9,7 @@ using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
-    [Authorize(Roles = "Examiner")]
+    //[Authorize(Roles = "Examiner")]
     public class ExaminerController : BaseController
     {
         /// <summary>

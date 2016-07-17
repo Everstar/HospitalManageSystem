@@ -10,7 +10,7 @@ using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
 {
-    [Authorize(Roles = "Nurse")]
+    //[Authorize(Roles = "Nurse")]
     public class NurseController : BaseController
     {
         public string accessRoles = "Nurse";
