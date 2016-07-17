@@ -17,5 +17,17 @@ namespace WebAPIs.Models.DataModels
         public string Friday { get; set; }
         public string Saturday { get; set; }
         public string Sunday { get; set; }
+
+        public Duty(string room_num, string mon, string tue, string wed, string thu, string fri, string sat, string sun)
+        {
+            this.room_num = room_num;
+            this.Monday = mon;
+            this.Tuesday = tue;
+            this.Wednesday = wed;
+            this.Thursday = thu;
+            this.Friday = fri;
+            this.Saturday = sat;
+            this.Sunday = sun;
+        }
     }
 }
