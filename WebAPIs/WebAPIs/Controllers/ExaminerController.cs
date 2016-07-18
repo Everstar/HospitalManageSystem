@@ -7,6 +7,8 @@ using System.Web.Http;
 using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
+using WebAPIs.Models;
+using System.Collections;
 
 namespace WebAPIs.Controllers
 {
@@ -24,12 +26,24 @@ namespace WebAPIs.Controllers
         [Route("api/Examiner/GetExamination/{docId}")]
         public HttpResponseMessage GetExamination(string docId)
         {
+            HttpResponseMessage response = new HttpResponseMessage();
             // get ALL Examination FROM Specific doc_id
             // examination表查找doc_id匹配的数据
             // 序列化返回
+            ArrayList list=ExaminerHelper.GetAllExamination(docId);
+            if (list.Count == 0)
+            {
+                response.Content = new StringContent("未找到相关检测记录");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
 
-            HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Examination()));
+            
+            //response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Examination()));
             return response;
         }
         /// <summary>
@@ -41,13 +55,28 @@ namespace WebAPIs.Controllers
         [Route("api/Examiner/MakeXRayExamination")]
         public HttpResponseMessage MakeXRayExamination(dynamic obj)
         {
+            HttpResponseMessage response = new HttpResponseMessage();
+
             string exam_id = obj.exam_id.Value;
             string checkpoint = obj.checkpoint.Value;
             string from_picture = obj.from_picture.Value;
             var picture = obj.picture;
+            //一个对象反序列化的过程
 
             // XRay表插入
-            HttpResponseMessage response = new HttpResponseMessage();
+
+            if (!ExaminerHelper.MakeXRayExamination(checkpoint,from_picture,picture))
+            {
+                response.Content = new StringContent("由于某种原因检测插入不成功");
+                response.StatusCode = HttpStatusCode.Forbidden;
+            }
+            else
+            {
+                response.Content = new StringContent("检测结果插入表中");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+
+            
             return response;
         }
         /// <summary>
@@ -64,8 +93,22 @@ namespace WebAPIs.Controllers
             string from_picture = obj.from_picture.Value;
             var picture = obj.picture;
 
-            // 胃镜表插入
             HttpResponseMessage response = new HttpResponseMessage();
+
+            if(!ExaminerHelper.MakeGastroscopeExamination(from_picture, diagnoses, picture))
+            {
+                response.Content = new StringContent("由于某种原因插入检查结果不成功");
+                response.StatusCode = HttpStatusCode.Forbidden;
+            }
+            else
+            {
+                response.Content = new StringContent("检测结果插入成功");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+
+
+            // 胃镜表插入
+            
             return response;
         }
         /// <summary>
@@ -101,6 +144,9 @@ namespace WebAPIs.Controllers
             string mpv = obj.mpv.Value;
             string pdw = obj.pdw.Value;
             string pct = obj.pct.Value;
+
+           
+
 
             // Blood表插入
             HttpResponseMessage response = new HttpResponseMessage();

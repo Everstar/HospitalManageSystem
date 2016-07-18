@@ -1,9 +1,9 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using System.Globalization;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;
@@ -12,7 +12,7 @@ namespace WebAPIs.Models
 {
     public class NurseHelper//获得该护士照顾的所有病人
     {
-        static ArrayList  GetHospitalizationInfo(string nurse_id)
+        public static ArrayList GetHospitalizationInfo(string nurse_id)
         {
             ArrayList hospitalization = new ArrayList();
             string sqlStr = String.Format(

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Web;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using System.Globalization;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;

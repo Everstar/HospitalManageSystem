@@ -5,10 +5,9 @@ using System.Web;
 using System.Data.SqlTypes;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
-using Oracle.ManagedDataAccess.Client;
-using Oracle.ManagedDataAccess.Types;
 using WebAPIs.Models.UnifiedTable;
 using System.Globalization;
+using Oracle.ManagedDataAccess.Client;
 
 namespace WebAPIs.Models
 {
