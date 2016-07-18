@@ -12,6 +12,9 @@ namespace WebAPIs.Models
 {
     public class PatientHelper
     {
+
+        private static Int64 _cnt = 10000000000;
+
         public static ArrayList GetAllClinic()
         {
             ArrayList clinics = new ArrayList();
@@ -36,6 +39,7 @@ namespace WebAPIs.Models
         }
 
         //only contain department, clinic, post, name, sex info
+
         public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
             ArrayList employees = new ArrayList();
@@ -61,12 +65,14 @@ namespace WebAPIs.Models
             return employees;
         }
 
+
         public static Duty GetEmployeeDutyTime(string id)
         {
             string sqlStr = String.Format(
               @"select room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
                 from employee natural join duty
-               ");
+                where duty_id='{0}'",
+                id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
             try
@@ -85,11 +91,31 @@ namespace WebAPIs.Models
             return null;
         }
 
-        public static bool  RegisterTreat(Treatment treat)
-        {
 
-            return true;
+        public static string RegisterTreat(Treatment treat)
+
+        {
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            try
+            {
+                string sqlStr = String.Format(
+                  @"insert into treatment
+                values('{0}', '{1}', 'to_date('{2}', 'dd/mm/yyyy hh24:mi:ss')', to_date('{3}', 'dd/mm/yyyy hh24:mi:ss'), '{4}')",
+                    FormatHelper.GetIDNum(_cnt++), treat.clinic, treat.start_time.ToString(), treat.end_time.ToString(), treat.doc_id);
+                cmd.CommandText = sqlStr;
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                cmd.Transaction.Rollback();
+                _cnt--;
+                return null;
+            }
+            return (_cnt - 1).ToString();
         }
+
 
         public static bool Commit(Evaluation item)
         {

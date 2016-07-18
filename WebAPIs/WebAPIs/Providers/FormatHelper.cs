@@ -35,5 +35,10 @@ namespace WebAPIs.Providers
             else if (cnt > 10) return "0" + cnt.ToString();
             else return "00" + cnt.ToString();
         }
+
+        public static string GetIDNum(Int64 cnt)
+        {
+            return cnt.ToString();
+        }
     }
 }
