@@ -5,10 +5,9 @@ using System.Web;
 using System.Data.SqlTypes;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
-using Oracle.ManagedDataAccess.Client;
-using Oracle.ManagedDataAccess.Types;
 using WebAPIs.Models.UnifiedTable;
 using System.Globalization;
+using Oracle.ManagedDataAccess.Client;
 
 namespace WebAPIs.Models
 {
@@ -39,8 +38,6 @@ namespace WebAPIs.Models
             //sign up patient
             try
             {
-                //sqlStr = String.Format("insert into identity values ('{0}', '{1}', '{2}', to_date('{3}', 'dd/mm/yyyy')",
-                //    item.credit_num, item.name, item.sex, item.birth.ToShortDateString());
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
@@ -71,6 +68,7 @@ namespace WebAPIs.Models
         {
             string sqlStr = String.Format("select password from patient where patient_id='{0}'",
                 id);
+
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
 
             try
@@ -78,7 +76,8 @@ namespace WebAPIs.Models
                 OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    return reader[2].ToString();
+                    var b = reader[0].ToString();
+                    return b;
                 }
             }
             catch (Exception e)
@@ -155,21 +154,21 @@ namespace WebAPIs.Models
                 if (reader.Read())
                 {
                     return new EmployeeInfo(
-                        reader[0].ToString(), 
-                        reader[1].ToString(), 
+                        reader[0].ToString(),
+                        reader[1].ToString(),
                         reader[2].ToString(),
-                        reader[3].ToString(), 
-                        reader[4].ToString(), 
-                        reader[5].ToString(), 
+                        reader[3].ToString(),
+                        reader[4].ToString(),
+                        reader[5].ToString(),
                         Convert.ToDouble(reader[6].ToString()),
-                        reader[7].ToString(), 
-                        reader[8].ToString(), 
+                        reader[7].ToString(),
+                        reader[8].ToString(),
                         Convert.ToDateTime(reader[9].ToString()));
                 }
             }
             catch (Exception e)
             {
-                
+
             }
             return null;
         }

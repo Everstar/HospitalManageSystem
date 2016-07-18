@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+    <h2>我的内心是拒绝的 2</h2>
+    <script src="http://cdn.bootcss.com/jquery/3.1.0/jquery.js"></script>
+
+    <script>
+            var uri = 'api/Account/SignUp';
+            input_name = 'sad';
+            input_ID = '456456456456456456';
+            input_sex = 'm';
+            input_birth = '2010-08-27';
+            input_password = '333333';
+
+            console.log(input_name + "  " + input_ID + "  " + input_sex + "" + input_birth + "  " + input_password);
+
+            var postData = { name: input_name, sex: input_sex, id: input_ID, birth: input_birth.toString(), passwd: input_password };
+
+            $.ajax({
+                type: "post",
+                url: uri,
+                contentType: "application/json",
+                data: JSON.stringify(postData),
+                success: function (data, status) {
+                    var patient_id = data;
+                    alert("你的病人账号为 :" + patient_id + "\n请重新登录。");
+                    // window.location.reload();
+                }
+            });
+    </script>
+</body>
+</html>

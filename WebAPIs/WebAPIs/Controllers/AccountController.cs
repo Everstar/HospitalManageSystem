@@ -13,6 +13,8 @@ using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
 using WebAPIs.Models.UnifiedTable;
+using Newtonsoft.Json;
+
 
 namespace WebAPIs.Controllers
 {
@@ -47,7 +49,7 @@ namespace WebAPIs.Controllers
                 accountModel.CreateLoginUserTicket(userAccount, userPasswd);
                 
                 //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent("登陆成功！");
+                response.Content = new StringContent("登陆成功！" + " " + AccountModel.GetUserAuthorities(userAccount));
                 return response;
             }
             else
@@ -57,12 +59,13 @@ namespace WebAPIs.Controllers
                 return response;
             }
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
+            userAccount = "14001";
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
@@ -110,6 +113,7 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage SignUp(dynamic user)
         {
             HttpResponseMessage response = new HttpResponseMessage();
+
             SignUpUser signUpUser = new SignUpUser();
             try
             {
@@ -118,21 +122,21 @@ namespace WebAPIs.Controllers
                 signUpUser.sex = user.sex.Value;
                 signUpUser.credit_num = user.id.Value;
 
-                signUpUser.name = "顺子";
-                signUpUser.sex = 'M';
-                signUpUser.credit_num = "444444444444444444";
-                signUpUser.birth = new DateTime(1980, 01, 10);
+                signUpUser = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(user), signUpUser);
             }
             catch (Exception e)
             {
-                response.Content = new StringContent("post数据格式错误");
+                response.Content = new StringContent("post数据格式错误\nReceives:\n"+JsonObjectConverter.ObjectToJson(user));
                 return response;
             }
-
             // 判断用户的id是否存在
-
             // 数据库中插入用户信息
-            UserHelper.SignUp(signUpUser);
+            if (!UserHelper.SignUp(signUpUser))
+            {
+                response.Content = new StringContent("该账号已注册过！");
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
             // 注册成功 分发cookie
             SignIn(user);
             response.StatusCode = HttpStatusCode.OK;

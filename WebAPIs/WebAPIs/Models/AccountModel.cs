@@ -44,7 +44,7 @@ namespace WebAPIs.Models
         /// </summary>  
         /// <param name="userName"></param>  
         /// <returns></returns>  
-        internal string GetUserAuthorities(string account)
+        internal static string GetUserAuthorities(string account)
         {
             string strAuth = "";
             Hashtable authTable = new Hashtable();
