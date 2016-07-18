@@ -11,6 +11,7 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using WebAPIs.Models;
 using WebAPIs.Models.DataModels;
+using WebAPIs.Models.UnifiedTable;
 using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
@@ -125,25 +126,45 @@ namespace WebAPIs.Controllers
             }
             else
             {
-                // Url合法
+                // Url合法 
+                EmployeeInfo employeeInfo = UserHelper.GetEmployeeInfo(employeeId);
+
+                //判断医生是否有空
+                
+
                 // 创建挂号记录
                 Treatment treatment = new Treatment();
-                // 根据employeeId找到医生的科室
+                //设置预约挂号时间段
+                DateTime treatTime = Convert.ToDateTime(time);
 
+                treatment.start_time = treatTime;
+
+                treatTime.AddHours(1);
+
+                treatment.end_time = treatTime;
+                //添加医生Id
+
+                treatment.doc_id = employeeId;
+                
+                // 根据employeeId找到医生的科室
+               
+                treatment.clinic = employeeInfo.clinic;
                 // 设置挂号金额
 
                 // 填充支付时间
 
                 // treatment 表插入一条记录
-                if (!PatientHelper.RegisterTreat(treatment))
-                {
+                string registerMessage = PatientHelper.RegisterTreat(treatment);
+
+                if (registerMessage==null)
+                { 
                     response.Content = new StringContent("挂号失败");
                     response.StatusCode = HttpStatusCode.BadRequest;
                     return response;
                 }
                 else
                 {
-                    //response.Content = new StringContent("挂号成功");
+                    response.Content = new StringContent("挂号成功:" + "\n" + employeeId + time);
                     response.StatusCode = HttpStatusCode.OK;
                 }
                 // 得到这条记录的主码
@@ -159,7 +180,7 @@ namespace WebAPIs.Controllers
 
                 
             }
-            response.Content = new StringContent(employeeId + " " + time);
+            //response.Content = new StringContent(employeeId + " " + time);
             
             return response;
         }
@@ -222,6 +243,31 @@ namespace WebAPIs.Controllers
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
+
+
+        [HttpGet]
+        [Route("api/Patient/GetDoctorIdName/{treatment_id}")]
+        //根据医疗流水号找到相关医生的id和name,返回一个arraylist{doc_id,doc_name}
+        public HttpResponseMessage GetDoctorIdName(string treatment_id)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            ArrayList doctorIdName = PatientHelper.GetDoctorIdName(treatment_id);
+
+            if (doctorIdName == null)
+            {
+                response.Content = new StringContent("查询医生未找到");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(doctorIdName));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+
+            return response;
+        }
+
 
     }
 }
