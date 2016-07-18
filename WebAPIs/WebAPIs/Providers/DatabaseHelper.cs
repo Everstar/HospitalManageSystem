@@ -21,7 +21,7 @@ namespace WebAPIs.Providers
                 (CONNECT_DATA =
                 (SERVICE_NAME = UnivHosDB)
                 )
-                );User Id=lvjinhua;Password=123456");
+                );User Id=system;Password=Aa123456");
                 conn.Open();
             }
             catch (NullReferenceException e)

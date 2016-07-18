@@ -9,7 +9,7 @@ namespace WebAPIs.Models
     {
         public string name { get; set; }
         public string sex { get; set; }
-        public string credit_num { get; set; }
+        public string id { get; set; }
         public DateTime birth { get; set; }
         public string passwd { get; set; }
     }

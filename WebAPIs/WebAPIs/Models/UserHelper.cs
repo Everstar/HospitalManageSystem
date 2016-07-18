@@ -28,7 +28,7 @@ namespace WebAPIs.Models
                 @"select *
                   from identity
                   where credit_num='{0}'",
-                  item.credit_num);
+                  item.id);
             cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -41,16 +41,16 @@ namespace WebAPIs.Models
             {
                 //sqlStr = String.Format("insert into identity values ('{0}', '{1}', '{2}', to_date('{3}', 'dd/mm/yyyy')",
                 //    item.credit_num, item.name, item.sex, item.birth.ToShortDateString());
-                sqlStr = "insert into identity values (@credit_num, @name, @sex, @birth";
+                sqlStr = "insert into identity values (@credit_num, @name, @sex, @birth)";
                 cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("@credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+                cmd.Parameters.Add("@credit_num", OracleDbType.Varchar2, 18).Value = item.id;
                 cmd.Parameters.Add("@name", OracleDbType.Varchar2, 40).Value = item.name;
                 cmd.Parameters.Add("@sex", OracleDbType.Char, 1).Value = item.sex[0];
                 cmd.Parameters.Add("@birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
                 cmd.ExecuteNonQuery();
 
                 sqlStr = String.Format("insert into patient values ('{0}', '{1}', '{2}')",
-                    FormatHelper.GetYMD() + FormatHelper.GetIDNum(_cnt++), item.credit_num, item.passwd);
+                    FormatHelper.GetYMD() + FormatHelper.GetIDNum(_cnt++), item.id, item.passwd);
                 cmd.CommandText = sqlStr;
                 cmd.ExecuteNonQuery();
 
@@ -66,27 +66,41 @@ namespace WebAPIs.Models
 
         public static string GetPwOfPatient(string id)
         {
-            string sqlStr = String.Format("select password from patient where id='{0}'",
+            string sqlStr = String.Format("select password from patient where patient_id='{0}'",
                 id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            var a = new OracleConnection(@"Data Source=(DESCRIPTION =
+                (ADDRESS_LIST =
+                (ADDRESS = (PROTOCOL = TCP)(HOST = 221.239.197.176)(PORT = 2333))
+                )
+                (CONNECT_DATA =
+                (SERVICE_NAME = UnivHosDB)
+                )
+                );User Id=system;Password=Aa123456");
+            a.Open();
+            OracleCommand cmd = new OracleCommand(sqlStr, a);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
                 if (reader.Read())
                 {
-                    return reader[2].ToString();
+                    var b = reader[0].ToString();
+                    return b;
                 }
             }
             catch (Exception e)
             {
 
             }
+            finally
+            {
+                a.Clone();
+            }
             return null;
         }
 
         public static string GetPwOfEmployee(string id)
         {
-            string sqlStr = String.Format("select password from employee where id='{0}'",
+            string sqlStr = String.Format("select password from employee_id where id='{0}'",
                 id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
@@ -108,9 +122,7 @@ namespace WebAPIs.Models
         public static PatientInfo GetPatientInfo(string id)
         {
             string sqlStr = String.Format(
-                @"select *
-                from patient natural join identity
-                where patient_id='{0}'",
+                @"select * from patient natural join identity where patient_id='{0}'",
                 id);
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd";
@@ -121,7 +133,7 @@ namespace WebAPIs.Models
                 if (reader.Read())
                 {
                     return new PatientInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                        reader[3].ToString(), reader[4].ToString(), Convert.ToDateTime(reader[5].ToString(), frm));
+                        reader[3].ToString(), reader[4].ToString(), Convert.ToDateTime(reader[5].ToString()));
                 }
             }
             catch (Exception e)

@@ -13,6 +13,8 @@ using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
 using WebAPIs.Models.UnifiedTable;
+using Newtonsoft.Json;
+
 
 namespace WebAPIs.Controllers
 {
@@ -57,12 +59,13 @@ namespace WebAPIs.Controllers
                 return response;
             }
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
+            userAccount = "123456789";
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
@@ -110,24 +113,25 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage SignUp(dynamic user)
         {
             HttpResponseMessage response = new HttpResponseMessage();
+
             SignUpUser signUpUser = new SignUpUser();
             try
             {
-                signUpUser.birth = user.birth.Value;
-                signUpUser.name = user.name.Value;
-                signUpUser.sex = user.sex.Value;
-                signUpUser.credit_num = user.id.Value;
+                signUpUser = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(user), signUpUser);
             }
             catch (Exception e)
             {
-                response.Content = new StringContent("post数据格式错误");
+                response.Content = new StringContent("post数据格式错误\nReceives:\n"+JsonObjectConverter.ObjectToJson(user));
                 return response;
             }
-
             // 判断用户的id是否存在
-
             // 数据库中插入用户信息
-            UserHelper.SignUp(signUpUser);
+            if (!UserHelper.SignUp(signUpUser))
+            {
+                response.Content = new StringContent("该账号已注册过！");
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
             // 注册成功 分发cookie
             SignIn(user);
             response.StatusCode = HttpStatusCode.OK;

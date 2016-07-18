@@ -4,10 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Managementstaff")]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
+
     public class ManagementstaffController : BaseController
     {
         /// <summary>
