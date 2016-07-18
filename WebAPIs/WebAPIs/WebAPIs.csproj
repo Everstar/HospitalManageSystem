@@ -220,7 +220,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModel.cs" />
-<<<<<<< HEAD
     <Compile Include="Models\PatientHelper.cs" />
     <Compile Include="Models\RawTable\Bed.cs" />
     <Compile Include="Models\RawTable\Blood.cs" />
@@ -247,7 +246,6 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LoginUser.cs" />
     <Compile Include="Models\Repository\IRepository.cs" />
-=======
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\LoginUser.cs" />
     <Compile Include="Models\RawTablee\Bed.cs" />
@@ -271,17 +269,13 @@
     <Compile Include="Models\RawTablee\Takes.cs" />
     <Compile Include="Models\RawTablee\Treatment.cs" />
     <Compile Include="Models\RawTablee\XRay.cs" />
->>>>>>> 51fbb8df3051686c6fec1516272c44f6d1e45f33
     <Compile Include="Models\SignUpUser.cs" />
     <Compile Include="Models\UnifiedTable\EmployeeInfo.cs" />
     <Compile Include="Models\UnifiedTable\PatientInfo.cs" />
     <Compile Include="Models\UserHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-<<<<<<< HEAD
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Providers\DatabaseHelper.cs" />
-=======
->>>>>>> 51fbb8df3051686c6fec1516272c44f6d1e45f33
     <Compile Include="Providers\JsonObjectConverter.cs" />
     <Compile Include="Providers\FormatHelper.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
