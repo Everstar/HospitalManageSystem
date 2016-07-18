@@ -9,6 +9,7 @@ using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
 using WebAPIs.Models;
 using System.Collections;
+using Newtonsoft.Json;
 
 namespace WebAPIs.Controllers
 {
@@ -62,10 +63,13 @@ namespace WebAPIs.Controllers
             string from_picture = obj.from_picture.Value;
             var picture = obj.picture;
             //一个对象反序列化的过程
+            PartXRayInfo xrayInfo = new PartXRayInfo();
+
+            xrayInfo = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), xrayInfo);
 
             // XRay表插入
 
-            if (!ExaminerHelper.MakeXRayExamination(checkpoint,from_picture,picture))
+            if (!ExaminerHelper.MakeXRayExamination(xrayInfo))
             {
                 response.Content = new StringContent("由于某种原因检测插入不成功");
                 response.StatusCode = HttpStatusCode.Forbidden;
