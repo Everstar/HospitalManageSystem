@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using WebAPIs.Models.RawTable;
+using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
 using Oracle.DataAccess.Client;
 using WebAPIs.Models.UnifiedTable;

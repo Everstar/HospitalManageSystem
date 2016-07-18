@@ -12,6 +12,7 @@ using WebAPIs.Models;
 using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
+using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Controllers
 {
@@ -36,7 +37,6 @@ namespace WebAPIs.Controllers
             }
             catch(Exception e)
             {
-
             }
             if (accountModel.ValidateUserLogin(userAccount, userPasswd))
             {
@@ -65,6 +65,17 @@ namespace WebAPIs.Controllers
             if (userAccount.Length == 9)
             {
                 // TODO:从数据库取病人的信息
+                PatientInfo userInfo = UserHelper.GetPatientInfo(userAccount);
+                // userInfo不存在
+                if (userInfo == null)
+                {
+                    response.StatusCode = HttpStatusCode.Forbidden;
+                }
+                else
+                {
+                    response.Content = new StringContent(JsonObjectConverter.ObjectToJson(userInfo));
+                    response.StatusCode = HttpStatusCode.OK;
+                }
                 return response;
             }
             else if (userAccount.Length == 5)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace WebAPIs.Models.RawTable
+namespace WebAPIs.Models.DataModels
 {
     public class Prescription
     {

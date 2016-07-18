@@ -56,7 +56,8 @@ namespace WebAPIs.Controllers
             // 返回医生值班的时间
             // employee表找到duty_id
             // duty表找到所有数据
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Duty()));
+
+            //response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Duty()));
             return response;
         }
         [HttpPost]
