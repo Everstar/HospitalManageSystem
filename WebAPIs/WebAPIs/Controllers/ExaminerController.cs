@@ -4,12 +4,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WebAPIs.Providers;
+using WebAPIs.Models.DataModels;
 
 namespace WebAPIs.Controllers
 {
+    //[Authorize(Roles = "Examiner")]
     public class ExaminerController : BaseController
     {
-        public string accessRoles = "Examiner";
         /// <summary>
         /// 获取检查单
         /// </summary>
@@ -22,7 +24,9 @@ namespace WebAPIs.Controllers
             // get ALL Examination FROM Specific doc_id
             // examination表查找doc_id匹配的数据
             // 序列化返回
+
             HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Examination()));
             return response;
         }
         /// <summary>

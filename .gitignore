@@ -1,0 +1,9 @@
+WebAPIs/*
+!WebAPIs/WebAPIs/
+!WebAPIs/packages/
+
+WebAPIs/WebAPIs/bin/*
+WebAPIs/WebAPIs/App_Data/*
+WebAPIs/WebAPIs/obj/*
+WebAPIs/WebAPIs/WebAPIs.csproj
+WebAPIs/WebAPIs/WebAPIs.csproj.user
