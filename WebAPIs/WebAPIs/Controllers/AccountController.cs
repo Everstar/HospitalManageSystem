@@ -80,7 +80,18 @@ namespace WebAPIs.Controllers
             }
             else if (userAccount.Length == 5)
             {
-                // TODO:从数据库获取雇员的信息
+                // TODO:从数据库获取雇员的信息 
+                EmployeeInfo userInfo = UserHelper.GetEmployeeInfo(userAccount);
+                //userInfo 不存在
+                if (userInfo == null)
+                {
+                    response.StatusCode = HttpStatusCode.Forbidden;
+                }
+                else
+                {
+                    response.Content = new StringContent(JsonObjectConverter.ObjectToJson(userInfo));
+                    response.StatusCode = HttpStatusCode.OK;
+                }
                 return response;
             }
             else

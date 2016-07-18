@@ -12,7 +12,9 @@ namespace WebAPIs.Models
 {
     public class PatientHelper
     {
-        public ArrayList GetAllClinic()
+
+        //done in controller
+        public static ArrayList GetAllClinic()
         {
             ArrayList clinics = new ArrayList();
             string sqlStr = String.Format(
@@ -29,7 +31,8 @@ namespace WebAPIs.Models
         }
 
         //only contain department, clinic, post, name, sex info
-        public ArrayList GetEmployeeOfClinic(string clinic_name)
+        //done in controller
+        public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
             ArrayList employees = new ArrayList();
             string sqlStr = String.Format(
@@ -47,7 +50,9 @@ namespace WebAPIs.Models
             return employees;
         }
 
-        public Duty GetEmployeeDutyTime(string id)
+
+        //done in controller
+        public static Duty GetEmployeeDutyTime(string id)
         {
             string sqlStr = String.Format(
               @"select room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
@@ -64,12 +69,12 @@ namespace WebAPIs.Models
             return null;
         }
 
-        bool RegisterTreat(Treatment treat)
+        public static bool RegisterTreat(Treatment treat)
         {
             return true;
         }
 
-        public bool Commit(Evaluation item)
+        public static bool Commit(Evaluation item)
         {
 
             OracleCommand cmd = new OracleCommand();
