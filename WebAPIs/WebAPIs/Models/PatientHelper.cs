@@ -92,18 +92,22 @@ namespace WebAPIs.Models
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
-            try { 
-            string sqlStr = String.Format(
-              @"insert into treatment
+            try
+            {
+                string sqlStr = String.Format(
+                  @"insert into treatment
                 values('{0}', '{1}', 'to_date('{2}', 'dd/mm/yyyy hh24:mi:ss')', to_date('{3}', 'dd/mm/yyyy hh24:mi:ss'), '{4}')",
-                FormatHelper.GetIDNum(_cnt++), treat.clinic, treat.start_time.ToString(), treat.end_time.ToString(), treat.doc_id);
-            cmd.CommandText = sqlStr;
-            cmd.ExecuteNonQuery();
+                    FormatHelper.GetIDNum(_cnt++), treat.clinic, treat.start_time.ToString(), treat.end_time.ToString(), treat.doc_id);
+                cmd.CommandText = sqlStr;
+                cmd.ExecuteNonQuery();
             }
             catch (Exception e)
             {
-
+                cmd.Transaction.Rollback();
+                _cnt--;
+                return null;
             }
+            return (_cnt - 1).ToString();
         }
 
 
