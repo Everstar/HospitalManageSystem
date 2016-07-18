@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,20 +12,28 @@ namespace WebAPIs.Providers
 
         static DatabaseHelper()
         {
-            conn = new OracleConnection(@"Data Source=(DESCRIPTION =
-            (ADDRESS_LIST =
-            (ADDRESS = (PROTOCOL = TCP)(HOST = 222.69.213.9)(PORT = 2333))
-            )
-            (CONNECT_DATA =
-            (SERVICE_NAME = UnivHosDB)
-            )
-            );User Id=lvjinhua;Password=123456");
-            conn.Open();
+            try
+            {
+                conn = new OracleConnection(@"Data Source=(DESCRIPTION =
+                (ADDRESS_LIST =
+                (ADDRESS = (PROTOCOL = TCP)(HOST = 221.239.197.176)(PORT = 2333))
+                )
+                (CONNECT_DATA =
+                (SERVICE_NAME = UnivHosDB)
+                )
+                );User Id=lvjinhua;Password=123456");
+                conn.Open();
+            }
+            catch (NullReferenceException e)
+            {
+                Debug.WriteLine("Connect Oracle Error!");
+            }
+
         }
 
         private static OracleConnection conn;
 
-        public OracleConnection Connection
+        public static OracleConnection Connection
         {
             get
             {

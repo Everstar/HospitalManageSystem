@@ -22,14 +22,27 @@ namespace WebAPIs
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
-        protected void Application_PostAuthorizeRequest()
+
+        void Application_PostAuthenticateRequest(Object sender, EventArgs e)
         {
-            if (IsWebApiRequest())
+            HttpApplication app = (HttpApplication)sender;
+            HttpContext context = app.Context;
+            if (context == null)
+                throw new ArgumentException("Context invalid!");
+            HttpCookie cookie = context.Request.Cookies[FormsAuthentication.FormsCookieName];
+            if (cookie == null || string.IsNullOrEmpty(cookie.Value))
+                return;
+            try
             {
-                HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
+                // 2. 解密Cookie值，获取FormsAuthenticationTicket对象
+                FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(cookie.Value);
+                string[] roles = ticket.UserData.Split(',');
+                IIdentity identity = new FormsIdentity(ticket);
+                IPrincipal principal = new GenericPrincipal(identity, roles);
+                HttpContext.Current.User = principal;
             }
+            catch { /* 有异常也不要抛出，防止攻击者试探。 */ }
         }
-        
 
         private bool IsWebApiRequest()
         {

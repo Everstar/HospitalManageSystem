@@ -2,12 +2,13 @@
 using System.Security.Principal;
 using System.Web;
 using System.Web.Security;
-
+using System.Collections;
 
 namespace WebAPIs.Models
 {
     public class AccountModel
     {
+
         // 参考这篇文章
         // http://blog.csdn.net/zjlovety/article/details/17095627
         /// <summary>  
@@ -16,9 +17,10 @@ namespace WebAPIs.Models
         /// <param name="strUserName"></param>  
         internal void CreateLoginUserTicket(string strUserName, string strPassword)
         {
+            string authRole = GetUserAuthorities(strUserName);
             //构造Form验证的票据信息  
             FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1, strUserName, DateTime.Now, DateTime.Now.AddMinutes(90),
-                true, string.Format("{0}:{1},Patient,Admin", strUserName, strPassword), FormsAuthentication.FormsCookiePath);
+                true, string.Format("{0}:{1},{2}", strUserName, strPassword, authRole), FormsAuthentication.FormsCookiePath);
 
             string ticString = FormsAuthentication.Encrypt(ticket);
 
@@ -41,15 +43,31 @@ namespace WebAPIs.Models
         /// </summary>  
         /// <param name="userName"></param>  
         /// <returns></returns>  
-        internal string GetUserAuthorities(string userName)
+        internal string GetUserAuthorities(string account)
         {
-            //从WebApi 访问用户权限数据，然后写入Session  
-            //string jsonAuth = "[{\"Controller\": \"SampleController\", \"Actions\":\"Apply,Process,Complete\"}, {\"Controller\": \"Product\", \"Actions\": \"List,Get,Detail\"}]";
-            string jsonAuth = "Admin";
-            //var userAuthList = ServiceStack.Text.JsonSerializer.DeserializeFromString(jsonAuth, typeof(UserAuthModel[]));
-            HttpContext.Current.Session["USER_AUTHORITIES"] = jsonAuth;
+            string strAuth = "";
+            Hashtable authTable = new Hashtable();
+            authTable.Add("Patient", "Patient");
+            authTable.Add("Doctor", "Doctor");
+            authTable.Add("Examiner", "Examiner");
+            authTable.Add("Nurse", "Nurse");
+            authTable.Add("Pharmacist", "Pharmacist");
+            authTable.Add("ManagementStaff", "ManagementStaff");
 
-            return jsonAuth;
+            if (account.Length == 9)
+            {
+                // 病人权限
+                strAuth = (string)authTable["Patient"];
+            }
+            else if (account.Length == 5)
+            {
+                // 医护人员权限
+                // employee表中找到对应emp_id的元组
+                // 取出post
+                string post = "Doctor";
+                strAuth = (string)authTable[post];
+            }
+            return strAuth;
         }
 
         /// <summary>  
@@ -60,6 +78,15 @@ namespace WebAPIs.Models
         /// <returns></returns>  
         internal bool ValidateUserLogin(string name, string password)
         {
+            // 如果用户是病人
+            if (name.Length == 9)
+            {
+                // TODO:从数据库取病人的信息
+            }
+            else if (name.Length == 5)
+            {
+                // TODO:从数据库获取雇员的信息
+            }
             //bool isValid = password == passwordInDatabase;  
             return true;
         }

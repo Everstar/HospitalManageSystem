@@ -15,7 +15,7 @@
 
         // 测试另一个POST能否正确路由
         function testPOST() {
-            var name = "sensen";
+            var name = "545879856";
             var password = "22222";
             var postData = { account: name, passwd: password };
             $.ajax({
@@ -26,20 +26,29 @@
                 success: function (data, status) {
                     $.getJSON('api/Patient/GetEmployee/hihiih')
                 .done(function (data) {
+                    name = "12345";
+                    postData = { account: name, passwd: password };
+                    $.ajax({
+                        type: "post",
+                        url: uri,
+                        contentType: "application/json",
+                        data: JSON.stringify(postData),
+                        success: function (data, status) {
+                            $.getJSON('api/Doctor/GetAllTreatment')
+                                .done(function (data) {
+                                    //
+                                    $.getJSON('api/Account/GetUserInfo')
+                                        .done(function (data) {
+
+                                        });
+                        });
+                        }
+                    });
                 });
                 }
             });
-            //$.ajax({
-            //    type: "post",
-            //    url: uri,
-            //    contentType: application/json
-            //    });
-            //$.ajax(
-            //    {
-            //        type: "post",
-            //        url: 
-            //    }
-            //    );
+            
+
 
             //$.post(uri, postData, function (data, textStatus, jqXHR) {
             //    if (jqXHR.getResponseHeader('FORCE_REDIRECT') !== null) {
@@ -52,7 +61,7 @@
             //    });
             //})
 
-            
+
 
             //$.ajax({
             //    url: 'api/Account/SignIn',
