@@ -16,25 +16,42 @@ using WebAPIs.Providers;
 namespace WebAPIs.Controllers
 {
     // 权限设置
-    [Authorize(Roles = "Patient")]
+    //[Authorize(Roles = "Patient")]
     [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PatientController : BaseController
     {
+
+        //获取所有科室名称
         public HttpResponseMessage GetAllClinic()
         {
             // 只需要获取名字就可以了
             // Clinic表获取所有名称
+
+            ArrayList list = PatientHelper.GetAllClinic();
+
             HttpResponseMessage response = new HttpResponseMessage();
-            ArrayList list = new ArrayList();
+            /*ArrayList list = new ArrayList();
             list.Add(new Clinic());
             list.Add(new Clinic());
             list.Add(new Clinic());
             list.Add(new Clinic());
             list.Add(new Clinic());
-            list.Add(new Clinic());
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+            list.Add(new Clinic());*/
+            if (list.Count == 0)
+            {
+                response.Content = new StringContent("");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            
             return response;
         }
+
+        //获取某科室的医生
         [Route("api/Patient/GetEmployee/{clinicName}")]
         public HttpResponseMessage GetEmployee(string clinicName)
         {
@@ -42,13 +59,27 @@ namespace WebAPIs.Controllers
             // 返回所有当前科室下所有医生的所有信息
             // employee表找到clinic符合的医生
             // 返回医生的所有信息
-            ArrayList list = new ArrayList();
+            ArrayList list = PatientHelper.GetEmployeeOfClinic(clinicName);
+
+            if (list.Count == 0)
+            {
+                response.Content = new StringContent("科室名错误，未找到相关科室医生");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            /*ArrayList list = new ArrayList();
             list.Add(new Employee());
-            list.Add(new Employee());
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+            list.Add(new Employee());*/
+            
 
             return response;
         }
+
+        //获取某医生值班信息
         [Route("api/Patient/GetEmployeeDutyTime/{employeeId}")]
         public HttpResponseMessage GetEmployeeDutyTime(string employeeId)
         {
@@ -58,8 +89,24 @@ namespace WebAPIs.Controllers
             // duty表找到所有数据
 
             //response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Duty()));
+
+            Duty employeeDuty = PatientHelper.GetEmployeeDutyTime(employeeId);
+            //duty不存在
+            if (employeeDuty == null)
+            {
+                response.Content = new StringContent("医生Id错误，或医生没有值班信息");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(employeeDuty));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+
             return response;
         }
+
+        //挂号
         [HttpPost]
         [Route("api/Patient/Register/{employeeId}")]
         public HttpResponseMessage Register([FromBody]string time)
@@ -80,16 +127,44 @@ namespace WebAPIs.Controllers
             {
                 // Url合法
                 // 创建挂号记录
+                Treatment treatment = new Treatment();
                 // 根据employeeId找到医生的科室
+
                 // 设置挂号金额
+
                 // 填充支付时间
+
                 // treatment 表插入一条记录
+                if (!PatientHelper.RegisterTreat(treatment))
+                {
+                    response.Content = new StringContent("挂号失败");
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    return response;
+                }
+                else
+                {
+                    //response.Content = new StringContent("挂号成功");
+                    response.StatusCode = HttpStatusCode.OK;
+                }
                 // 得到这条记录的主码
+
                 // takes表插入患者id treatment id 医生id设为空, 等接诊成功时再填充doc_id
+
+
+
+                
+                
+
+
+
+                
             }
             response.Content = new StringContent(employeeId + " " + time);
+            
             return response;
         }
+
+        //获取患者自己的医疗记录
         [HttpPost]
         [Route("api/Patient/GetTreatmentID")]
         public HttpResponseMessage GetTreatmentID(dynamic obj)
@@ -110,8 +185,10 @@ namespace WebAPIs.Controllers
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
+
         [HttpPost]
         [Route("api/Patient/Comment")]
+        //评价医生
         public HttpResponseMessage Comment(dynamic obj)
         {
             string employee_id = obj.employee_id.Value;
@@ -126,8 +203,10 @@ namespace WebAPIs.Controllers
             response.Content = new StringContent("评价成功~");
             return response;
         }
+
         [HttpPost]
         [Route("api/Patient/GetAllConsumption")]
+        //获取某次医疗的所有消费记录
         public HttpResponseMessage GetAllConsumption(dynamic obj)
         {
             string treatment_id = obj.treatment_id.Value;

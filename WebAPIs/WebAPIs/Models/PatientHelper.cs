@@ -12,7 +12,9 @@ namespace WebAPIs.Models
 {
     public class PatientHelper
     {
+
         private static Int64 _cnt = 10000000000;
+
         public static ArrayList GetAllClinic()
         {
             ArrayList clinics = new ArrayList();
@@ -37,6 +39,7 @@ namespace WebAPIs.Models
         }
 
         //only contain department, clinic, post, name, sex info
+
         public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
             ArrayList employees = new ArrayList();
@@ -61,6 +64,7 @@ namespace WebAPIs.Models
             }
             return employees;
         }
+
 
         public static Duty GetEmployeeDutyTime(string id)
         {
@@ -87,7 +91,9 @@ namespace WebAPIs.Models
             return null;
         }
 
+
         public static string RegisterTreat(Treatment treat)
+
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
