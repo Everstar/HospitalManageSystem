@@ -49,7 +49,7 @@ namespace WebAPIs.Controllers
                 accountModel.CreateLoginUserTicket(userAccount, userPasswd);
                 
                 //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent("登陆成功！");
+                response.Content = new StringContent("登陆成功！" + " " + AccountModel.GetUserAuthorities(userAccount));
                 return response;
             }
             else
@@ -65,7 +65,7 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetUserInfo()
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
-            userAccount = "123456789";
+            userAccount = "14001";
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人

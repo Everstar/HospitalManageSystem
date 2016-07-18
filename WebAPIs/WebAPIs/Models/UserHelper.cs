@@ -42,12 +42,12 @@ namespace WebAPIs.Models
                 //sqlStr = String.Format("insert into identity values ('{0}', '{1}', '{2}', to_date('{3}', 'dd/mm/yyyy')",
                 //    item.credit_num, item.name, item.sex, item.birth.ToShortDateString());
 
-                sqlStr = "insert into identity values (@credit_num, @name, @sex, to_data(@birth, 'yyyy-mm-dd')";
+                sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth)";
                 cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("@credit_num", OracleDbType.Varchar2, 18).Value = item.id;
-                cmd.Parameters.Add("@name", OracleDbType.Varchar2, 40).Value = item.name;
-                cmd.Parameters.Add("@sex", OracleDbType.Char, 1).Value = item.sex[0];
-                cmd.Parameters.Add("@birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
+                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.id;
+                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
+                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex[0];
+                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
                 cmd.ExecuteNonQuery();
 
                 sqlStr = String.Format("insert into patient values ('{0}', '{1}', '{2}')",
@@ -141,7 +141,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                @"select *
                 from employee natural join identity
-                where patient_id='{0}'",
+                where employee_id='{0}'",
                id);
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd";

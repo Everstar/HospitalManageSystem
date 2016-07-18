@@ -13,6 +13,7 @@ namespace WebAPIs.Providers
             int year = DateTime.Now.Year;
             int month = DateTime.Now.Month;
             int day  =DateTime.Now.Day;
+            year %= 100;
             if (year%100 < 10)
                 ymd += '0';
             ymd += year.ToString();
