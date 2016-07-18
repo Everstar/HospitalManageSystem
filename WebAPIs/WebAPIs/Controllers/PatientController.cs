@@ -31,13 +31,7 @@ namespace WebAPIs.Controllers
             ArrayList list = PatientHelper.GetAllClinic();
 
             HttpResponseMessage response = new HttpResponseMessage();
-            /*ArrayList list = new ArrayList();
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());*/
+
             if (list.Count == 0)
             {
                 response.Content = new StringContent("");
