@@ -12,7 +12,7 @@ namespace WebAPIs.Models
 {
     public class PatientHelper
     {
-        public ArrayList GetAllClinic()
+        public static ArrayList GetAllClinic()
         {
             ArrayList clinics = new ArrayList();
             string sqlStr = String.Format(
@@ -21,33 +21,47 @@ namespace WebAPIs.Models
                ");
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                clinics.Add(reader[0].ToString());
+                while (reader.Read())
+                {
+                    clinics.Add(reader[0].ToString());
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return clinics;
         }
 
         //only contain department, clinic, post, name, sex info
-        public ArrayList GetEmployeeOfClinic(string clinic_name)
+        public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
             ArrayList employees = new ArrayList();
             string sqlStr = String.Format(
                @"select dept_name, clinic_name, post, name, sex
                 from employee natural join identity natural join clinic;
-                where clinic_name='{0}'", 
+                where clinic_name='{0}'",
                 clinic_name);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            try
             {
-                employees.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                    reader[3].ToString(), reader[4].ToString()));
+                while (reader.Read())
+                {
+                    employees.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
+                        reader[3].ToString(), reader[4].ToString()));
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return employees;
         }
 
-        public Duty GetEmployeeDutyTime(string id)
+        public static Duty GetEmployeeDutyTime(string id)
         {
             string sqlStr = String.Format(
               @"select room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
@@ -55,21 +69,29 @@ namespace WebAPIs.Models
                ");
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return new Duty(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                    reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), reader[6].ToString(),
-                    reader[7].ToString());
+                if (reader.Read())
+                {
+                    return new Duty(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
+                        reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), reader[6].ToString(),
+                        reader[7].ToString());
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return null;
         }
 
-        bool RegisterTreat(Treatment treat)
+        public static bool  RegisterTreat(Treatment treat)
         {
+
             return true;
         }
 
-        public bool Commit(Evaluation item)
+        public static bool Commit(Evaluation item)
         {
 
             OracleCommand cmd = new OracleCommand();

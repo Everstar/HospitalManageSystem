@@ -12,10 +12,10 @@ namespace WebAPIs.Models
 {
     public class UserHelper
     {
-        private int _cnt = 0;
+        private static int _cnt = 0;
 
         //SignUp as Patient
-        public bool SignUp(SignUpUser item)
+        public static bool SignUp(SignUpUser item)
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
@@ -42,34 +42,48 @@ namespace WebAPIs.Models
             return true;
         }
 
-        public string GetPwOfPatient(string id)
+        public static string GetPwOfPatient(string id)
         {
             string sqlStr = String.Format("select password from patient where id='{0}'",
                 id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return reader[2].ToString();
+                if (reader.Read())
+                {
+                    return reader[2].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return null;
         }
 
-        public string GetPwOfEmployee(string id)
+        public static string GetPwOfEmployee(string id)
         {
             string sqlStr = String.Format("select password from employee where id='{0}'",
                 id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return reader[2].ToString();
+                if (reader.Read())
+                {
+                    return reader[2].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return null;
         }
 
         //entire patient info
-        public PatientInfo GetPatientInfo(string id)
+        public static PatientInfo GetPatientInfo(string id)
         {
             string sqlStr = String.Format(
                 @"select *
@@ -80,16 +94,23 @@ namespace WebAPIs.Models
             frm.ShortDatePattern = "yyyy-mm-dd";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return new PatientInfo(reader[0].ToString(),reader[1].ToString(), reader[2].ToString(),
-                    reader[3].ToString(),reader[4].ToString(), Convert.ToDateTime(reader[5].ToString(), frm));
+                if (reader.Read())
+                {
+                    return new PatientInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
+                        reader[3].ToString(), reader[4].ToString(), Convert.ToDateTime(reader[5].ToString(), frm));
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return null;
         }
 
         //entire employee info
-        public EmployeeInfo GetEmployeeInfo(string id)
+        public static EmployeeInfo GetEmployeeInfo(string id)
         {
             string sqlStr = String.Format(
                @"select *
@@ -100,11 +121,18 @@ namespace WebAPIs.Models
             frm.ShortDatePattern = "yyyy-mm-dd";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             OracleDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                return new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                    reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), Convert.ToDouble(reader[6].ToString()),
-                    reader[7].ToString(), reader[8].ToString(),  Convert.ToDateTime(reader[9].ToString(), frm));
+                if (reader.Read())
+                {
+                    return new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
+                        reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), Convert.ToDouble(reader[6].ToString()),
+                        reader[7].ToString(), reader[8].ToString(), Convert.ToDateTime(reader[9].ToString(), frm));
+                }
+            }
+            catch (Exception e)
+            {
+
             }
             return null;
         }
