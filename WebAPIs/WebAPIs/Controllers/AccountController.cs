@@ -37,6 +37,7 @@ namespace WebAPIs.Controllers
             }
             catch(Exception e)
             {
+
             }
             if (accountModel.ValidateUserLogin(userAccount, userPasswd))
             {

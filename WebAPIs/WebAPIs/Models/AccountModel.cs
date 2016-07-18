@@ -78,17 +78,20 @@ namespace WebAPIs.Models
         /// <returns></returns>  
         internal bool ValidateUserLogin(string name, string password)
         {
+            string passwordInDatabase = "";
             // 如果用户是病人
             if (name.Length == 9)
             {
                 // TODO:从数据库取病人的信息
+                passwordInDatabase = UserHelper.GetPwOfPatient(name);
             }
             else if (name.Length == 5)
             {
                 // TODO:从数据库获取雇员的信息
+                passwordInDatabase = UserHelper.GetPwOfEmployee(name);
             }
-            //bool isValid = password == passwordInDatabase;  
-            return true;
+            bool isValid = password == passwordInDatabase;  
+            return isValid;
         }
 
         /// <summary>  
