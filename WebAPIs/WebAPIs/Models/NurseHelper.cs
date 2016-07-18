@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,7 +12,7 @@ namespace WebAPIs.Models
 {
     public class NurseHelper//获得该护士照顾的所有病人
     {
-        static ArrayList  GetHospitalizationInfo(string nurse_id)
+        static public ArrayList  GetHospitalizationInfo(string nurse_id)
         {
             ArrayList hospitalization = new ArrayList();
             string sqlStr = String.Format(
