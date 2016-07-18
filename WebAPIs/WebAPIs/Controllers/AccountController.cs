@@ -117,6 +117,11 @@ namespace WebAPIs.Controllers
                 signUpUser.name = user.name.Value;
                 signUpUser.sex = user.sex.Value;
                 signUpUser.credit_num = user.id.Value;
+
+                signUpUser.name = "顺子";
+                signUpUser.sex = 'M';
+                signUpUser.credit_num = "444444444444444444";
+                signUpUser.birth = new DateTime(1980, 01, 10);
             }
             catch (Exception e)
             {
