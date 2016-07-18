@@ -13,7 +13,7 @@ using System.Web.Http.Cors;
 
 namespace WebAPIs.Controllers
 {
-    [Authorize(Roles = "Doctor")]
+    //[Authorize(Roles = "Doctor")]
     [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class DoctorController : BaseController
     {
@@ -22,7 +22,6 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        //[Route("api/Doctor/GetAllTreatment")]
         public HttpResponseMessage GetAllTreatment()
         {
             string doc_id = HttpContext.Current.User.Identity.Name;

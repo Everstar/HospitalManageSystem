@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using WebAPIs.Models.UnifiedTable;
 using System.Globalization;
 

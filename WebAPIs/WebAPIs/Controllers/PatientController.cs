@@ -17,7 +17,7 @@ using WebAPIs.Providers;
 namespace WebAPIs.Controllers
 {
     // 权限设置
-    [Authorize(Roles = "Patient")]
+    //[Authorize(Roles = "Patient")]
     [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PatientController : BaseController
     {
