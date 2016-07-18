@@ -139,5 +139,32 @@ namespace WebAPIs.Models
             }
             return true;
         }
+
+        //根据treatment_id，返回doctorID&name
+        public static ArrayList GetDoctorIdName(string treatment_id)
+        {
+            string sqlStr = String.Format(
+                @"select doc_id, name
+                 from treatment natural join (employee natural join identity)
+                 where treat_id ={0}", treatment_id);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            ArrayList doctorIdName = new ArrayList();
+            try
+            {
+                if (reader.Read())
+                {
+                    doctorIdName.Add(reader[0].ToString());
+                    doctorIdName.Add(reader[1].ToString());
+                    return doctorIdName;
+                }
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
     }
 }
