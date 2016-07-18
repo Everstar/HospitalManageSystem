@@ -69,7 +69,7 @@ namespace WebAPIs.Models
         }
 
         //entire patient info
-        public PatientInfo GetPatientInfo(string id)
+        public static PatientInfo GetPatientInfo(string id)
         {
             string sqlStr = String.Format(
                 @"select *
