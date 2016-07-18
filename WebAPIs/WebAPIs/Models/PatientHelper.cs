@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
-using Oracle.ManagedDataAccess.Client;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;
 using WebAPIs.Providers;
+using Oracle.DataAccess.Client;
 
 namespace WebAPIs.Models
 {

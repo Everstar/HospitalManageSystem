@@ -31,13 +31,7 @@ namespace WebAPIs.Controllers
             ArrayList list = PatientHelper.GetAllClinic();
 
             HttpResponseMessage response = new HttpResponseMessage();
-            /*ArrayList list = new ArrayList();
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());
-            list.Add(new Clinic());*/
+            
             if (list.Count == 0)
             {
                 response.Content = new StringContent("");
@@ -71,11 +65,7 @@ namespace WebAPIs.Controllers
             {
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
                 response.StatusCode = HttpStatusCode.OK;
-            }
-            /*ArrayList list = new ArrayList();
-            list.Add(new Employee());
-            list.Add(new Employee());*/
-            
+            }            
 
             return response;
         }
@@ -88,8 +78,6 @@ namespace WebAPIs.Controllers
             // 返回医生值班的时间
             // employee表找到duty_id
             // duty表找到所有数据
-
-            //response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Duty()));
 
             Duty employeeDuty = PatientHelper.GetEmployeeDutyTime(employeeId);
             //duty不存在
@@ -170,15 +158,7 @@ namespace WebAPIs.Controllers
                 // 得到这条记录的主码
 
                 // takes表插入患者id treatment id 医生id设为空, 等接诊成功时再填充doc_id
-
-
-
-                
-                
-
-
-
-                
+       
             }
             //response.Content = new StringContent(employeeId + " " + time);
             
