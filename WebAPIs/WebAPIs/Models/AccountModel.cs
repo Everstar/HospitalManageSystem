@@ -3,6 +3,7 @@ using System.Security.Principal;
 using System.Web;
 using System.Web.Security;
 using System.Collections;
+using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Models
 {
@@ -38,7 +39,7 @@ namespace WebAPIs.Models
             //HttpContext.Current.User = principal;
         }
 
-        /// <summary>  
+        /// <summary>
         /// 获取用户权限列表数据  
         /// </summary>  
         /// <param name="userName"></param>  
@@ -64,8 +65,9 @@ namespace WebAPIs.Models
                 // 医护人员权限
                 // employee表中找到对应emp_id的元组
                 // 取出post
-                string post = "Doctor";
-                strAuth = (string)authTable[post];
+                string post = "";
+                EmployeeInfo userInfo = UserHelper.GetEmployeeInfo(account);
+                strAuth = (string)authTable[userInfo.post];
             }
             return strAuth;
         }
@@ -73,22 +75,29 @@ namespace WebAPIs.Models
         /// <summary>  
         /// 读取数据库用户表数据，判断用户密码是否匹配  
         /// </summary>  
-        /// <param name="name"></param>  
-        /// <param name="password"></param>  
+        /// <param name="name">用户名</param>  
+        /// <param name="password">密码</param>  
         /// <returns></returns>  
         internal bool ValidateUserLogin(string name, string password)
         {
+            string passwordInDatabase = "";
             // 如果用户是病人
             if (name.Length == 9)
             {
                 // TODO:从数据库取病人的信息
+                passwordInDatabase = UserHelper.GetPwOfPatient(name);
+
             }
             else if (name.Length == 5)
             {
                 // TODO:从数据库获取雇员的信息
+                passwordInDatabase = UserHelper.GetPwOfEmployee(name);
             }
-            //bool isValid = password == passwordInDatabase;  
-            return true;
+            else
+            {
+                return false;
+            } 
+            return password.Equals(passwordInDatabase);
         }
 
         /// <summary>  
