@@ -14,7 +14,7 @@ namespace WebAPIs.Models
         /// <summary>  
         /// 创建登录用户的票据信息  
         /// </summary>  
-        /// <param name="strUserName"></param>  
+        /// <param name="strUserName"></param>
         internal void CreateLoginUserTicket(string strUserName, string strPassword)
         {
             string authRole = GetUserAuthorities(strUserName);

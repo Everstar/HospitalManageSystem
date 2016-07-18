@@ -9,10 +9,12 @@ using System.Web.Http;
 using WebAPIs.Providers;
 using WebAPIs.Models;
 using WebAPIs.Models.DataModels;
+using System.Web.Http.Cors;
 
 namespace WebAPIs.Controllers
 {
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor")]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class DoctorController : BaseController
     {
         /// <summary>

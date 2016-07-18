@@ -5,12 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Nurse")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class NurseController : BaseController
     {
         public string accessRoles = "Nurse";

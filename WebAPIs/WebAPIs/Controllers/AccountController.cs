@@ -11,9 +11,11 @@ using System.Web.Security;
 using WebAPIs.Models;
 using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
+using System.Web.Http.Cors;
 
 namespace WebAPIs.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class AccountController : BaseController
     {
         /// <summary>

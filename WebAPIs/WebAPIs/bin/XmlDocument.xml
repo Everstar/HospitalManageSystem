@@ -485,7 +485,7 @@
             <summary>
             登陆
             </summary>
-            <param name="user"></param>
+            <param name="user">用户账号、密码构成的Json</param>
             <returns></returns>
         </member>
         <member name="M:WebAPIs.Controllers.DoctorController.GetAllTreatment">
@@ -615,7 +615,7 @@
             <summary>  
             创建登录用户的票据信息  
             </summary>  
-            <param name="strUserName"></param>  
+            <param name="strUserName"></param>
         </member>
         <member name="M:WebAPIs.Models.AccountModel.GetUserAuthorities(System.String)">
             <summary>  
