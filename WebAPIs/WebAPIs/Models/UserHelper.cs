@@ -40,7 +40,7 @@ namespace WebAPIs.Models
             {
                 //sqlStr = String.Format("insert into identity values ('{0}', '{1}', '{2}', to_date('{3}', 'dd/mm/yyyy')",
                 //    item.credit_num, item.name, item.sex, item.birth.ToShortDateString());
-                sqlStr = "insert into identity values (@credit_num, @name, @sex, @birth";
+                sqlStr = "insert into identity values (@credit_num, @name, @sex, to_data(@birth, 'yyyy-mm-dd')";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("@credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
                 cmd.Parameters.Add("@name", OracleDbType.Varchar2, 40).Value = item.name;
@@ -68,9 +68,10 @@ namespace WebAPIs.Models
             string sqlStr = String.Format("select password from patient where id='{0}'",
                 id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
-            OracleDataReader reader = cmd.ExecuteReader();
+
             try
             {
+                OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
                     return reader[2].ToString();
@@ -78,7 +79,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null;
             }
             return null;
         }
@@ -88,9 +89,10 @@ namespace WebAPIs.Models
             string sqlStr = String.Format("select password from employee where id='{0}'",
                 id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
-            OracleDataReader reader = cmd.ExecuteReader();
+
             try
             {
+                OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
                     return reader[2].ToString();
@@ -98,7 +100,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null;
             }
             return null;
         }
@@ -114,9 +116,10 @@ namespace WebAPIs.Models
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
-            OracleDataReader reader = cmd.ExecuteReader();
+
             try
             {
+                OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
                     return new PatientInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
@@ -125,7 +128,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null;
             }
             return null;
         }
@@ -141,9 +144,9 @@ namespace WebAPIs.Models
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
-            OracleDataReader reader = cmd.ExecuteReader();
             try
             {
+                OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
                     return new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
@@ -153,7 +156,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null;
             }
             return null;
         }

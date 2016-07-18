@@ -31,10 +31,10 @@ namespace WebAPIs.Controllers
             ArrayList list = PatientHelper.GetAllClinic();
 
             HttpResponseMessage response = new HttpResponseMessage();
-            
+
             if (list.Count == 0)
             {
-                response.Content = new StringContent("");
+                response.Content = new StringContent("获取信息失败");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
             else
@@ -200,8 +200,25 @@ namespace WebAPIs.Controllers
 
             // 向evaluation插入相关评价
             // 返回评价后的界面
+            
+            //这里缺少一个反序列化的过程
+
+            Evaluation evaluation = new Evaluation();
+
             HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent("评价成功~");
+
+            if (!PatientHelper.Comment(evaluation))
+            {
+                response.Content = new StringContent("由于某些原因，评价失败~");
+                response.StatusCode = HttpStatusCode.Forbidden;
+            }
+            else
+            {
+                response.Content = new StringContent("评价成功~");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            
+            
             return response;
         }
 

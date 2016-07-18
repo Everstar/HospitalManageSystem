@@ -45,7 +45,7 @@ namespace WebAPIs.Models
             ArrayList employees = new ArrayList();
             string sqlStr = String.Format(
                @"select dept_name, clinic_name, post, name, sex
-                from employee natural join identity natural join clinic;
+                from employee natural join identity natural join clinic
                 where clinic_name='{0}'",
                 clinic_name);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
@@ -71,9 +71,10 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
               @"select room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
                 from employee natural join duty
-                where duty_id='{0}'",
+                where employee_id='{0}'",
                 id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleConnection conn = DatabaseHelper.Connection;
+            OracleCommand cmd = new OracleCommand(sqlStr, conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -93,7 +94,6 @@ namespace WebAPIs.Models
 
 
         public static string RegisterTreat(Treatment treat)
-
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
@@ -117,9 +117,8 @@ namespace WebAPIs.Models
         }
 
 
-        public static bool Commit(Evaluation item)
+        public static bool Comment(Evaluation item)
         {
-
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
