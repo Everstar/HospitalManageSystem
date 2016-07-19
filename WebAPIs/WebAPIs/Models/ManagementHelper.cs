@@ -18,7 +18,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                @"select dept_name,clinic_name,post,name,sex
                 from employee;");
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -52,7 +52,7 @@ namespace WebAPIs.Models
                   select employee_id,dept_name,clinic_name,post,name,sex
                   from ComplaintedDoctor natural join employee
                   where em_percent>='{0}'",percent);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
