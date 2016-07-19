@@ -9,7 +9,6 @@ namespace WebAPIs.Models.DataModels
     {
         public string duty_id { get; set; }
         public string room_num { get; set; }
-        public int max_limit { get; set; }
         public string Monday { get; set; }
         public string Tuesday { get; set; }
         public string Wednesday { get; set; }
@@ -20,6 +19,18 @@ namespace WebAPIs.Models.DataModels
 
         public Duty(string room_num, string mon, string tue, string wed, string thu, string fri, string sat, string sun)
         {
+            this.room_num = room_num;
+            this.Monday = mon;
+            this.Tuesday = tue;
+            this.Wednesday = wed;
+            this.Thursday = thu;
+            this.Friday = fri;
+            this.Saturday = sat;
+            this.Sunday = sun;
+        }
+        public Duty(string duty_id,string room_num, string mon, string tue, string wed, string thu, string fri, string sat, string sun)
+        {
+            this.duty_id = duty_id;
             this.room_num = room_num;
             this.Monday = mon;
             this.Tuesday = tue;

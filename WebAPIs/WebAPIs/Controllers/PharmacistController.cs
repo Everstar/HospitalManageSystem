@@ -8,10 +8,13 @@ using System.Text.RegularExpressions;
 using System.Web.Http;
 using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
+using System.Web.Http.Cors;
+using WebAPIs.Models;
 
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Pharmacist")]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PharmacistController : BaseController
     {
         /// <summary>
@@ -30,12 +33,21 @@ namespace WebAPIs.Controllers
             // 处方ID对应的所有药品的名称 量
             // 开方时间等
             // prescription prescribe表联合
-            ArrayList list = new ArrayList();
-            list.Add(new Prescribe());
-            list.Add(new Prescribe());
-            list.Add(new Prescribe());
+            ArrayList list = PrescriptionHelper.GetAllPrescription(employeeId);
+
             HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+
+            if (list == null)
+            {
+                response.Content = new StringContent("查找失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            
             return response;
         }
         /// <summary>
@@ -52,6 +64,19 @@ namespace WebAPIs.Controllers
             // prescription表加一条配处方的时间
 
             HttpResponseMessage response = new HttpResponseMessage();
+
+            ArrayList list = PrescriptionHelper.Prescribe(pres_id);
+
+            if (list == null)
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
             return response;
         }
     }

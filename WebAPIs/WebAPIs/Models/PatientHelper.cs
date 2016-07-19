@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
-using Oracle.ManagedDataAccess.Client;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;
 using WebAPIs.Providers;
+using Oracle.ManagedDataAccess.Client;
 
 namespace WebAPIs.Models
 {
     public class PatientHelper
     {
-
-        private static Int64 _cnt = 10000000000;
 
         public static ArrayList GetAllClinic()
         {
@@ -22,7 +20,7 @@ namespace WebAPIs.Models
                @"select clinic_name
                 from clinic
                ");
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -45,17 +43,21 @@ namespace WebAPIs.Models
             ArrayList employees = new ArrayList();
             string sqlStr = String.Format(
                @"select dept_name, clinic_name, post, name, sex
-                from employee natural join identity natural join clinic;
+                from employee natural join identity natural join clinic
                 where clinic_name='{0}'",
                 clinic_name);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
                 while (reader.Read())
                 {
-                    employees.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                        reader[3].ToString(), reader[4].ToString()));
+                    employees.Add(new EmployeeInfo(
+                        reader[0].ToString(), 
+                        reader[1].ToString(), 
+                        reader[2].ToString(),
+                        reader[3].ToString(), 
+                        reader[4].ToString()));
                 }
             }
             catch (Exception e)
@@ -71,16 +73,22 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
               @"select room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
                 from employee natural join duty
-                where duty_id='{0}'",
+                where employee_id='{0}'",
                 id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
                 if (reader.Read())
                 {
-                    return new Duty(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                        reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), reader[6].ToString(),
+                    return new Duty(
+                        reader[0].ToString(), 
+                        reader[1].ToString(), 
+                        reader[2].ToString(),
+                        reader[3].ToString(), 
+                        reader[4].ToString(), 
+                        reader[5].ToString(),
+                        reader[6].ToString(),
                         reader[7].ToString());
                 }
             }
@@ -92,37 +100,35 @@ namespace WebAPIs.Models
         }
 
 
-        public static string RegisterTreat(Treatment treat)
-
+        public static int RegisterTreat(Treatment treat)
         {
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
-                string sqlStr = String.Format(
-                  @"insert into treatment
-                values('{0}', '{1}', 'to_date('{2}', 'dd/mm/yyyy hh24:mi:ss')', to_date('{3}', 'dd/mm/yyyy hh24:mi:ss'), '{4}')",
-                    FormatHelper.GetIDNum(_cnt++), treat.clinic, treat.start_time.ToString(), treat.end_time.ToString(), treat.doc_id);
+                string sqlStr = "insert into treatment values(:clinic_name, :start_time, :end_time, :employee_id)";
                 cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("clinic_name", OracleDbType.Varchar2, 20).Value = treat.clinic;
+                cmd.Parameters.Add("start_time", OracleDbType.Date).Value = treat.start_time.ToString();
+                cmd.Parameters.Add("end_time", OracleDbType.Date).Value = treat.end_time.ToString();
                 cmd.ExecuteNonQuery();
             }
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                _cnt--;
-                return null;
+                return -1;
             }
-            return (_cnt - 1).ToString();
+
+            //select the max id;
+            return 0;
         }
 
-
-        public static bool Commit(Evaluation item)
+        public static bool Comment(Evaluation item)
         {
-
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
                 string sqlStr = String.Format(
@@ -144,10 +150,10 @@ namespace WebAPIs.Models
         public static ArrayList GetDoctorIdName(string treatment_id)
         {
             string sqlStr = String.Format(
-                @"select doc_id, name
+                @"select employee_id, name
                  from treatment natural join (employee natural join identity)
                  where treat_id ={0}", treatment_id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
 
             ArrayList doctorIdName = new ArrayList();

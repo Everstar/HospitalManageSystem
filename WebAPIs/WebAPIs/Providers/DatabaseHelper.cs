@@ -3,42 +3,33 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 using Oracle.ManagedDataAccess.Client;
 
 namespace WebAPIs.Providers
 {
     public class DatabaseHelper
     {
+        private static DatabaseHelper instance = null;
 
-        static DatabaseHelper()
+        public OracleConnection conn = null;
+
+        private DatabaseHelper()
         {
-            try
+            if (conn == null)
             {
-                conn = new OracleConnection(@"Data Source=(DESCRIPTION =
-                (ADDRESS_LIST =
-                (ADDRESS = (PROTOCOL = TCP)(HOST = 221.239.197.176)(PORT = 2333))
-                )
-                (CONNECT_DATA =
-                (SERVICE_NAME = UnivHosDB)
-                )
-                );User Id=lvjinhua;Password=123456");
+                conn = new OracleConnection(WebConfigurationManager.AppSettings["connectStr"]);
                 conn.Open();
             }
-            catch (NullReferenceException e)
-            {
-                Debug.WriteLine("Connect Oracle Error!");
-            }
-
         }
 
-        private static OracleConnection conn;
-
-        public static OracleConnection Connection
+        public static DatabaseHelper GetInstance()
         {
-            get
+            if (null == instance)
             {
-                return conn;
+                instance = new DatabaseHelper();
             }
+            return instance;
         }
     }
 }

@@ -13,6 +13,8 @@ using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
 using WebAPIs.Models.UnifiedTable;
+using Newtonsoft.Json;
+
 
 namespace WebAPIs.Controllers
 {
@@ -24,6 +26,7 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="user">用户账号、密码构成的Json</param>
         /// <returns></returns>
+        /// Test Passed
         [HttpPost]
         public HttpResponseMessage SignIn(dynamic user)
         {
@@ -46,8 +49,16 @@ namespace WebAPIs.Controllers
                 //创建用户ticket信息
                 accountModel.CreateLoginUserTicket(userAccount, userPasswd);
                 
-                //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent("登陆成功！");
+                string fail = AccountModel.GetUserAuthorities(userAccount);
+                // 用户类别获取
+                if (fail.Equals("fail"))
+                {
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                }
+                else
+                {
+                    response.Content = new StringContent(fail);
+                }
                 return response;
             }
             else
@@ -57,14 +68,18 @@ namespace WebAPIs.Controllers
                 return response;
             }
         }
-        [Authorize]
+        /// <summary>
+        /// 获取用户的信息
+        /// </summary>
+        /// <returns></returns>
+        /// Test Passed
+        //[Authorize]
         [HttpGet]
         [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
             if (userAccount.Length == 9)
             {
@@ -110,26 +125,37 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage SignUp(dynamic user)
         {
             HttpResponseMessage response = new HttpResponseMessage();
+
             SignUpUser signUpUser = new SignUpUser();
             try
             {
-                signUpUser.birth = user.birth.Value;
-                signUpUser.name = user.name.Value;
-                signUpUser.sex = user.sex.Value;
-                signUpUser.credit_num = user.id.Value;
+                signUpUser = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(user), signUpUser);
             }
             catch (Exception e)
             {
-                response.Content = new StringContent("post数据格式错误");
+                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(user));
                 return response;
             }
-
             // 判断用户的id是否存在
-
             // 数据库中插入用户信息
-            UserHelper.SignUp(signUpUser);
+            string result = UserHelper.SignUp(signUpUser);
+            if (result.StartsWith("Already"))
+            {
+                response.Content = new StringContent(result);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+            else if (result.StartsWith("Insert"))
+            {
+                response.Content = new StringContent("数据错误:"+result);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
             // 注册成功 分发cookie
             SignIn(user);
+
+            PatientInfo info = UserHelper.GetPatientInfoByCredNum(signUpUser.credit_num);
+            response.Content = new StringContent(info.patient_id);
             response.StatusCode = HttpStatusCode.OK;
             return response;
         }
@@ -142,8 +168,7 @@ namespace WebAPIs.Controllers
         {
             var accountModel = new AccountModel();
             accountModel.Logout();
-            return new HttpResponseMessage(HttpStatusCode.Redirect);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
-
     }
 }
