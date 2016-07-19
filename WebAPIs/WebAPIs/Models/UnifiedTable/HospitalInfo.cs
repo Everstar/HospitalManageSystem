@@ -9,7 +9,7 @@ namespace WebAPIs.Models.UnifiedTable
     {
         public string hos_id { get; set; }
         public string treat_id { get; set; }
-        public string nurse_id { get; set; }
+        public string employee_id { get; set; }
         public string bed_num { get; set; }
         public double pay { get; set; }
         public int rank { get; set; }
@@ -22,7 +22,7 @@ namespace WebAPIs.Models.UnifiedTable
         {
             this.hos_id = hos;
             this.treat_id = treat;
-            this.nurse_id = nurse;
+            this.employee_id = nurse;
             this.bed_num = bed;
             this.in_time = in_time;
             this.out_time = out_time;

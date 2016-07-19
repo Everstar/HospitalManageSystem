@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Web;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using System.Globalization;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;
@@ -14,12 +14,16 @@ namespace WebAPIs.Models
         public static ArrayList GetAllExamination(string doc_id)//获得该检验医生的所有检查记录
         {
             ArrayList AllExamination = new ArrayList();
-            string sqlStr = String.Format(
-               @"select patient_id, name, sex, birth, bed_num
-                from hospitalization natural join consultation natural join patient natural join identity;
-                where nurse_id='{0}'",
-                doc_id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            string sqlStr = 
+               @"select exam_id,type,exam_time,pay,pay_time
+                from examination
+                where employee_id=:doc_id";
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("doc_id", OracleDbType.Varchar2, 5).Value = doc_id;
+
             OracleDataReader reader = cmd.ExecuteReader();
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
@@ -27,8 +31,8 @@ namespace WebAPIs.Models
             {
                 while (reader.Read())
                 {
-                    AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                         reader[3].ToString(), Convert.ToDouble(reader[4]),Convert.ToDateTime(reader[5].ToString(),frm)));
+                    AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(), 
+                         Convert.ToDateTime(reader[2].ToString(),frm),  Convert.ToDouble(reader[3]),Convert.ToDateTime(reader[4].ToString(),frm)));
                 }
                 return AllExamination;
             }

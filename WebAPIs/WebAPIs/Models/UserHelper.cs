@@ -5,10 +5,9 @@ using System.Web;
 using System.Data.SqlTypes;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
-using Oracle.ManagedDataAccess.Client;
-using Oracle.ManagedDataAccess.Types;
 using WebAPIs.Models.UnifiedTable;
 using System.Globalization;
+using Oracle.ManagedDataAccess.Client;
 
 namespace WebAPIs.Models
 {
@@ -24,12 +23,12 @@ namespace WebAPIs.Models
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
 
             //check if the credit_num is used
-            string sqlStr = String.Format(
+            string sqlStr = 
                 @"select *
                   from identity
-                  where credit_num='{0}'",
-                  item.credit_num);
+                  where credit_num=:credit_num";
             cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
@@ -39,19 +38,18 @@ namespace WebAPIs.Models
             //sign up patient
             try
             {
-                //sqlStr = String.Format("insert into identity values ('{0}', '{1}', '{2}', to_date('{3}', 'dd/mm/yyyy')",
-                //    item.credit_num, item.name, item.sex, item.birth.ToShortDateString());
-                sqlStr = "insert into identity values (@credit_num, @name, @sex, to_data(@birth, 'yyyy-mm-dd')";
+                sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth";
                 cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("@credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("@name", OracleDbType.Varchar2, 40).Value = item.name;
-                cmd.Parameters.Add("@sex", OracleDbType.Char, 1).Value = item.sex[0];
-                cmd.Parameters.Add("@birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
+                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
+                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
+                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
                 cmd.ExecuteNonQuery();
 
-                sqlStr = String.Format("insert into patient values ('{0}', '{1}', '{2}')",
-                    FormatHelper.GetYMD() + FormatHelper.GetIDNum(_cnt++), item.credit_num, item.passwd);
+                sqlStr = "insert into patient values (:credit_num, :password)";
                 cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.passwd;
                 cmd.ExecuteNonQuery();
 
                 cmd.Transaction.Commit();
@@ -64,10 +62,13 @@ namespace WebAPIs.Models
             return true;
         }
 
+
+
         public static string GetPwOfPatient(string id)
         {
-            string sqlStr = String.Format("select password from patient where id='{0}'",
+            string sqlStr = String.Format("select password from patient where patient_id='{0}'",
                 id);
+
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
 
             try
@@ -75,7 +76,8 @@ namespace WebAPIs.Models
                 OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    return reader[2].ToString();
+                    var b = reader[0].ToString();
+                    return b;
                 }
             }
             catch (Exception e)
@@ -87,7 +89,7 @@ namespace WebAPIs.Models
 
         public static string GetPwOfEmployee(string id)
         {
-            string sqlStr = String.Format("select password from employee where id='{0}'",
+            string sqlStr = String.Format("select password from employee where employee_id='{0}'",
                 id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
 
@@ -110,12 +112,10 @@ namespace WebAPIs.Models
         public static PatientInfo GetPatientInfo(string id)
         {
             string sqlStr = String.Format(
-                @"select *
+                @"select patient_id, credit_num, password, name, sex, birth
                 from patient natural join identity
                 where patient_id='{0}'",
                 id);
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
 
             try
@@ -123,8 +123,13 @@ namespace WebAPIs.Models
                 OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    return new PatientInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                        reader[3].ToString(), reader[4].ToString(), Convert.ToDateTime(reader[5].ToString(), frm));
+                    return new PatientInfo(
+                        reader[0].ToString(), 
+                        reader[1].ToString(), 
+                        reader[2].ToString(),
+                        reader[3].ToString(), 
+                        reader[4].ToString(), 
+                        Convert.ToDateTime(reader[5].ToString()));
                 }
             }
             catch (Exception e)
@@ -138,26 +143,32 @@ namespace WebAPIs.Models
         public static EmployeeInfo GetEmployeeInfo(string id)
         {
             string sqlStr = String.Format(
-               @"select *
+               @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth
                 from employee natural join identity
-                where patient_id='{0}'",
+                where employee_id='{0}'",
                id);
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    return new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                        reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), Convert.ToDouble(reader[6].ToString()),
-                        reader[7].ToString(), reader[8].ToString(), Convert.ToDateTime(reader[9].ToString(), frm));
+                    return new EmployeeInfo(
+                        reader[0].ToString(),
+                        reader[1].ToString(),
+                        reader[2].ToString(),
+                        reader[3].ToString(),
+                        reader[4].ToString(),
+                        reader[5].ToString(),
+                        Convert.ToDouble(reader[6].ToString()),
+                        reader[7].ToString(),
+                        reader[8].ToString(),
+                        Convert.ToDateTime(reader[9].ToString()));
                 }
             }
             catch (Exception e)
             {
-                return null;
+
             }
             return null;
         }

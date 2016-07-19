@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
-using Oracle.DataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using System.Globalization;
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;
@@ -71,7 +71,7 @@ namespace WebAPIs.Models
         } 
         public static bool SetDuty(Duty item)//duty类的id什么时候设置
         {
-            return false；
+            return false;
         }
     }
 }

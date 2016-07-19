@@ -8,10 +8,12 @@ using System.Text.RegularExpressions;
 using System.Web.Http;
 using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
+using System.Web.Http.Cors;
 
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Pharmacist")]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PharmacistController : BaseController
     {
         /// <summary>

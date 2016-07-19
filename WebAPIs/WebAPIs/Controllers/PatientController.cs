@@ -34,7 +34,7 @@ namespace WebAPIs.Controllers
 
             if (list.Count == 0)
             {
-                response.Content = new StringContent("");
+                response.Content = new StringContent("获取信息失败");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
             else
@@ -65,11 +65,7 @@ namespace WebAPIs.Controllers
             {
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
                 response.StatusCode = HttpStatusCode.OK;
-            }
-            /*ArrayList list = new ArrayList();
-            list.Add(new Employee());
-            list.Add(new Employee());*/
-            
+            }            
 
             return response;
         }
@@ -82,8 +78,6 @@ namespace WebAPIs.Controllers
             // 返回医生值班的时间
             // employee表找到duty_id
             // duty表找到所有数据
-
-            //response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Duty()));
 
             Duty employeeDuty = PatientHelper.GetEmployeeDutyTime(employeeId);
             //duty不存在
@@ -164,15 +158,7 @@ namespace WebAPIs.Controllers
                 // 得到这条记录的主码
 
                 // takes表插入患者id treatment id 医生id设为空, 等接诊成功时再填充doc_id
-
-
-
-                
-                
-
-
-
-                
+       
             }
             //response.Content = new StringContent(employeeId + " " + time);
             
@@ -214,8 +200,25 @@ namespace WebAPIs.Controllers
 
             // 向evaluation插入相关评价
             // 返回评价后的界面
+            
+            //这里缺少一个反序列化的过程
+
+            Evaluation evaluation = new Evaluation();
+
             HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent("评价成功~");
+
+            if (!PatientHelper.Comment(evaluation))
+            {
+                response.Content = new StringContent("由于某些原因，评价失败~");
+                response.StatusCode = HttpStatusCode.Forbidden;
+            }
+            else
+            {
+                response.Content = new StringContent("评价成功~");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            
+            
             return response;
         }
 
