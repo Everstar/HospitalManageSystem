@@ -11,6 +11,7 @@ namespace WebAPIs.Models
 {
     public class ExaminerHelper
     {
+        // Test Passed
         public static ArrayList GetAllExamination(string doc_id)//获得该检验医生的所有检查记录
         {
             ArrayList AllExamination = new ArrayList();
@@ -25,14 +26,12 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("doc_id", OracleDbType.Varchar2, 5).Value = doc_id;
 
             OracleDataReader reader = cmd.ExecuteReader();
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
             try
             {
                 while (reader.Read())
                 {
                     AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(), 
-                         Convert.ToDateTime(reader[2].ToString(),frm),  Convert.ToDouble(reader[3]),Convert.ToDateTime(reader[4].ToString(),frm)));
+                         (DateTime)reader[2],  Convert.ToDouble(reader[3]),(DateTime)reader[4]));
                 }
                 return AllExamination;
             }
@@ -89,7 +88,12 @@ namespace WebAPIs.Models
             return true;
         }
 
+        public static bool MakeBloodExamination(Blood item)
+        {
+            //TODO
+            return false;
 
+        }
 
         // 0:验血 1：胃镜 2：XRay
         public static ArrayList GetPatientByExamId(string examineID,char type)

@@ -158,11 +158,10 @@ namespace WebAPIs.Models
                  from treatment natural join (employee natural join identity)
                  where treat_id ={0}", treatment_id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-
             ArrayList doctorIdName = new ArrayList();
             try
             {
-                OracleDataReader reader = cmd.ExecuteReader();
+                OracleDataReader reader = cmd.ExecuteReader();//写在里面防止reader抛exception
                 if (reader.Read())
                 {
                     doctorIdName.Add(reader[0].ToString());
@@ -172,7 +171,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+
             }
             return null;
         }

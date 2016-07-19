@@ -73,7 +73,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                strAuth = "fail";
             }
 
             return strAuth;
@@ -113,6 +113,11 @@ namespace WebAPIs.Models
         internal void Logout()
         {
             FormsAuthentication.SignOut();
+            FormsAuthentication.RedirectToLoginPage();
+            // clear authentication cookie
+            //HttpCookie cookie1 = new HttpCookie(FormsAuthentication.FormsCookieName, "");
+            //cookie1.Expires = DateTime.Now.AddYears(-1);
+            //HttpContext.Current.Response.Cookies.Add(cookie1);
         }
     }
 }

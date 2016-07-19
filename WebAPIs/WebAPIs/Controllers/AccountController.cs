@@ -26,6 +26,7 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="user">用户账号、密码构成的Json</param>
         /// <returns></returns>
+        /// Test Passed
         [HttpPost]
         public HttpResponseMessage SignIn(dynamic user)
         {
@@ -48,8 +49,16 @@ namespace WebAPIs.Controllers
                 //创建用户ticket信息
                 accountModel.CreateLoginUserTicket(userAccount, userPasswd);
                 
-                //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent(AccountModel.GetUserAuthorities(userAccount));
+                string fail = AccountModel.GetUserAuthorities(userAccount);
+                // 用户类别获取
+                if (fail.Equals("fail"))
+                {
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                }
+                else
+                {
+                    response.Content = new StringContent(fail);
+                }
                 return response;
             }
             else
@@ -59,6 +68,11 @@ namespace WebAPIs.Controllers
                 return response;
             }
         }
+        /// <summary>
+        /// 获取用户的信息
+        /// </summary>
+        /// <returns></returns>
+        /// Test Passed
         //[Authorize]
         [HttpGet]
         [Route("api/Account/GetUserInfo")]
@@ -66,7 +80,6 @@ namespace WebAPIs.Controllers
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
             if (userAccount.Length == 9)
             {
@@ -120,22 +133,29 @@ namespace WebAPIs.Controllers
             }
             catch (Exception e)
             {
-                response.Content = new StringContent("post数据格式错误\nReceives:\n"+JsonObjectConverter.ObjectToJson(user));
+                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(user));
                 return response;
             }
             // 判断用户的id是否存在
             // 数据库中插入用户信息
-            //string fuck = UserHelper.SignUp(signUpUser);
-            if (!UserHelper.SignUp(signUpUser))
+            string result = UserHelper.SignUp(signUpUser);
+            if (result.StartsWith("Already"))
             {
-                response.Content = new StringContent("该账号已注册过！ 身份证号码:" + signUpUser.credit_num);
+                response.Content = new StringContent(result);
                 response.StatusCode = HttpStatusCode.BadRequest;
                 return response;
             }
-            //// 注册成功 分发cookie
+            else if (result.StartsWith("Insert"))
+            {
+                response.Content = new StringContent("数据错误:"+result);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+            // 注册成功 分发cookie
             SignIn(user);
+
             PatientInfo info = UserHelper.GetPatientInfoByCredNum(signUpUser.credit_num);
-            response.Content = new StringContent(info.credit_num);
+            response.Content = new StringContent(info.patient_id);
             response.StatusCode = HttpStatusCode.OK;
             return response;
         }
@@ -148,8 +168,7 @@ namespace WebAPIs.Controllers
         {
             var accountModel = new AccountModel();
             accountModel.Logout();
-            return new HttpResponseMessage(HttpStatusCode.Redirect);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
-
     }
 }
