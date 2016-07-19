@@ -10,7 +10,7 @@ namespace WebAPIs.Providers
 {
     public class DatabaseHelper
     {
-        private static OracleConnection conn;
+        private static OracleConnection conn = null;
 
         public static OracleConnection Connection
         {

@@ -117,6 +117,11 @@ namespace WebAPIs.Controllers
             SignUpUser signUpUser = new SignUpUser();
             try
             {
+                signUpUser.birth = user.birth.Value;
+                signUpUser.name = user.name.Value;
+                signUpUser.sex = user.sex.Value;
+                signUpUser.credit_num = user.id.Value;
+
                 signUpUser = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(user), signUpUser);
             }
             catch (Exception e)
