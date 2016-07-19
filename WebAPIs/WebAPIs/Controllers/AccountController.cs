@@ -125,14 +125,17 @@ namespace WebAPIs.Controllers
             }
             // 判断用户的id是否存在
             // 数据库中插入用户信息
+            //string fuck = UserHelper.SignUp(signUpUser);
             if (!UserHelper.SignUp(signUpUser))
             {
-                response.Content = new StringContent("该账号已注册过！");
+                response.Content = new StringContent("该账号已注册过！ 身份证号码:" + signUpUser.credit_num);
                 response.StatusCode = HttpStatusCode.BadRequest;
                 return response;
             }
-            // 注册成功 分发cookie
+            //// 注册成功 分发cookie
             SignIn(user);
+            PatientInfo info = UserHelper.GetPatientInfoByCredNum(signUpUser.credit_num);
+            response.Content = new StringContent(info.credit_num);
             response.StatusCode = HttpStatusCode.OK;
             return response;
         }
