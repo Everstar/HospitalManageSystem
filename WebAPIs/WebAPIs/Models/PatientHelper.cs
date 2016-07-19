@@ -20,7 +20,7 @@ namespace WebAPIs.Models
                @"select clinic_name
                 from clinic
                ");
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -46,7 +46,7 @@ namespace WebAPIs.Models
                 from employee natural join identity natural join clinic
                 where clinic_name='{0}'",
                 clinic_name);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -75,7 +75,7 @@ namespace WebAPIs.Models
                 from employee natural join duty
                 where employee_id='{0}'",
                 id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -103,8 +103,8 @@ namespace WebAPIs.Models
         public static int RegisterTreat(Treatment treat)
         {
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
                 string sqlStr = "insert into treatment values(:clinic_name, :start_time, :end_time, :employee_id)";
@@ -127,8 +127,8 @@ namespace WebAPIs.Models
         public static bool Comment(Evaluation item)
         {
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
                 string sqlStr = String.Format(
@@ -153,7 +153,7 @@ namespace WebAPIs.Models
                 @"select employee_id, name
                  from treatment natural join (employee natural join identity)
                  where treat_id ={0}", treatment_id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
 
             ArrayList doctorIdName = new ArrayList();

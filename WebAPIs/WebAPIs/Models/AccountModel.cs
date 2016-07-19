@@ -73,7 +73,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                strAuth = "fail";
             }
 
             return strAuth;
