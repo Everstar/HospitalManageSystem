@@ -19,8 +19,7 @@ namespace WebAPIs.Models
             cmd.Connection = DatabaseHelper.Connection;
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
             string sqlStr = 
-                @"select hos_id,treat_id,employee_id,bed_num,pay,rank,
-                in_time,out_time,pay_time
+                @"select hos_id,treat_id,employee_id,bed_num,pay,rank,in_time,out_time,pay_time
                 from hospitalization natural join bed 
                 where employee_id=:Pnurse_id";
             cmd.CommandText = sqlStr;

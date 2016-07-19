@@ -26,6 +26,8 @@ namespace WebAPIs.Controllers
         [HttpGet]
         [Route("api/Nurse/GetHospitalization/{nurseId}")]
 
+
+        //done
         //retrun{hos_id,treat_id,nurse_id,bed_num,pay,rank,in_time,out_time,pay_time}
         public HttpResponseMessage GetHospitalization(string nurseId)
         {
