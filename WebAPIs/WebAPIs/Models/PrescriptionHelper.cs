@@ -24,7 +24,7 @@ namespace WebAPIs.Models
             cmd.Connection = DatabaseHelper.Connection;
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
             cmd.CommandText = sqlStr;
-            cmd.Parameters.Add("em_id", OracleDbType.Varchar2, 5).Value = employee_id;
+            cmd.Parameters.Add("em_id",  employee_id);
             OracleDataReader reader = cmd.ExecuteReader();
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
@@ -39,7 +39,7 @@ namespace WebAPIs.Models
                 }
                 return allPrescription;
             }
-            catch
+            catch(Exception ex)
             {
                 
             }
@@ -53,7 +53,26 @@ namespace WebAPIs.Models
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
-            return false;
-        }
+            string sqlStr =
+                @"select medicine_id,unit,num,name
+                from prescribe natural join medicine
+                where prescribe.pres_id=:Ppres_id";
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("Ppres_id", pres_id);
+            OracleDataReader reader = cmd.ExecuteReader();
+            try
+            {
+                while(reader.Read())
+                {
+                    prescribeMedicine.Add(new PrescribeMedicine(reader[0].ToString(), reader[1].ToString(), Convert.ToInt32(reader[2]), reader[3].ToString()));
+                }
+                return prescribeMedicine;
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return null
+;        }
     }
 }

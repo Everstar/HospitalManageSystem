@@ -18,7 +18,10 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                @"select dept_name,clinic_name,post,name,sex
                 from employee;");
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -35,15 +38,42 @@ namespace WebAPIs.Models
             }
             return null;
         }
-        /* 人事调配 但是我没看懂API 所以大家先忽略···
-        static bool bool SetEmployee(string, string, string, double)
+        
+        public static bool SetEmployee(string employee_id,string department, string clinic, string post, double salary)
         {
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            try
+            {
+                string sqlStr =
+                @"update employee
+                 set department=:Pdep,clinic=:Pcl,post=:Ppos,salary=:Psal
+                 where employee_id=:Pemp";
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("Pdep", department);
+                cmd.Parameters.Add("Pcl", clinic);
+                cmd.Parameters.Add("Ppos", post);
+                cmd.Parameters.Add("Psal", salary);
+                cmd.Parameters.Add("Pemp", employee_id);
+                
+            }
 
+            //异常这里我还要研究一下
+            catch(Exception ex)
+            {
+                return false;
+            }
+            return true;
+            
         }
-        */
+        
         public static ArrayList GetComplaintedDoctor(double percent)//获取投诉率高于percent的医生
         {
             ArrayList ComplaintedDoctor = new ArrayList();
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
             string sqlStr = String.Format(
                @"with ComplaintedDoctor(em_id,em_percent) as
                  (select employee_id ,avg(rank)
@@ -51,8 +81,8 @@ namespace WebAPIs.Models
                   group by employee_id)
                   select employee_id,dept_name,clinic_name,post,name,sex
                   from ComplaintedDoctor natural join employee
-                  where em_percent>='{0}'",percent);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                  where em_percent>=：Pper",percent);
+            cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -69,9 +99,31 @@ namespace WebAPIs.Models
             }
             return null;
         } 
-        public static bool SetDuty(Duty item)//duty类的id什么时候设置
+        public static bool SetDuty(Duty item)
         {
-            return false;
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            string sqlStr =
+                @"insert into duty
+                values (:Pduty_id,:Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("Pduty_id", item.duty_id);
+            cmd.Parameters.Add("Proom_num", item.room_num);
+            cmd.Parameters.Add("Pmon", item.Monday);
+            cmd.Parameters.Add("Ptue", item.Tuesday);
+            cmd.Parameters.Add("Pwed", item.Wednesday);
+            cmd.Parameters.Add("Pthu", item.Thursday);
+            cmd.Parameters.Add("Pfri", item.Friday);
+            cmd.Parameters.Add("Psat", item.Saturday);
+            cmd.Parameters.Add("Psun", item.Sunday);
+            if(cmd.ExecuteNonQuery()==0)
+            {
+                cmd.Transaction.Rollback();
+                return false;
+            }
+            else
+                return true;
         }
     }
 }
