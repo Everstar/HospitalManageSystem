@@ -89,7 +89,12 @@ namespace WebAPIs.Models
             return true;
         }
 
+        public static bool MakeBloodExamination(Blood item)
+        {
+            //TODO
+            return false;
 
+        }
 
         // 0:验血 1：胃镜 2：XRay
         public static ArrayList GetPatientByExamId(string examineID,char type)
