@@ -15,8 +15,8 @@ namespace WebAPIs.Models
         {
             ArrayList AllExamination = new ArrayList();
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr = 
                @"select exam_id,type,exam_time,pay,pay_time
                 from examination
@@ -25,14 +25,13 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("doc_id", OracleDbType.Varchar2, 5).Value = doc_id;
 
             OracleDataReader reader = cmd.ExecuteReader();
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
+            
             try
             {
                 while (reader.Read())
                 {
                     AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(), 
-                         Convert.ToDateTime(reader[2].ToString(),frm),  Convert.ToDouble(reader[3]),Convert.ToDateTime(reader[4].ToString(),frm)));
+                         (DateTime)reader[2],  Convert.ToDouble(reader[3]),(DateTime)reader[4]));
                 }
                 return AllExamination;
             }
@@ -48,8 +47,8 @@ namespace WebAPIs.Models
         {
             XrayInfo xray = new XrayInfo(partXrayInfo.checkpoint,partXrayInfo.from_picture, partXrayInfo.picture);
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
                 string sqlStr = String.Format(
@@ -70,8 +69,8 @@ namespace WebAPIs.Models
         {
             GastroscopeInfo gastroscope = new GastroscopeInfo(from_picture, diagnoses ,picture);
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
                 string sqlStr = String.Format(
@@ -116,7 +115,7 @@ namespace WebAPIs.Models
                       from identity natural patient,pattreat
                       where patient.patient_id=pattreat.pat_id          
                      ", examineID);
-                OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 OracleDataReader reader = cmd.ExecuteReader();
                 try
                 {
@@ -149,7 +148,7 @@ namespace WebAPIs.Models
                       from identity natural patient,pattreat
                       where patient.patient_id=pattreat.pat_id          
                      ", examineID);
-                OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 OracleDataReader reader = cmd.ExecuteReader();
                 try
                 {
@@ -183,7 +182,7 @@ namespace WebAPIs.Models
                       from identity natural patient,pattreat
                       where patient.patient_id=pattreat.pat_id          
                      ", examineID);
-                OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 OracleDataReader reader = cmd.ExecuteReader();
                 try
                 {

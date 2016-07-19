@@ -16,8 +16,8 @@ namespace WebAPIs.Models
         {
             ArrayList hospitalization = new ArrayList();
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr = 
                 @"select hos_id,treat_id,employee_id,bed_num,pay,rank,
                 in_time,out_time,pay_time
@@ -26,17 +26,16 @@ namespace WebAPIs.Models
             cmd.CommandText = sqlStr;
             cmd.Parameters.Add("Pnurse_id", nurse_id);            
             OracleDataReader reader = cmd.ExecuteReader();
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
+            
             try
             {
                 while (reader.Read())
                 {
                     hospitalization.Add(new HospitalInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
                         reader[3].ToString(),Convert.ToDouble(reader[4]),Convert.ToInt32(reader[5]),
-                         Convert.ToDateTime(reader[5].ToString(), frm), 
-                         Convert.ToDateTime(reader[6].ToString(), frm), 
-                         Convert.ToDateTime(reader[7].ToString(), frm)));
+                        (DateTime)reader[5],
+                         (DateTime)reader[6], 
+                         (DateTime)reader[7]));
                 }
                 return hospitalization;
             }

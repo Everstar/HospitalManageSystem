@@ -21,21 +21,20 @@ namespace WebAPIs.Models
                 from prescription
                 where employee_id=:em_id";
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper. GetInstance().conn;
+            cmd.Transaction = DatabaseHelper. GetInstance().conn.BeginTransaction();
             cmd.CommandText = sqlStr;
             cmd.Parameters.Add("em_id",  employee_id);
             OracleDataReader reader = cmd.ExecuteReader();
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
+          
             try
             {
                 while(reader.Read())
                 {
                     allPrescription.Add(new PrescriptionInfo(reader[0].ToString(),
-                        reader[1].ToString(), Convert.ToDateTime(reader[2], frm),
-                        Convert.ToDateTime(reader[3], frm), Convert.ToDouble(reader[4]),
-                        Convert.ToDateTime(reader[5], frm)));
+                        reader[1].ToString(), (DateTime)reader[2],
+                        (DateTime)reader[3], Convert.ToDouble(reader[4]),
+                        (DateTime)(reader[5])));
                 }
                 return allPrescription;
             }
@@ -51,8 +50,8 @@ namespace WebAPIs.Models
         {
             ArrayList prescribeMedicine = new ArrayList();
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper. GetInstance().conn;
+            cmd.Transaction = DatabaseHelper. GetInstance().conn.BeginTransaction();
             string sqlStr =
                 @"select medicine_id,unit,num,name
                 from prescribe natural join medicine

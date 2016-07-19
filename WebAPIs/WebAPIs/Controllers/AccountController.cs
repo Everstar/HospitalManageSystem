@@ -47,9 +47,17 @@ namespace WebAPIs.Controllers
             {
                 //创建用户ticket信息
                 accountModel.CreateLoginUserTicket(userAccount, userPasswd);
-                
+
                 //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent("登陆成功！" + " " + AccountModel.GetUserAuthorities(userAccount));
+                string fail = AccountModel.GetUserAuthorities(userAccount);
+                if (fail.Equals("fail"))
+                {
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                }
+                else
+                {
+                    response.Content = new StringContent(fail);
+                }
                 return response;
             }
             else
@@ -116,7 +124,6 @@ namespace WebAPIs.Controllers
             SignUpUser signUpUser = new SignUpUser();
             try
             {
-
                 signUpUser = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(user), signUpUser);
             }
             catch (Exception e)
@@ -126,14 +133,17 @@ namespace WebAPIs.Controllers
             }
             // 判断用户的id是否存在
             // 数据库中插入用户信息
+            //string fuck = UserHelper.SignUp(signUpUser);
             if (!UserHelper.SignUp(signUpUser))
             {
-                response.Content = new StringContent("该账号已注册过！");
+                response.Content = new StringContent("该账号已注册过！ 身份证号码:" + signUpUser.credit_num);
                 response.StatusCode = HttpStatusCode.BadRequest;
                 return response;
             }
-            // 注册成功 分发cookie
+            //// 注册成功 分发cookie
             SignIn(user);
+            PatientInfo info = UserHelper.GetPatientInfoByCredNum(signUpUser.credit_num);
+            response.Content = new StringContent(info.patient_id);
             response.StatusCode = HttpStatusCode.OK;
             return response;
         }

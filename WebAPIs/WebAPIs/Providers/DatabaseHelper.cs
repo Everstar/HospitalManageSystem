@@ -10,27 +10,26 @@ namespace WebAPIs.Providers
 {
     public class DatabaseHelper
     {
-        private static OracleConnection conn = null;
+        private static DatabaseHelper instance = null;
 
-        public static OracleConnection Connection
+        public OracleConnection conn = null;
+
+        private DatabaseHelper()
         {
-            get
+            if (conn == null)
             {
-                if (conn == null)
-                {
-                    try
-                    {
-                        conn = new OracleConnection(WebConfigurationManager.AppSettings["connectStr"]);
-                        conn.Open();
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.WriteLine("Connect Oracle Error!");
-                    }
-                    return conn;
-                }
-                return conn;
+                conn = new OracleConnection(WebConfigurationManager.AppSettings["connectStr"]);
+                conn.Open();
             }
+        }
+
+        public static DatabaseHelper GetInstance()
+        {
+            if (null == instance)
+            {
+                instance = new DatabaseHelper();
+            }
+            return instance;
         }
     }
 }

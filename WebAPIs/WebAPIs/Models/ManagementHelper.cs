@@ -19,8 +19,8 @@ namespace WebAPIs.Models
                @"select dept_name,clinic_name,post,name,sex
                 from employee;");
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper. GetInstance().conn;
+            cmd.Transaction = DatabaseHelper. GetInstance().conn.BeginTransaction();
             cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
             try
@@ -42,8 +42,8 @@ namespace WebAPIs.Models
         public static bool SetEmployee(string employee_id,string department, string clinic, string post, double salary)
         {
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper. GetInstance().conn;
+            cmd.Transaction = DatabaseHelper. GetInstance().conn.BeginTransaction();
             try
             {
                 string sqlStr =
@@ -72,8 +72,8 @@ namespace WebAPIs.Models
         {
             ArrayList ComplaintedDoctor = new ArrayList();
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper. GetInstance().conn;
+            cmd.Transaction = DatabaseHelper. GetInstance().conn.BeginTransaction();
             string sqlStr = String.Format(
                @"with ComplaintedDoctor(em_id,em_percent) as
                  (select employee_id ,avg(rank)
@@ -102,8 +102,8 @@ namespace WebAPIs.Models
         public static bool SetDuty(Duty item)
         {
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper. GetInstance().conn;
+            cmd.Transaction = DatabaseHelper. GetInstance().conn.BeginTransaction();
             string sqlStr =
                 @"insert into duty
                 values (:Pduty_id,:Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
