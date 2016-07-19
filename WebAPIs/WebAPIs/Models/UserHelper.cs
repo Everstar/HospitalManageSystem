@@ -38,7 +38,7 @@ namespace WebAPIs.Models
             //sign up patient
             try
             {
-                sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth";
+                sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth)";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
                 cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
