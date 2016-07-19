@@ -27,18 +27,21 @@ namespace WebAPIs.Controllers
         {
             // 数据库中找到所有employee的信息
             // 序列化成Json
-            ArrayList list = UserHelper.GetAllEmployee();
-            HttpResponseMessage response = new HttpResponseMessage();
+            ArrayList list=ManagementHelper.GetAllEmployee();
 
-            if (list == null)
+            HttpResponseMessage response = new HttpResponseMessage();
+            if (list.Count == 0)
             {
-                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Content = new StringContent("查找失败");
+                response.StatusCode = HttpStatusCode.NotFound;
             }
             else
             {
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
-            }
 
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            
             return response;
         }
         /// <summary>
@@ -65,7 +68,7 @@ namespace WebAPIs.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/ManagementStaff/GetComplaintedDoctor/{percent}")]
-        public HttpResponseMessage GetComplaintedDoctor(string percent)
+        public HttpResponseMessage GetComplaintedDoctor(double percent)
         {
             // 被投诉是指某个医生的Rank小于等于两颗星星
             // 在evaluation表找到每一个doc_id下的数据总数 找到doc_id对应的rank小于等于2的数量
@@ -73,6 +76,19 @@ namespace WebAPIs.Controllers
             // 记录下这个医生的doc_id
             // 返回一个doc_id的列表
             HttpResponseMessage response = new HttpResponseMessage();
+
+            ArrayList list = ManagementHelper.GetComplaintedDoctor(percent);
+
+            if (list == null)
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
             return response;
         }
         [HttpPost]

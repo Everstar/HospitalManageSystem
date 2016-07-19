@@ -42,6 +42,19 @@ namespace WebAPIs.Models
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
                 cmd.CommandText = sqlStr;
+
+                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
+                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
+                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
+                cmd.ExecuteNonQuery();//这里貌似没意义，问一下？？？
+
+                sqlStr = "insert into patient values (:credit_num, :password)";
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.passwd;
+                    
+
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("name", item.name);
                 cmd.Parameters.Add("sex", item.sex);
@@ -52,6 +65,7 @@ namespace WebAPIs.Models
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("password", item.passwd);
                 cmd.ExecuteNonQuery();
+
 
                 cmd.Transaction.Commit();
             }

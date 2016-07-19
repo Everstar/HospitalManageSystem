@@ -26,13 +26,12 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("doc_id", OracleDbType.Varchar2, 5).Value = doc_id;
 
             OracleDataReader reader = cmd.ExecuteReader();
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
             try
             {
                 while (reader.Read())
                 {
                     AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(), 
-                         (DateTime)reader[2],  Convert.ToDouble(reader[3]), (DateTime)reader[4]));
+                         (DateTime)reader[2],  Convert.ToDouble(reader[3]),(DateTime)reader[4]));
                 }
                 return AllExamination;
             }
@@ -89,7 +88,12 @@ namespace WebAPIs.Models
             return true;
         }
 
+        public static bool MakeBloodExamination(Blood item)
+        {
+            //TODO
+            return false;
 
+        }
 
         // 0:验血 1：胃镜 2：XRay
         public static ArrayList GetPatientByExamId(string examineID,char type)

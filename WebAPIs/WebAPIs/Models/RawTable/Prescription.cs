@@ -9,7 +9,7 @@ namespace WebAPIs.Models.DataModels
     {
         public string pres_id { get; set; }
         public string treat_id { get; set; }
-        public string parm_id { get; set; }
+        public string employee_id { get; set; }
         public DateTime make_time { get; set;}
         public DateTime done_time { get; set; }
         public double pay { get; set; }

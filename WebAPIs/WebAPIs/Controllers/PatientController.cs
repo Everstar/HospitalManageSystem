@@ -192,6 +192,7 @@ namespace WebAPIs.Controllers
 
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+            response.StatusCode = HttpStatusCode.OK;
             return response;
         }
 
