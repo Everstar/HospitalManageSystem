@@ -5,5 +5,6 @@ WebAPIs/*
 WebAPIs/WebAPIs/bin/*
 WebAPIs/WebAPIs/App_Data/*
 WebAPIs/WebAPIs/obj/*
+WebAPIs/WebAPIs/TestHtmls/*
 WebAPIs/WebAPIs/WebAPIs.csproj
 WebAPIs/WebAPIs/WebAPIs.csproj.user
