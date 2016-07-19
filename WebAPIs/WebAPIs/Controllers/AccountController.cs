@@ -65,7 +65,6 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetUserInfo()
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
-            userAccount = "14001";
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
@@ -117,10 +116,6 @@ namespace WebAPIs.Controllers
             SignUpUser signUpUser = new SignUpUser();
             try
             {
-                signUpUser.birth = user.birth.Value;
-                signUpUser.name = user.name.Value;
-                signUpUser.sex = user.sex.Value;
-                signUpUser.credit_num = user.id.Value;
 
                 signUpUser = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(user), signUpUser);
             }

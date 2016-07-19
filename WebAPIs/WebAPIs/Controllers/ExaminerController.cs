@@ -9,6 +9,7 @@ using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
 using WebAPIs.Models;
 using System.Collections;
+using Newtonsoft.Json;
 
 namespace WebAPIs.Controllers
 {
@@ -22,6 +23,10 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="docId"></param>
         /// <returns></returns>
+        /// 
+
+
+        //done
         [HttpGet]
         [Route("api/Examiner/GetExamination/{docId}")]
         public HttpResponseMessage GetExamination(string docId)
@@ -51,21 +56,34 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// 
+
+        //done
         [HttpPost]
         [Route("api/Examiner/MakeXRayExamination")]
         public HttpResponseMessage MakeXRayExamination(dynamic obj)
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
-            string exam_id = obj.exam_id.Value;
+            /*string exam_id = obj.exam_id.Value;
             string checkpoint = obj.checkpoint.Value;
-            string from_picture = obj.from_picture.Value;
+            string from_picture = obj.from_picture.Value;*/
             var picture = obj.picture;
             //一个对象反序列化的过程
-
+            PartXRayInfo xrayInfo = new PartXRayInfo();
+            try
+            {
+                xrayInfo = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), xrayInfo);
+            }
+            catch(Exception e)
+            {
+                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(obj));
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
             // XRay表插入
 
-            if (!ExaminerHelper.MakeXRayExamination(checkpoint,from_picture,picture))
+            if (!ExaminerHelper.MakeXRayExamination(xrayInfo))
             {
                 response.Content = new StringContent("由于某种原因检测插入不成功");
                 response.StatusCode = HttpStatusCode.Forbidden;
@@ -84,18 +102,35 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// 
+
+        //done
         [HttpPost]
         [Route("api/Examiner/MakeGastroscopeExamination")]
         public HttpResponseMessage MakeGastroscopeExamination(dynamic obj)
         {
-            string exam_id = obj.exam_id.Value;
+            /*string exam_id = obj.exam_id.Value;
             string diagnoses = obj.diagnoses.Value;
-            string from_picture = obj.from_picture.Value;
+            string from_picture = obj.from_picture.Value;*/
             var picture = obj.picture;
+
+            Gastroscope gastroscope = new Gastroscope();
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if(!ExaminerHelper.MakeGastroscopeExamination(from_picture, diagnoses, picture))
+            try
+            {
+                gastroscope = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), gastroscope);
+            }
+            catch(Exception e)
+            {
+                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(obj));
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+
+           
+
+            if(!ExaminerHelper.MakeGastroscopeExamination(gastroscope.from_picture,gastroscope.diagnoses, picture))
             {
                 response.Content = new StringContent("由于某种原因插入检查结果不成功");
                 response.StatusCode = HttpStatusCode.Forbidden;
@@ -116,6 +151,9 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// 
+
+        //update needed
         [HttpPost]
         [Route("api/Examiner/MakeBloodExamination")]
         public HttpResponseMessage MakeBloodExamination(dynamic obj)
@@ -150,6 +188,40 @@ namespace WebAPIs.Controllers
 
             // Blood表插入
             HttpResponseMessage response = new HttpResponseMessage();
+            return response;
+        }
+
+
+
+        //dnoe
+        // 0:验血 1：胃镜 2：XRay
+        [HttpGet]
+        [Route("api/Examiner/GetPatientById/{examInfo}")]
+        public HttpResponseMessage GetPatientNameById(string examInfo)
+        {
+            string examineId = examInfo.Substring(0, 20);
+            char type = examInfo[20];
+
+            ArrayList list = ExaminerHelper.GetPatientByExamId(examineId,type);
+
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            if (list[0]== "查询失败")
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else if(list[0]== "Examine Type Error!")
+            {
+                response.Content = new StringContent("不存在的检测类型！");
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            
             return response;
         }
     }
