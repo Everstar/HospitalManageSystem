@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections;
+
 using WebAPIs.Models.DataModels;
 using WebAPIs.Models.UnifiedTable;
 using WebAPIs.Providers;
 using Oracle.ManagedDataAccess.Client;
+
+using Oracle.ManagedDataAccess.Client;
+using System.Globalization;
+using WebAPIs.Models.DataModels;
+using WebAPIs.Models.UnifiedTable;
+using WebAPIs.Providers;
+
 
 namespace WebAPIs.Models
 {
@@ -14,6 +22,7 @@ namespace WebAPIs.Models
     
     public class PrescriptionHelper
     {
+
         
         //根据药剂师id获取所有有关的处方id和相关病人姓名，性别
         public static ArrayList GetAllPrescription(string pharmacistId)
@@ -109,6 +118,8 @@ namespace WebAPIs.Models
             }
             return null;
         }
+
+
     }
 
 

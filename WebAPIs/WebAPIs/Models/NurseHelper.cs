@@ -23,19 +23,18 @@ namespace WebAPIs.Models
                 from hospitalization natural join bed 
                 where employee_id=:Pnurse_id";
             cmd.CommandText = sqlStr;
-            cmd.Parameters.Add(":Pnurse_id", OracleDbType.Varchar2, 5).Value = nurse_id;            
+            cmd.Parameters.Add("Pnurse_id", nurse_id);            
             OracleDataReader reader = cmd.ExecuteReader();
-            DateTimeFormatInfo frm = new DateTimeFormatInfo();
-            frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
+            
             try
             {
                 while (reader.Read())
                 {
                     hospitalization.Add(new HospitalInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
                         reader[3].ToString(),Convert.ToDouble(reader[4]),Convert.ToInt32(reader[5]),
-                         Convert.ToDateTime(reader[5].ToString(), frm), 
-                         Convert.ToDateTime(reader[6].ToString(), frm), 
-                         Convert.ToDateTime(reader[7].ToString(), frm)));
+                        (DateTime)reader[5],
+                         (DateTime)reader[6], 
+                         (DateTime)reader[7]));
                 }
                 return hospitalization;
             }
