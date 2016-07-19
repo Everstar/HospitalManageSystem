@@ -65,7 +65,6 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetUserInfo()
         {
             string userAccount = HttpContext.Current.User.Identity.Name;
-            userAccount = "14001";
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Patient()));
             // 如果用户是病人
