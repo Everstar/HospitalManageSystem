@@ -16,8 +16,8 @@ namespace WebAPIs.Models
         {
             ArrayList hospitalization = new ArrayList();
             OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr = 
                 @"select hos_id,treat_id,employee_id,bed_num,pay,rank,
                 in_time,out_time,pay_time

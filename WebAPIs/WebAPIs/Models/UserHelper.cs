@@ -23,8 +23,8 @@ namespace WebAPIs.Models
                 @"select * from identity
                   where credit_num = :credit_num";
 
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             cmd.Parameters.Add("credit_num", item.credit_num);
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -37,7 +37,7 @@ namespace WebAPIs.Models
             {
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
                     + strBirth + "', 'yyyy/mm/dd'))";
-                cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("credit_num", item.credit_num);
@@ -46,7 +46,7 @@ namespace WebAPIs.Models
                 cmd.ExecuteNonQuery();
 
                 sqlStr = "insert into patient values (null, :credit_num, :password)";
-                cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("password", item.passwd);
                 cmd.ExecuteNonQuery();
@@ -68,7 +68,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format("select password from patient where patient_id='{0}'",
                 id);
 
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
             try
             {
@@ -90,14 +90,14 @@ namespace WebAPIs.Models
         {
             string sqlStr = String.Format("select password from employee where employee_id='{0}'",
                 id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    return reader[2].ToString();
+                    return reader[0].ToString();
                 }
             }
             catch (Exception e)
@@ -115,7 +115,7 @@ namespace WebAPIs.Models
                 from patient natural join identity
                 where patient_id='{0}'",
                 id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
             try
             {
@@ -146,7 +146,7 @@ namespace WebAPIs.Models
                 from employee natural join identity
                 where employee_id='{0}'",
                id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
@@ -179,7 +179,7 @@ namespace WebAPIs.Models
                 from patient natural join identity
                 where credit_num='{0}'",
                 num);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
             try
             {
