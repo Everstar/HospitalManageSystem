@@ -142,7 +142,7 @@ namespace WebAPIs.Controllers
                 // 填充支付时间
 
                 // treatment 表插入一条记录
-                string registerMessage = PatientHelper.RegisterTreat(treatment);
+                int registerMessage = PatientHelper.RegisterTreat(treatment);
 
                 if (registerMessage==null)
                 { 
