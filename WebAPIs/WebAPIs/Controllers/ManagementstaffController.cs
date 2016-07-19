@@ -78,9 +78,16 @@ namespace WebAPIs.Controllers
 
             ArrayList list = ManagementHelper.GetComplaintedDoctor(percent);
 
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
-            response.StatusCode = HttpStatusCode.OK;
-
+            if (list == null)
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.StatusCode = HttpStatusCode.OK;
+            }
             return response;
         }
         [HttpPost]

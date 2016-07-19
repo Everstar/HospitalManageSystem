@@ -19,7 +19,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                @"select dept_name,clinic_name,post,name,sex
                 from employee;");
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
             try
             {
@@ -32,7 +32,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null; 
             }
             return null;
         }
@@ -55,7 +55,7 @@ namespace WebAPIs.Models
                   select employee_id,dept_name,clinic_name,post,name,sex
                   from ComplaintedDoctor natural join employee natural join identity
                   where em_percent<={0}",percent);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleDataReader reader = cmd.ExecuteReader();
 
             int i = 0;
@@ -69,13 +69,14 @@ namespace WebAPIs.Models
                         ComplaintedDoctor.Add(1);
                         ComplaintedDoctor.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
                             reader[3].ToString(), reader[4].ToString(), reader[5].ToString()));
+                       i++;
                     }
                     else
                     {
                         ComplaintedDoctor.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
                             reader[3].ToString(), reader[4].ToString(), reader[5].ToString()));
                     }
-                    i++;
+                    
                 }
                 if (i == 0)
                 {
@@ -85,7 +86,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null;
             }
             return null;
         } 

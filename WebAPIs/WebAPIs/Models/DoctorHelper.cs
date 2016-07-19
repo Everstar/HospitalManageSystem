@@ -15,7 +15,7 @@ namespace WebAPIs.Models
     {
         public static ArrayList GetAllTreatment(int employee_id)
         {
-            string sqlStr = @"select treat_id,patient_id,patient_name
+            /*string sqlStr = @"select treat_id,patient_id,patient_name
                        from treatment T join takes using treat_id join patient using patient_id join identity using credi
                         where treatment.employee_id=:Pemployee_id";
 
@@ -26,8 +26,9 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
             cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
             cmd.ExecuteNonQuery();
-
-
+            */
+            ArrayList list = new ArrayList();
+            return list;
 
 
         }
