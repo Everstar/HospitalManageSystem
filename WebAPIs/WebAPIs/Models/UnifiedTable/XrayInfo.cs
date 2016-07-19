@@ -7,7 +7,7 @@ namespace WebAPIs.Models.UnifiedTable
 {
     public class XrayInfo
     {
-        const string head = "1234567890";
+        const string head = "1234567890";//这里最后要改！！！自动加一
         static int num = 1;
         public string exam_id { get; set; }
         public string checkpoint { get; set; }

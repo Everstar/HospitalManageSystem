@@ -42,5 +42,14 @@ namespace WebAPIs.Models.UnifiedTable
             this.name = name;
             this.sex = sex[0];
         }
+        public EmployeeInfo(string employee_id ,string dept_name, string clinic_name, string post, string name, string sex)
+        {
+            this.employee_id = employee_id;
+            this.department = dept_name;
+            this.clinic = clinic_name;
+            this.post = post;
+            this.name = name;
+            this.sex = sex[0];
+        }
     }
 }

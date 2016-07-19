@@ -15,12 +15,16 @@ namespace WebAPIs.Models
         public static ArrayList GetHospitalizationInfo(string nurse_id)
         {
             ArrayList hospitalization = new ArrayList();
-            string sqlStr = String.Format(
-               @"select hos_id,treat_id,nurse_id,bed_num,pay,rank,in_time,out_time,pay_time
-                from hospitalization natural join bed;
-                where nurse_id='{0}'",
-                nurse_id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.Connection;
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            string sqlStr = 
+                @"select hos_id,treat_id,employee_id,bed_num,pay,rank,
+                in_time,out_time,pay_time
+                from hospitalization natural join bed 
+                where employee_id=:Pnurse_id";
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add(":Pnurse_id", OracleDbType.Varchar2, 5).Value = nurse_id;            
             OracleDataReader reader = cmd.ExecuteReader();
             DateTimeFormatInfo frm = new DateTimeFormatInfo();
             frm.ShortDatePattern = "yyyy-mm-dd HH24:mi:ss";
@@ -44,3 +48,4 @@ namespace WebAPIs.Models
         }
     }
 }
+
