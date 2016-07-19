@@ -15,8 +15,8 @@
 
         // 测试另一个POST能否正确路由
         function testPOST() {
-            var name = "16687";
-            var password = "ssetj";
+            var name = "160710001";
+            var password = "xiaoge";
             var postData = { account: name, passwd: password };
             $.ajax({
                 type: "post",
@@ -24,52 +24,16 @@
                 contentType: "application/json",
                 data: JSON.stringify(postData),
                 success: function (data, status) {
-                    $.getJSON('api/Patient/GetEmployee/hihiih')
+                    $.getJSON('api/Account/GetUserInfo')
                 .done(function (data) {
-                    name = "12345";
-                    postData = { account: name, passwd: password };
-                    $.ajax({
-                        type: "post",
-                        url: uri,
-                        contentType: "application/json",
-                        data: JSON.stringify(postData),
-                        success: function (data, status) {
-                            $.getJSON('api/Doctor/GetAllTreatment')
-                                .done(function (data) {
-                                    //
-                                    $.getJSON('api/Account/GetUserInfo')
-                                        .done(function (data) {
-
-                                        });
-                        });
-                        }
+                    // 登出
+                    $.getJSON('api/Account/SingOut').done(function (data) {
+                        // 试验是否成功
+                        $.getJSON('api/Account/GetUserInfo').done();
                     });
                 });
                 }
             });
-            
-
-
-            //$.post(uri, postData, function (data, textStatus, jqXHR) {
-            //    if (jqXHR.getResponseHeader('FORCE_REDIRECT') !== null) {
-            //        window.location = jqXHR.getResponseHeader('FORCE_REDIRECT');
-            //        return;
-            //    }
-            //    $.getJSON('api/Account/GetStringTest')
-            //    .done(function (data) {
-            //        console.log(data);
-            //    });
-            //})
-
-
-
-            //$.ajax({
-            //    url: 'api/Account/SignIn',
-            //    type: "post",
-            //    contentType: application/json,
-            //    data: postData,
-            //    success: function (data, status) {}
-            //});
         }
     </script>
 </body>

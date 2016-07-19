@@ -13,7 +13,6 @@ namespace WebAPIs
     {
         public void Configuration(IAppBuilder app)
         {
-            ConfigureAuth(app);
             var a = DatabaseHelper.GetInstance().conn;
         }
     }

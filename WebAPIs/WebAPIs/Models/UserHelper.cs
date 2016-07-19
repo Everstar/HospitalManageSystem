@@ -8,6 +8,7 @@ using WebAPIs.Providers;
 using WebAPIs.Models.UnifiedTable;
 using System.Globalization;
 using Oracle.ManagedDataAccess.Client;
+using System.Collections;
 
 namespace WebAPIs.Models
 {
@@ -16,7 +17,7 @@ namespace WebAPIs.Models
         private static int _cnt = 0;
 
         //SignUp as Patient
-        public static bool SignUp(SignUpUser item)
+        public static string SignUp(SignUpUser item)
         {
             //check if the credit_num is used
             string sqlStr =
@@ -29,7 +30,8 @@ namespace WebAPIs.Models
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                return false;
+                cmd.Transaction.Rollback();
+                return "Already exise";
             }
             var strBirth = item.birth.ToString().Split(' ')[0];
             //sign up patient
@@ -56,9 +58,11 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                return false;
+                return "Insert failed, message:" + e.Message + " " + strBirth;
+                //return false;
             }
-            return true;
+            string i = "d";
+            return "Ok";
         }
 
 
@@ -123,11 +127,11 @@ namespace WebAPIs.Models
                 if (reader.Read())
                 {
                     return new PatientInfo(
-                        reader[0].ToString(), 
-                        reader[1].ToString(), 
+                        reader[0].ToString(),
+                        reader[1].ToString(),
                         reader[2].ToString(),
-                        reader[3].ToString(), 
-                        reader[4].ToString(), 
+                        reader[3].ToString(),
+                        reader[4].ToString(),
                         Convert.ToDateTime(reader[5].ToString()));
                 }
             }
@@ -164,6 +168,41 @@ namespace WebAPIs.Models
                         reader[8].ToString(),
                         Convert.ToDateTime(reader[9].ToString()));
                 }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+        /// <summary>
+        /// 获取所有用户信息
+        /// </summary>
+        /// <returns></returns>
+        public static ArrayList GetAllEmployee()
+        {
+            string sqlStr = @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth 
+                            from employee natural join identity";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                ArrayList list = new ArrayList();
+                while (reader.Read())
+                {
+                    list.Add(new EmployeeInfo(
+                        reader[0].ToString(),
+                        reader[1].ToString(),
+                        reader[2].ToString(),
+                        reader[3].ToString(),
+                        reader[4].ToString(),
+                        reader[5].ToString(),
+                        Convert.ToDouble(reader[6].ToString()),
+                        reader[7].ToString(),
+                        reader[8].ToString(),
+                        Convert.ToDateTime(reader[9].ToString())));
+                }
+                return list;
             }
             catch (Exception e)
             {

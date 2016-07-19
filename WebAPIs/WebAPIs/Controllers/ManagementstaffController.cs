@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using WebAPIs.Models;
+using WebAPIs.Providers;
 
 namespace WebAPIs.Controllers
 {
@@ -24,8 +27,18 @@ namespace WebAPIs.Controllers
         {
             // 数据库中找到所有employee的信息
             // 序列化成Json
-            
+            ArrayList list = UserHelper.GetAllEmployee();
             HttpResponseMessage response = new HttpResponseMessage();
+
+            if (list == null)
+            {
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+            else
+            {
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+            }
+
             return response;
         }
         /// <summary>

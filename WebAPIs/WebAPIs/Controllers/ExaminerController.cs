@@ -23,10 +23,10 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="docId"></param>
         /// <returns></returns>
-        /// 
 
 
-        //done
+        // Done
+        // Test Passed
         [HttpGet]
         [Route("api/Examiner/GetExamination/{docId}")]
         public HttpResponseMessage GetExamination(string docId)
