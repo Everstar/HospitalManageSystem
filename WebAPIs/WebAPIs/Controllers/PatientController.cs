@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace WebAPIs.Controllers
     public class PatientController : BaseController
     {
 
+        //done
         //获取所有科室名称
         public HttpResponseMessage GetAllClinic()
         {
@@ -46,6 +48,7 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+        //done
         //获取某科室的医生
         [Route("api/Patient/GetEmployee/{clinicName}")]
         public HttpResponseMessage GetEmployee(string clinicName)
@@ -70,6 +73,7 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+        //done
         //获取某医生值班信息
         [Route("api/Patient/GetEmployeeDutyTime/{employeeId}")]
         public HttpResponseMessage GetEmployeeDutyTime(string employeeId)
@@ -95,6 +99,8 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+
+        //update needed
         //挂号
         [HttpPost]
         [Route("api/Patient/Register/{employeeId}")]
@@ -142,9 +148,9 @@ namespace WebAPIs.Controllers
                 // 填充支付时间
 
                 // treatment 表插入一条记录
-                string registerMessage = PatientHelper.RegisterTreat(treatment);
+                int registerMessage = PatientHelper.RegisterTreat(treatment);
 
-                if (registerMessage==null)
+                if (registerMessage==-1)
                 { 
                     response.Content = new StringContent("挂号失败");
                     response.StatusCode = HttpStatusCode.BadRequest;
@@ -165,6 +171,8 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+
+        //update needed
         //获取患者自己的医疗记录
         [HttpPost]
         [Route("api/Patient/GetTreatmentID")]
@@ -187,26 +195,37 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+
+        //done
         [HttpPost]
         [Route("api/Patient/Comment")]
         //评价医生
         public HttpResponseMessage Comment(dynamic obj)
         {
-            string employee_id = obj.employee_id.Value;
-            string treatment_id = obj.treatment_id.Value;
-            string rank = obj.rank.Value;
-            string text = obj.text.Value;
+            
             string patient_id = HttpContext.Current.User.Identity.Name;
+
+            HttpResponseMessage response = new HttpResponseMessage();
 
             // 向evaluation插入相关评价
             // 返回评价后的界面
             
-            //这里缺少一个反序列化的过程
+            //反序列化的过程
 
             Evaluation evaluation = new Evaluation();
+            try
+            {
+                evaluation = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), evaluation);
+            }
+            catch(Exception e)
+            {
+                response.Content = new StringContent("参数传递出错，反序列化失败！");
+                response.StatusCode = HttpStatusCode.Forbidden;
+                return response;
+            }
+            evaluation.patient_id = patient_id;
 
-            HttpResponseMessage response = new HttpResponseMessage();
-
+            //数据库更新相关评论
             if (!PatientHelper.Comment(evaluation))
             {
                 response.Content = new StringContent("由于某些原因，评价失败~");
@@ -222,6 +241,8 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+
+        //update needed
         [HttpPost]
         [Route("api/Patient/GetAllConsumption")]
         //获取某次医疗的所有消费记录
@@ -244,6 +265,9 @@ namespace WebAPIs.Controllers
 
         [HttpGet]
         [Route("api/Patient/GetDoctorIdName/{treatment_id}")]
+
+
+        //done
         //根据医疗流水号找到相关医生的id和name,返回一个arraylist{doc_id,doc_name}
         public HttpResponseMessage GetDoctorIdName(string treatment_id)
         {
