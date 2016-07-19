@@ -40,9 +40,9 @@ namespace WebAPIs.Models
         }
 
 
-        public static bool MakeXRayExamination(string checkpoint, string from_picture, string picture)//插入XRay的检查结果
+        public static bool MakeXRayExamination(PartXRayInfo partXrayInfo)//插入XRay的检查结果
         {
-            XrayInfo xray = new XrayInfo(checkpoint, from_picture, picture);
+            XrayInfo xray = new XrayInfo(partXrayInfo.checkpoint,partXrayInfo.from_picture, partXrayInfo.picture);
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.Connection;
             cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();

@@ -38,18 +38,23 @@ namespace WebAPIs.Models
             //sign up patient
             try
             {
-                sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth)";
+                var strBirth = item.birth.ToString().Split(' ')[0];
+                sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
+                    + strBirth + "', 'mm/dd/yyyy'))";
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+
                 cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
-                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
-                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
+                cmd.Parameters.Add("credit_num", item.credit_num);
+                cmd.Parameters.Add("name", item.name);
+                cmd.Parameters.Add("sex", item.sex);
+                //cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth;
                 cmd.ExecuteNonQuery();
 
                 sqlStr = "insert into patient values (:credit_num, :password)";
-                cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.passwd;
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                
+                cmd.Parameters.Add("credit_num", item.credit_num);
+                cmd.Parameters.Add("password", item.passwd);
                 cmd.ExecuteNonQuery();
 
                 cmd.Transaction.Commit();

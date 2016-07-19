@@ -54,21 +54,28 @@ namespace WebAPIs.Models
             authTable.Add("Nurse", "Nurse");
             authTable.Add("Pharmacist", "Pharmacist");
             authTable.Add("ManagementStaff", "ManagementStaff");
+            try
+            {
+                if (account.Length == 9)
+                {
+                    // 病人权限
+                    strAuth = (string)authTable["Patient"];
+                }
+                else if (account.Length == 5)
+                {
+                    // 医护人员权限
+                    // employee表中找到对应emp_id的元组
+                    // 取出post
+                    string post = "";
+                    EmployeeInfo userInfo = UserHelper.GetEmployeeInfo(account);
+                    strAuth = (string)authTable[userInfo.post];
+                }
+            }
+            catch (Exception e)
+            {
 
-            if (account.Length == 9)
-            {
-                // 病人权限
-                strAuth = (string)authTable["Patient"];
             }
-            else if (account.Length == 5)
-            {
-                // 医护人员权限
-                // employee表中找到对应emp_id的元组
-                // 取出post
-                string post = "";
-                EmployeeInfo userInfo = UserHelper.GetEmployeeInfo(account);
-                strAuth = (string)authTable[userInfo.post];
-            }
+
             return strAuth;
         }
 

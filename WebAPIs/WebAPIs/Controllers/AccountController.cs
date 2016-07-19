@@ -49,7 +49,7 @@ namespace WebAPIs.Controllers
                 accountModel.CreateLoginUserTicket(userAccount, userPasswd);
                 
                 //response.Headers.Add("FORCE_REDIRECT", "http://www.baidu.com");
-                response.Content = new StringContent("登陆成功！" + " " + AccountModel.GetUserAuthorities(userAccount));
+                response.Content = new StringContent(AccountModel.GetUserAuthorities(userAccount));
                 return response;
             }
             else
