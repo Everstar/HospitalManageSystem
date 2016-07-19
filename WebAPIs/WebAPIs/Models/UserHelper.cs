@@ -18,38 +18,37 @@ namespace WebAPIs.Models
         //SignUp as Patient
         public static bool SignUp(SignUpUser item)
         {
-            OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.Connection;
-            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
-
             //check if the credit_num is used
-            string sqlStr = 
-                @"select *
-                  from identity
-                  where credit_num=:credit_num";
-            cmd.CommandText = sqlStr;
-            cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+            string sqlStr =
+                @"select * from identity
+                  where credit_num = :credit_num";
+
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+            cmd.Transaction = DatabaseHelper.Connection.BeginTransaction();
+            cmd.Parameters.Add("credit_num", item.credit_num);
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 return false;
             }
-
+            var strBirth = item.birth.ToString().Split(' ')[0];
             //sign up patient
             try
             {
-                sqlStr = "insert into identity values (:credit_num, :name, :sex, :birth)";
+                sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
+                    + strBirth + "', 'yyyy/mm/dd'))";
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+
                 cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
-                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
-                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
+                cmd.Parameters.Add("credit_num", item.credit_num);
+                cmd.Parameters.Add("name", item.name);
+                cmd.Parameters.Add("sex", item.sex);
                 cmd.ExecuteNonQuery();
 
-                sqlStr = "insert into patient values (:credit_num, :password)";
-                cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.passwd;
+                sqlStr = "insert into patient values (null, :credit_num, :password)";
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+                cmd.Parameters.Add("credit_num", item.credit_num);
+                cmd.Parameters.Add("password", item.passwd);
                 cmd.ExecuteNonQuery();
 
                 cmd.Transaction.Commit();
@@ -169,6 +168,36 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
 
+            }
+            return null;
+        }
+
+        public static PatientInfo GetPatientInfoByCredNum(string num)
+        {
+            string sqlStr = String.Format(
+                @"select patient_id, credit_num, password, name, sex, birth
+                from patient natural join identity
+                where credit_num='{0}'",
+                num);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.Connection);
+
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new PatientInfo(
+                        reader[0].ToString(),
+                        reader[1].ToString(),
+                        reader[2].ToString(),
+                        reader[3].ToString(),
+                        reader[4].ToString(),
+                        Convert.ToDateTime(reader[5].ToString()));
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
             }
             return null;
         }

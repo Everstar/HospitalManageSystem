@@ -33,6 +33,7 @@ namespace WebAPIs.Controllers
             // 开方时间等
             // prescription prescribe表联合
             ArrayList list = new ArrayList();
+            list.Add(new string("name".ToCharArray()));
             list.Add(new Prescribe());
             list.Add(new Prescribe());
             list.Add(new Prescribe());

@@ -256,7 +256,7 @@ namespace WebAPIs.Controllers
             // 根据治疗ID返回所有相关的治疗记录
             ArrayList list = new ArrayList();
             list.Add(new Hospitalization());
-            list.Add(new Examination());
+            //list.Add(new Examination());
             list.Add(new Prescribe());
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
