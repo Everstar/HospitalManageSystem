@@ -37,10 +37,16 @@ namespace WebAPIs.Controllers
 
             ArrayList list = NurseHelper.GetHospitalizationInfo(nurseId);
 
+            if (list == null)
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+
             if (list.Count == 0)
             {
                 response.Content = new StringContent("未找到相关信息");
-                response.StatusCode = HttpStatusCode.NotFound;
+                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {
@@ -50,5 +56,26 @@ namespace WebAPIs.Controllers
            
             return response;
         }
+
+        [HttpGet]
+        [Route("api/Nurse/OutHospital/{hospitalId}")]
+        public HttpResponseMessage OutHospital(string hospitalId)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            if (NurseHelper.OutHospital(hospitalId))
+            {
+                response.Content = new StringContent("出院成功");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            else
+            {
+                response.Content = new StringContent("更新失败");
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+
+            return response;
+        }
+
     }
 }

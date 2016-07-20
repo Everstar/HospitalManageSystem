@@ -18,7 +18,9 @@ using WebAPIs.Providers;
 
 namespace WebAPIs.Models
 {
-
+    /// <summary>
+    /// this part is finished!
+    /// </summary>
     
     public class PrescriptionHelper
     {
