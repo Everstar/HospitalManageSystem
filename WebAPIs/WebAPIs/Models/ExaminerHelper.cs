@@ -96,18 +96,36 @@ namespace WebAPIs.Models
         }
 
         // 0:验血 1：胃镜 2：XRay
-        public static ArrayList GetPatientByExamId(string examineID,char type)
+        public static ArrayList GetPatientByExamId(string examineID)
         {
+
             ArrayList patientInfo = new ArrayList();
 
             string sqlStr = String.Format(
-               @"with treatmentid(treat_id) as(
-                      select treatment.treat_id
-                      from treatment natural join examine natural join examination
-                      where examine");
+               @"with treatmentid(patient_id) as(
+                      select treatment.patient_id
+                      from treatment natural join examine
+                      where examine.exam_id = '{0}')
+                 select identity.name, identity.sex 
+                 from patient natural join indentity, treatmentid
+                 where patient.patient_id=treatmentid.patient_id",examineID);
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    patientInfo.Add(reader[0].ToString());
+                    patientInfo.Add(reader[1].ToString());
+                }
+                return patientInfo;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
             return patientInfo;
 
 
