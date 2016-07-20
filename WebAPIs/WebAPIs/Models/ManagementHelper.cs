@@ -66,8 +66,7 @@ namespace WebAPIs.Models
             return true;
 
         }
-
-
+   
 
         //获取投诉率高于percent的医生
 
@@ -133,9 +132,9 @@ namespace WebAPIs.Models
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr =
                 @"insert into duty
-                values (:Pduty_id,:Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
-            cmd.CommandText = sqlStr;
+                values (null, :Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
             cmd.Parameters.Add("Pduty_id", item.duty_id);
+            cmd.CommandText = sqlStr;
             cmd.Parameters.Add("Proom_num", item.room_num);
             cmd.Parameters.Add("Pmon", item.Monday);
             cmd.Parameters.Add("Ptue", item.Tuesday);
