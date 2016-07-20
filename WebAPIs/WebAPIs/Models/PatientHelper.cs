@@ -37,7 +37,6 @@ namespace WebAPIs.Models
         }
 
         //only contain department, clinic, post, name, sex info
-
         public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
             ArrayList employees = new ArrayList();
@@ -66,7 +65,6 @@ namespace WebAPIs.Models
             }
             return employees;
         }
-
 
         public static Duty GetEmployeeDutyTime(string id)
         {
@@ -99,7 +97,6 @@ namespace WebAPIs.Models
             return null;
         }
 
-
         public static int RegisterTreat(Treatment treat)
         {
             OracleCommand cmd = new OracleCommand();
@@ -113,10 +110,11 @@ namespace WebAPIs.Models
                     treat.end_time.ToString("yyyy-mm-dd hh24:mi:ss"));
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("clinic_name", OracleDbType.Varchar2, 20).Value = treat.clinic;
-                cmd.Parameters.Add("patient_id", OracleDbType.Varchar2, 20).Value = treat.patient_id;
+                cmd.Parameters.Add("patient_id", OracleDbType.Varchar2, 9).Value = treat.patient_id;
                 cmd.Parameters.Add("take", OracleDbType.Int32).Value = 0;
-                cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 20).Value = treat.doc_id;
+                cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = treat.doc_id;
                 cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
             }
             catch (Exception e)
             {
@@ -135,19 +133,24 @@ namespace WebAPIs.Models
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
-                string sqlStr = String.Format(
+                string sqlStr =
                   @"insert into evaluation
-                values('{0}','{1}','{2}', {3}, '{4}')
-               ", item.treat_id, item.patient_id, item.doc_id, item.rank, item.content);
+                values(:treat_id, :patient_id, :employee_id, :rank, :content)";
                 cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("treat_id", OracleDbType.Varchar2, 20).Value = item.treat_id;
+                cmd.Parameters.Add("patient_id", OracleDbType.Varchar2, 9).Value = item.patient_id;
+                cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = item.doc_id;
+                cmd.Parameters.Add("rank", OracleDbType.Int32).Value = item.rank;
+                cmd.Parameters.Add("content", OracleDbType.Varchar2, 2000).Value = item.content;
                 cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
+                return true;
             }
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                return false;
             }
-            return true;
+            return false;
         }
 
         //根据treatment_id，返回doctorID&name
@@ -174,6 +177,29 @@ namespace WebAPIs.Models
 
             }
             return null;
+        }
+
+        public static string GetNameById(string id)
+        {
+            string sqlStr = String.Format(
+                @"select name
+                from patient natural join identity
+                where patient_id='{0}'", id);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return reader[0].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+
         }
 
         public static ArrayList GetTreatmentInfo(string patient_id, int month, int year)
@@ -256,11 +282,12 @@ namespace WebAPIs.Models
                 OracleDataReader reader_1 = cmd.ExecuteReader();
                 while (reader_1.Read())
                 {
-                    examInfo.Add(new Examination{
+                    examInfo.Add(new Examination
+                    {
                         exam_id = reader_1[0].ToString(),
                         type = reader_1[1].ToString(),
                         exam_time = (DateTime)reader_1[2],
-                        employee_id =reader_1[3].ToString(),
+                        employee_id = reader_1[3].ToString(),
                         pay = (double)reader_1[4],
                         pay_time = (DateTime)reader_1[5]
                     });
@@ -278,14 +305,16 @@ namespace WebAPIs.Models
                 OracleDataReader reader_2 = cmd.ExecuteReader();
                 while (reader_2.Read())
                 {
-                    presInfo.Add(new Prescription{
-                    pres_id = reader_2[0].ToString(),
-                    treat_id = reader_2[1].ToString(),
-                    parm_id =reader_2[2].ToString(),
-                    make_time =(DateTime)reader_2[3],
-                    done_time = (DateTime)reader_2[4],
-                    pay =(double) reader_2[5],
-                    pay_time = (DateTime)reader_2[6]});
+                    presInfo.Add(new Prescription
+                    {
+                        pres_id = reader_2[0].ToString(),
+                        treat_id = reader_2[1].ToString(),
+                        parm_id = reader_2[2].ToString(),
+                        make_time = (DateTime)reader_2[3],
+                        done_time = (DateTime)reader_2[4],
+                        pay = (double)reader_2[5],
+                        pay_time = (DateTime)reader_2[6]
+                    });
                 }
                 #endregion
 
@@ -312,7 +341,7 @@ namespace WebAPIs.Models
                 }
                 #endregion
 
-                #region 
+                #region
 
                 ArrayList hosInfo = new ArrayList();
                 sqlStr = String.Format(
@@ -328,7 +357,7 @@ namespace WebAPIs.Models
                         hos_id = reader_4[0].ToString(),
                         treat_id = reader_4[1].ToString(),
                         nurse_id = reader_4[2].ToString(),
-                        bed_num  = reader_4[3].ToString(),
+                        bed_num = reader_4[3].ToString(),
                         in_time = (DateTime)reader_4[4],
                         out_time = (DateTime)reader_4[5],
                         pay = (double)reader_4[6],
