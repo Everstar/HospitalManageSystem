@@ -309,7 +309,7 @@ namespace WebAPIs.Models
                     {
                         pres_id = reader_2[0].ToString(),
                         treat_id = reader_2[1].ToString(),
-                        parm_id = reader_2[2].ToString(),
+                        employee_id = reader_2[2].ToString(),
                         make_time = (DateTime)reader_2[3],
                         done_time = (DateTime)reader_2[4],
                         pay = (double)reader_2[5],

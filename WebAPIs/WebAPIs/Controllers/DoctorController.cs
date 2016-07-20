@@ -151,22 +151,38 @@ namespace WebAPIs.Controllers
         [Route("api/Doctor/WritePrescription")]
         public HttpResponseMessage WritePrescription(dynamic obj)
         {
-            ArrayList list = new ArrayList();
-            string jsonRes = JsonObjectConverter.ObjectToJson(obj);
-            var strObject = JsonConvert.DeserializeObject(jsonRes) as JArray;
-            // 遍历strObject得到每一个药物
-            for (int i = 0; i < strObject.Count; i++)
-            {
-                JObject tmpObj = JObject.Parse(strObject[i].ToString());
-            }
-            string doc_id = HttpContext.Current.User.Identity.Name;
-
-            // prescription表创建一条记录
-            // 设置pres_id treat_id doc_id从药剂师中随机挑选 time
-            // 其他空值
-            // prescribeb表创建一条记录
-            // 设置pres_id medicine_id num
+            ArrayList medicine_id = new ArrayList();
+            ArrayList num = new ArrayList();
             HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                string jsonRes = JsonObjectConverter.ObjectToJson(obj);
+                var strObject = JsonConvert.DeserializeObject(jsonRes) as JArray;
+
+                var treatment_id = strObject[0].ToString();
+                // 遍历strObject得到每一个药物
+                for (int i = 1; i < strObject.Count; i++)
+                {
+                    JObject tmpObj = JObject.Parse(strObject[i].ToString());
+                    var id = tmpObj["id"];
+                    var number = tmpObj["number"];
+                    medicine_id.Add(id);
+                    num.Add(number);
+                }
+                string doc_id = HttpContext.Current.User.Identity.Name;
+                // prescription表创建一条记录
+                // 设置pres_id treat_id doc_id从药剂师中随机挑选 time
+                // 其他空值
+                // prescribeb表创建一条记录
+                // 设置pres_id medicine_id num
+                DoctorHelper.WritePrescription(treatment_id, doc_id, medicine_id, num);
+            } catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+            response.Content = new StringContent("开方成功！");
             return response;
         }
         /// <summary>
