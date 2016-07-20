@@ -18,7 +18,6 @@ using Newtonsoft.Json;
 
 namespace WebAPIs.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class AccountController : BaseController
     {
         /// <summary>
@@ -51,7 +50,12 @@ namespace WebAPIs.Controllers
                 
                 string fail = AccountModel.GetUserAuthorities(userAccount);
                 // 用户类别获取
-                if (fail.Equals("fail"))
+                if (null == fail)
+                {
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.Content = new StringContent("用户权限不正确！无法完成权限映射！");
+                }
+                else if (fail.Equals("fail"))
                 {
                     response.StatusCode = HttpStatusCode.BadRequest;
                 }
@@ -164,11 +168,11 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public HttpResponseMessage SingOut()
+        public HttpResponseMessage SignOut()
         {
             var accountModel = new AccountModel();
             accountModel.Logout();
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.Moved);
         }
     }
 }

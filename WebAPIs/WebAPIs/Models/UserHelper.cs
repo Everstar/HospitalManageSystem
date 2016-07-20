@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -30,30 +31,19 @@ namespace WebAPIs.Models
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                cmd.Transaction.Rollback();
+                //查询语句不需要回滚
                 return "Already exise";
             }
-            var strBirth = item.birth.ToString().Split(' ')[0];
+            //var strBirth = item.birth.ToString().Split(' ')[0];
+            DateTime dt = DateTime.Parse(item.birth.ToString());
+            var strBirth = item.birth.Year.ToString() + "/" + item.birth.Month.ToString() + "/" + item.birth.Day.ToString();
             //sign up patient
             try
             {
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-
                 cmd.CommandText = sqlStr;
-
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
-                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
-                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
-                cmd.ExecuteNonQuery();//这里貌似没意义，问一下？？？
-
-                sqlStr = "insert into patient values (:credit_num, :password)";
-                cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.passwd;
-                    
 
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("name", item.name);
@@ -73,7 +63,6 @@ namespace WebAPIs.Models
             {
                 cmd.Transaction.Rollback();
                 return "Insert failed, message:" + e.Message + " " + strBirth;
-                //return false;
             }
             string i = "d";
             return "Ok";
@@ -99,7 +88,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+
             }
             return null;
         }
@@ -120,7 +109,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+                //无需做任何操作
             }
             return null;
         }
@@ -254,5 +243,28 @@ namespace WebAPIs.Models
             }
             return null;
         }
+
+        public static string GetPatientIdByTreatmentId(string id)
+        {
+            string sqlStr = @"select * from treatment natural join patient";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader[1].ToString().Equals(id))
+                        return reader[0].ToString();
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
     }
 }

@@ -6,7 +6,8 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <form name="form1" method="post" enctype="multipart/form-data" action="api/upload">
+    <script src="http://cdn.bootcss.com/jquery/3.1.0/jquery.js"></script>
+    <!--<form name="form1" method="post" enctype="multipart/form-data" action="api/upload">
         <div>
             <label for="caption">Image Caption</label>
             <input name="caption" type="text" />
@@ -25,9 +26,9 @@
         <div>
             <input type="submit" value="Submit" />
         </div>
-    </form>
+    </form>-->
     <br />
-    <form name="trip_search" method="post" enctype="multipart/form-data" action="api/upload">
+    <!--<form name="trip_search" method="post" enctype="multipart/form-data" action="api/upload">
         <div>
             <input type="radio" name="trip" value="round-trip" />
             Round-Trip
@@ -63,6 +64,39 @@
             <input type="submit" value="Submit" />
 
         </div>
+    </form>-->
+    <form enctype="multipart/form-data" method="post" name="fileinfo">
+        <label>Your email address:</label>
+        <input type="email" autocomplete="on" autofocus name="userid" placeholder="email" required size="32" maxlength="64" /><br />
+        <label>Custom file label:</label>
+        <input type="text" name="filelabel" size="12" maxlength="32" /><br />
+        <label>File to stash:</label>
+        <input type="file" name="file" required />
+        <input type="submit" value="Stash the file!" />
     </form>
+    <div></div>
+    <script>
+        var form = document.forms.namedItem("fileinfo");
+        form.addEventListener('submit', function (ev) {
+
+            var oOutput = document.querySelector("div"),
+                oData = new FormData(form);
+
+            oData.append("CustomField", "This is some extra data");
+
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", "api/upload", true);
+            oReq.onload = function (oEvent) {
+                if (oReq.status == 200) {
+                    oOutput.innerHTML = "Uploaded!";
+                } else {
+                    oOutput.innerHTML = "Error " + oReq.status + " occurred when trying to upload your file.<br \/>";
+                }
+            };
+
+            oReq.send(oData);
+            ev.preventDefault();
+        }, false);
+    </script>
 </body>
 </html>

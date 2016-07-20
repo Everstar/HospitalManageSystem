@@ -15,8 +15,8 @@
 
         // 测试另一个POST能否正确路由
         function testPOST() {
-            var name = "160710001";
-            var password = "xiaoge";
+            var name = "160710002";
+            var password = "buzao";
             var postData = { account: name, passwd: password };
             $.ajax({
                 type: "post",
@@ -27,7 +27,7 @@
                     $.getJSON('api/Account/GetUserInfo')
                 .done(function (data) {
                     // 登出
-                    $.getJSON('api/Account/SingOut').done(function (data) {
+                    $.getJSON('api/Account/SignOut').done(function (data) {
                         // 试验是否成功
                         $.getJSON('api/Account/GetUserInfo').done();
                     });

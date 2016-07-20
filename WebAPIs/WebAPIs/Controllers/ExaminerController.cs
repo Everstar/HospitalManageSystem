@@ -10,12 +10,13 @@ using System.Web.Http.Cors;
 using WebAPIs.Models;
 using System.Collections;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.IO;
+using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Examiner")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
-
     public class ExaminerController : BaseController
     {
         /// <summary>
@@ -56,28 +57,25 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// 
-
+        /// Test Passed
         //done
         [HttpPost]
         [Route("api/Examiner/MakeXRayExamination")]
-        public HttpResponseMessage MakeXRayExamination(dynamic obj)
+        public async Task<HttpResponseMessage> MakeXRayExamination()
         {
             HttpResponseMessage response = new HttpResponseMessage();
-
-            /*string exam_id = obj.exam_id.Value;
-            string checkpoint = obj.checkpoint.Value;
-            string from_picture = obj.from_picture.Value;*/
-            var picture = obj.picture;
+            // 存储文件到数据库
             //一个对象反序列化的过程
-            PartXRayInfo xrayInfo = new PartXRayInfo();
+            XrayInfo xrayInfo = await ReadAndSaveFile();
+            string jsonStr = "";
             try
             {
-                xrayInfo = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), xrayInfo);
+                jsonStr = JsonObjectConverter.ObjectToJson(xrayInfo);
+                response.Content = new StringContent(jsonStr);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(obj));
+                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(xrayInfo));
                 response.StatusCode = HttpStatusCode.BadRequest;
                 return response;
             }
@@ -93,9 +91,31 @@ namespace WebAPIs.Controllers
                 response.Content = new StringContent("检测结果插入表中");
                 response.StatusCode = HttpStatusCode.OK;
             }
-
             
             return response;
+        }
+
+        private async Task<XrayInfo> ReadAndSaveFile()
+        {
+            string root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/Uploads");
+
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            await Request.Content.ReadAsMultipartAsync(provider);
+
+            FileInfo finfo = new FileInfo(provider.FileData.First().LocalFileName);
+
+            string guid = Guid.NewGuid().ToString();
+            string path = Path.Combine(root, guid + "_" + provider.FileData.First().Headers.ContentDisposition.FileName.Replace("\"", ""));
+            File.Move(finfo.FullName, path);
+
+            string exam_id = provider.FormData.GetValues("exam_id").FirstOrDefault();
+            string checkpoint = provider.FormData.GetValues("checkpoint").FirstOrDefault();
+            string from_picture = provider.FormData.GetValues("from_picture").FirstOrDefault();
+            string picture = path;
+
+            XrayInfo info = new XrayInfo(exam_id, checkpoint, from_picture, picture);
+            return info;
         }
         /// <summary>
         /// 胃镜检查
@@ -194,26 +214,24 @@ namespace WebAPIs.Controllers
 
 
         //dnoe
-        // 0:验血 1：胃镜 2：XRay
+        //return {name,sex}
         [HttpGet]
         [Route("api/Examiner/GetPatientById/{examInfo}")]
         public HttpResponseMessage GetPatientNameById(string examInfo)
         {
-            string examineId = examInfo.Substring(0, 20);
-            char type = examInfo[20];
-
-            ArrayList list = ExaminerHelper.GetPatientByExamId(examineId,type);
+ 
+            ArrayList list = ExaminerHelper.GetPatientByExamId(examInfo);
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if (list[0]== "查询失败")
+            if (list==null)
             {
                 response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
-            else if(list[0]== "Examine Type Error!")
+            else if(list.Count==0)
             {
-                response.Content = new StringContent("不存在的检测类型！");
+                response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.BadRequest;
             }
             else

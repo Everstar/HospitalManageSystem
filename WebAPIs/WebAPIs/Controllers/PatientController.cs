@@ -19,7 +19,6 @@ namespace WebAPIs.Controllers
 {
     // 权限设置
     //[Authorize(Roles = "Patient")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PatientController : BaseController
     {
 
@@ -148,17 +147,16 @@ namespace WebAPIs.Controllers
                 // 填充支付时间
 
                 // treatment 表插入一条记录
-                int registerMessage = PatientHelper.RegisterTreat(treatment);
-
-                if (registerMessage==-1)
-                { 
+                string treatment_id = PatientHelper.RegisterTreat(treatment);
+                if (treatment == null)
+                {
                     response.Content = new StringContent("挂号失败");
                     response.StatusCode = HttpStatusCode.BadRequest;
-                    return response;
                 }
                 else
                 {
-                    response.Content = new StringContent("挂号成功:" + "\n" + employeeId + time);
+                    response.Content = new StringContent("挂号成功:" + "\n" + employeeId + time + "\n" +
+                        "挂号单id:" + treatment_id);
                     response.StatusCode = HttpStatusCode.OK;
                 }
                 // 得到这条记录的主码

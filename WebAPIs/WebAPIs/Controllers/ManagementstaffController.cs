@@ -7,13 +7,14 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using WebAPIs.Models;
+using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Managementstaff")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
-
     public class ManagementstaffController : BaseController
     {
         /// <summary>
@@ -105,6 +106,32 @@ namespace WebAPIs.Controllers
             // 设置room_num
             // max_limit设置成随机数
             // 日期随便设置了 上下午。。。
+            HttpResponseMessage response = new HttpResponseMessage();
+            return response;
+        }
+        /// <summary>
+        /// 增加雇员
+        /// </summary>
+        /// <example>
+        /// 调用格式
+        /// <code>
+        /// {credit_num: '2222', password: '344123', dept_name: '门诊部', clinic_name： '妇产科', post: 'Nurse', salary: '100000000'}
+        /// </code>
+        /// </example>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/ManagementStaff/AddEmployee")]
+        public HttpResponseMessage AddEmployee(dynamic obj)
+        {
+            var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
+            Employee emp = new Employee();
+            emp.clinic = employee.GetValue("clinic_name").ToString();
+            emp.credit_num = employee.GetValue("credit_num").ToString();
+            emp.password = employee.GetValue("password").ToString();
+            emp.post = employee.GetValue("post").ToString();
+            emp.salary = double.Parse(employee.GetValue("salary").ToString());
+            // 数据库中插入
             HttpResponseMessage response = new HttpResponseMessage();
             return response;
         }
