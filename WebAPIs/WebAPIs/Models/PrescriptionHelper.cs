@@ -36,7 +36,7 @@ namespace WebAPIs.Models
                          (select pres_id
                           from prescription ,employee
                           where employee.employee_id = '{0}'and employee.employee_ID=prescription.employee_ID and prescription.done_time is null)
-                       select unique pres_id, name, sex 
+                       select unique pres_id, sex, name
                        from identity natural join patient natural join treatment natural join prewithdoc", pharmacistId);
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
@@ -67,7 +67,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                 @"select name, num, unit
                   from prescription natural join prescribe natural join medicine
-				  where prescription.pres_id='{0}'", pres_id);
+				  where pres_id='{0}'", pres_id);
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
   

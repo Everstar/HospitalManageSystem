@@ -13,6 +13,7 @@ using System.Web.Http.Cors;
 using WebAPIs.Providers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Controllers
 {
@@ -35,11 +36,13 @@ namespace WebAPIs.Controllers
         /// </code>
         /// </example>
         /// <returns>所有接诊挂号单(需要cookie获取employee_id)</returns>
+        /// Pending to test
         [HttpGet]
         public HttpResponseMessage GetAllTreatment()
         {
             HttpResponseMessage response = new HttpResponseMessage();
             string doc_id = HttpContext.Current.User.Identity.Name;
+            doc_id = "16687";
             // 在数据库treatment表找到所有与当前医生doc_id相关的所有挂号记录
             // treatment natural join takes using(treat_id)
             // tekes.doc_id若为空 取出这条数据组成数组
@@ -47,7 +50,7 @@ namespace WebAPIs.Controllers
             try
             {
                 ArrayList list = DoctorHelper.GetAllTreatment(doc_id);
-                if (list.Count == null)
+                if (list.Count == 0)
                 {
                     list.Add("0");
                 }
@@ -96,14 +99,14 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test Failed.
+        /// Test Passed.
         [HttpGet]
         [Route("api/Doctor/WriteExamination/{treatment_id}/{exam_type}")]
         public HttpResponseMessage WriteExamination(string treatment_id, string exam_type)
         {
             HttpResponseMessage response = new HttpResponseMessage();
             string doc_id = HttpContext.Current.User.Identity.Name;
-            doc_id = "16687";
+            //doc_id = "16687";
             switch (int.Parse(exam_type))
             {
                 case 0:
@@ -177,9 +180,27 @@ namespace WebAPIs.Controllers
                     medicine_id.Add(id);
                     num.Add(number);
                 }
-                string doc_id = HttpContext.Current.User.Identity.Name;
-                doc_id = "16656";
-                // doc_id随机分配一个
+                string doc_id = "16656";
+                // TODO:
+                // doc_id随机分配一个而不是从Cookie来
+                ArrayList empList = UserHelper.GetAllEmployee();
+                ArrayList pharmacist = new ArrayList();
+                foreach (EmployeeInfo item in empList)
+                {
+                    // 获取所有药剂师
+                    if (item.post.Equals("Pharmacist"))
+                    {
+                        pharmacist.Add(item);
+                    }
+                }
+                // 随机选择一个药剂师
+                Random rand = new Random();
+                if (pharmacist.Count > 0)
+                {
+                    int index = rand.Next(0, pharmacist.Count - 1);
+                    doc_id = ((EmployeeInfo)pharmacist[index]).employee_id;
+                }
+                
                 // prescription表创建一条记录
                 // 设置pres_id treat_id doc_id从药剂师中随机挑选 time
                 // 其他空值

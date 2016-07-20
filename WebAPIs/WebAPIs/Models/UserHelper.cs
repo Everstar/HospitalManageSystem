@@ -34,7 +34,9 @@ namespace WebAPIs.Models
                 //查询语句不需要回滚
                 return "Already exise";
             }
-            var strBirth = item.birth.ToString().Split(' ')[0];
+            //var strBirth = item.birth.ToString().Split(' ')[0];
+            DateTime dt = DateTime.Parse(item.birth.ToString());
+            var strBirth = item.birth.Year.ToString() + "/" + item.birth.Month.ToString() + "/" + item.birth.Day.ToString();
             //sign up patient
             try
             {

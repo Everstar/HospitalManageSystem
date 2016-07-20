@@ -33,8 +33,8 @@ namespace WebAPIs.Models
                         end_time = (DateTime)reader[3],
                         patient_id = reader[4].ToString(),
                         doc_id = reader[5].ToString(),
-                        take = (int)reader[6],
-                        pay = (double)reader[7],
+                        take = int.Parse(reader[6].ToString()),
+                        pay = double.Parse(reader[7].ToString()),
                         pay_time = (DateTime)reader[8]
                     });
                 }
@@ -108,7 +108,9 @@ namespace WebAPIs.Models
                         medicine_id = reader[0].ToString(),
                         name = reader[1].ToString(),
                         unit = reader[2].ToString(),
-                        stock = (int)reader[3]
+                        // $exception	{"Specified cast is not valid."}	System.InvalidCastException
+                        // 这怎么可以强制类型转换。。。直接Parse更好
+                        stock = int.Parse(reader[3].ToString())
                     });
                 }
                 return medicine;
