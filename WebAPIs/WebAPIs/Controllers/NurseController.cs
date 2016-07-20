@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using WebAPIs.Models;
@@ -22,16 +23,14 @@ namespace WebAPIs.Controllers
         /// 获取住院信息
         /// </summary>
         /// <param name="nurseId"></param>
-        /// <returns></returns>
+        /// <returns>{hos_id,treat_id,nurse_id,bed_num,pay,rank,in_time,out_time,pay_time}</returns>
+        /// done
+        /// Version 7.20 11:14 根据新的API文档去掉了参数的nurseid 改为由Cookie获取
         [HttpGet]
-        [Route("api/Nurse/GetHospitalization/{nurseId}")]
-
-
-        //done
-        //retrun{hos_id,treat_id,nurse_id,bed_num,pay,rank,in_time,out_time,pay_time}
-        public HttpResponseMessage GetHospitalization(string nurseId)
+        [Route("api/Nurse/GetHospitalization")]
+        public HttpResponseMessage GetHospitalization()
         {
-
+            string nurseId = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
             // Retuen ALL Hospitalization natural join Bed
             // hospitalization表查找nurse_id相关的记录 找到床 返回
