@@ -96,7 +96,7 @@ namespace WebAPIs.Models
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr = 
                 @" update prescription
-                   set done_time = systimestamp)
+                   set done_time = systimestamp
                    where pres_id =:Pres_id";
             cmd.CommandText = sqlStr;
            
