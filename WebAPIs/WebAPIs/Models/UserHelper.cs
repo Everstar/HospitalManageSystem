@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -30,7 +31,7 @@ namespace WebAPIs.Models
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                cmd.Transaction.Rollback();
+                //查询语句不需要回滚
                 return "Already exise";
             }
             var strBirth = item.birth.ToString().Split(' ')[0];
@@ -40,8 +41,8 @@ namespace WebAPIs.Models
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-
                 cmd.CommandText = sqlStr;
+
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("name", item.name);
                 cmd.Parameters.Add("sex", item.sex);
@@ -60,7 +61,6 @@ namespace WebAPIs.Models
             {
                 cmd.Transaction.Rollback();
                 return "Insert failed, message:" + e.Message + " " + strBirth;
-                //return false;
             }
             string i = "d";
             return "Ok";
@@ -86,7 +86,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+
             }
             return null;
         }
@@ -107,7 +107,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+                //无需做任何操作
             }
             return null;
         }
@@ -241,5 +241,6 @@ namespace WebAPIs.Models
             }
             return null;
         }
+
     }
 }
