@@ -75,7 +75,7 @@ namespace WebAPIs.Models
 
        
         
-            //获取投诉率高于percent的医生
+            //获取得分低于percent的医生
     
         
         public static ArrayList GetComplaintedDoctor(double percent)//获取投诉率高于percent的医生
