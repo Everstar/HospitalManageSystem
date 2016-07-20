@@ -18,7 +18,6 @@ using WebAPIs.Models.UnifiedTable;
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Doctor")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class DoctorController : BaseController
     {
         /// <summary>
@@ -120,6 +119,7 @@ namespace WebAPIs.Controllers
             }
             response.Content = new StringContent("接诊成功！医生:" + doc_id + " 病人：" + treatment_id);
             // tekes表填充treatment_id对应的doc_id
+            response.StatusCode = HttpStatusCode.OK;
             return response;
         }
         /// <summary>

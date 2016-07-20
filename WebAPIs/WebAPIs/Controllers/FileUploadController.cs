@@ -14,7 +14,7 @@ namespace WebAPIs.Controllers
     public class FileUploadController : ApiController
     {
         [HttpPost]
-        [Route("api/upload")]
+        [Route("api/upload2")]
         public Task<HttpResponseMessage> UploadImagePost()
         {
             HttpRequestMessage request = this.Request;
@@ -49,6 +49,28 @@ namespace WebAPIs.Controllers
                 }
             );
             return task;
+        }
+        [HttpPost]
+        [Route("api/upload")]
+        public async Task<string> Upload()
+        {
+            string root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/Uploads");
+
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            await Request.Content.ReadAsMultipartAsync(provider);
+
+            FileInfo finfo = new FileInfo(provider.FileData.First().LocalFileName);
+
+            string guid = Guid.NewGuid().ToString();
+            string path = Path.Combine(root, guid + "_" + provider.FileData.First().Headers.ContentDisposition.FileName.Replace("\"", ""));
+            File.Move(finfo.FullName, path);
+
+
+            var myParameter = provider.FormData.GetValues("userid").FirstOrDefault();
+            var count = provider.FileData.Count;
+
+            return count + " / " + myParameter;
         }
     }
 }

@@ -18,7 +18,6 @@ using Newtonsoft.Json;
 
 namespace WebAPIs.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class AccountController : BaseController
     {
         /// <summary>

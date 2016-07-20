@@ -14,7 +14,7 @@ namespace WebAPIs
         public static string UrlPrefixRelative { get { return "~/api"; } }
         public static void Register(HttpConfiguration config)
         {
-            config.EnableCors();
+            //config.EnableCors();
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

@@ -15,8 +15,6 @@ using Newtonsoft.Json.Linq;
 namespace WebAPIs.Controllers
 {
     //[Authorize(Roles = "Managementstaff")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
-
     public class ManagementstaffController : BaseController
     {
         /// <summary>
