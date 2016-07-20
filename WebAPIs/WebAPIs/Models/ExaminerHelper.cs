@@ -96,22 +96,22 @@ namespace WebAPIs.Models
         }
 
         // 0:验血 1：胃镜 2：XRay
-        public static ArrayList GetPatientByExamId(string examineID,char type)
-        {
-            ArrayList patientInfo = new ArrayList();
+        //public static ArrayList GetPatientByExamId(string examineID)
+        //{
+        //    ArrayList patientInfo = new ArrayList();
 
-            string sqlStr = String.Format(
-               @"with treatmentid(treat_id) as(
-                      select treatment.treat_id
-                      from treatment natural join examine natural join examination
-                      where examine");
+        //    string sqlStr = String.Format(
+        //       @"with treatmentid(treat_id) as(
+        //              select treatment.treat_id
+        //              from treatment natural join examine natural join examination
+        //              where examine");
 
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+        //    OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
-            return patientInfo;
+        //    return patientInfo;
 
 
             
-        } 
+        //} 
     }
 }
