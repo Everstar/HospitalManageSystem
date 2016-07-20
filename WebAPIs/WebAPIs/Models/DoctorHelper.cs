@@ -80,13 +80,18 @@ namespace WebAPIs.Models
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
-                cmd.ExecuteNonQuery();
+                var num = cmd.ExecuteNonQuery();
+                if (num != 1)
+                {
+                    cmd.Transaction.Rollback();
+                    throw new Exception("需要更改的id不存在，更改的Num:" + num.ToString());
+                }
                 cmd.Transaction.Commit();
                 return true;
             }
             catch (Exception e)
             {
-                cmd.Transaction.Rollback();
+                throw e;
             }
             return false;
         }

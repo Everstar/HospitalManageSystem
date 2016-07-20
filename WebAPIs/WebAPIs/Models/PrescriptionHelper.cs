@@ -36,7 +36,7 @@ namespace WebAPIs.Models
                          (select pres_id
                           from prescription ,employee
                           where employee.employee_id = '{0}'and employee.employee_ID=prescription.employee_ID and prescription.done_time is null)
-                       select unique pres_id, sex, name
+                       select unique pres_id, sex, name 
                        from identity natural join patient natural join treatment natural join prewithdoc", pharmacistId);
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
@@ -69,6 +69,7 @@ namespace WebAPIs.Models
                   from prescription natural join prescribe natural join medicine
 				  where pres_id='{0}'", pres_id);
 
+
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
   
 
@@ -96,10 +97,10 @@ namespace WebAPIs.Models
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr = 
                 @" update prescription
-                   set done_time = to_date(:Pnowtime,'yyyy-mm-dd hh24:mi:ss')
+                   set done_time = systimestamp
                    where pres_id =:Pres_id";
             cmd.CommandText = sqlStr;
-            cmd.Parameters.Add("Ponwtime", DateTime.Now.ToString("yyyy-mm-dd hh24:mi:ss"));
+           
             cmd.Parameters.Add("Pres_id", pres_id);
             try
             {

@@ -42,7 +42,8 @@ namespace WebAPIs.Controllers
         {
             HttpResponseMessage response = new HttpResponseMessage();
             string doc_id = HttpContext.Current.User.Identity.Name;
-            doc_id = "16687";
+            if (doc_id.Equals(""))
+                doc_id = "16687";
             // 在数据库treatment表找到所有与当前医生doc_id相关的所有挂号记录
             // treatment natural join takes using(treat_id)
             // tekes.doc_id若为空 取出这条数据组成数组
@@ -50,15 +51,41 @@ namespace WebAPIs.Controllers
             try
             {
                 ArrayList list = DoctorHelper.GetAllTreatment(doc_id);
+                JArray resArray = new JArray();
                 if (list.Count == 0)
                 {
-                    list.Add("0");
+                    resArray.Add(0);
                 }
                 else
                 {
-                    list.Insert(0, "1");
+                    resArray.Add("1");
+                    string jsonRes = JsonObjectConverter.ObjectToJson(list);
+                    var strObject = JsonConvert.DeserializeObject(jsonRes) as JArray;
+
+                    for (int i = 0; i < strObject.Count; i++)
+                    {
+                        JObject tmpObj = JObject.Parse(strObject[i].ToString());
+                        JObject obj = new JObject();
+                        string patient_id = tmpObj.GetValue("patient_id").ToString();
+                        string employee_id = tmpObj.GetValue("doc_id").ToString();
+                        PatientInfo patientInfo = UserHelper.GetPatientInfo(patient_id);
+                        EmployeeInfo employeeInfo = UserHelper.GetEmployeeInfo(employee_id);
+                        string treatment_id = tmpObj.GetValue("treat_id").ToString();
+                        string patient_name = patientInfo.name.ToString();
+                        string clinic = tmpObj.GetValue("clinic").ToString();
+                        string employee_name = employeeInfo.name.ToString();
+                        string start_time = tmpObj.GetValue("start_time").ToString();
+                        string take = tmpObj.GetValue("take").ToString();
+                        obj.Add("treatment_id", treatment_id);
+                        obj.Add("patient_name", patient_name);
+                        obj.Add("clinic", clinic);
+                        obj.Add("employee_name", employee_name);
+                        obj.Add("start_time", start_time);
+                        obj.Add("take", take);
+                        resArray.Add(obj);
+                    }
                 }
-                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(resArray));
 
             }
             catch (Exception e)
@@ -81,16 +108,18 @@ namespace WebAPIs.Controllers
         {
             string doc_id = HttpContext.Current.User.Identity.Name;
             HttpResponseMessage response = new HttpResponseMessage();
-
-            // tekes表填充treatment_id对应的doc_id
-            if (DoctorHelper.TakeTreat(doc_id, treatment_id))
+            try
             {
-                response.Content = new StringContent("接诊成功！医生:" + doc_id + " 病人：" + treatment_id);
+                DoctorHelper.TakeTreat(doc_id, treatment_id);
             }
-            else
+            catch (Exception e)
             {
+                response.Content = new StringContent(e.Message);
                 response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
             }
+            response.Content = new StringContent("接诊成功！医生:" + doc_id + " 病人：" + treatment_id);
+            // tekes表填充treatment_id对应的doc_id
             return response;
         }
         /// <summary>
@@ -200,14 +229,15 @@ namespace WebAPIs.Controllers
                     int index = rand.Next(0, pharmacist.Count - 1);
                     doc_id = ((EmployeeInfo)pharmacist[index]).employee_id;
                 }
-                
+
                 // prescription表创建一条记录
                 // 设置pres_id treat_id doc_id从药剂师中随机挑选 time
                 // 其他空值
                 // prescribeb表创建一条记录
                 // 设置pres_id medicine_id num
                 DoctorHelper.WritePrescription(treatment_id, doc_id, medicine_id, num);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 response.Content = new StringContent(e.Message);
                 response.StatusCode = HttpStatusCode.BadRequest;
