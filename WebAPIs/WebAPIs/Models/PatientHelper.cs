@@ -159,7 +159,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                 @"select employee_id, name
                  from treatment natural join (employee natural join identity)
-                 where treat_id ={0}", treatment_id);
+                 where treat_id ='{0}'", treatment_id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             ArrayList doctorIdName = new ArrayList();
             try
@@ -174,9 +174,9 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                return null;
             }
-            return null;
+            return doctorIdName;
         }
 
         public static string GetNameById(string id)
