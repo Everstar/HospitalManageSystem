@@ -10,6 +10,7 @@ using WebAPIs.Providers;
 using WebAPIs.Models.DataModels;
 using System.Web.Http.Cors;
 using WebAPIs.Models;
+using System.Web;
 
 namespace WebAPIs.Controllers
 {
@@ -22,13 +23,9 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Pharmacist/GetAllPrescription/{employeeId}")]
         public HttpResponseMessage GetAllPrescription()
         {
-            string url = Request.RequestUri.AbsolutePath;
-            string pattern = @"\d+";
-            string employeeId = Regex.Match(url, pattern, RegexOptions.IgnoreCase).Value;
-
+            string employeeId = HttpContext.Current.User.Identity.Name;
             // 返回所有处方employeeId药剂师对应的处方表
             // 处方ID对应的所有药品的名称 量
             // 开方时间等
