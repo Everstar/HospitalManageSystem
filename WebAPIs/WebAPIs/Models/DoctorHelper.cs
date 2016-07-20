@@ -25,6 +25,16 @@ namespace WebAPIs.Models
                 OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
+                    DateTime time = new DateTime();
+
+                    if (reader[8].ToString().Equals(""))
+                    {
+                        time = new DateTime();
+                    }
+                    else
+                    {
+                        time = (DateTime)reader[8];
+                    }
                     treatInfo.Add(new Treatment
                     {
                         treat_id = reader[0].ToString(),
@@ -35,7 +45,7 @@ namespace WebAPIs.Models
                         doc_id = reader[5].ToString(),
                         take = int.Parse(reader[6].ToString()),
                         pay = double.Parse(reader[7].ToString()),
-                        pay_time = (DateTime)reader[8]
+                        pay_time = time
                     });
                 }
                 return treatInfo;

@@ -97,15 +97,15 @@ namespace WebAPIs.Models
             return null;
         }
 
-        public static int RegisterTreat(Treatment treat)
+        public static string RegisterTreat(Treatment treat)
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            cmd.Transaction = cmd.Connection.BeginTransaction();
             try
             {
-                string sqlStr = String.Format(@"insert into treatment 
-                    values(:clinic_name, to_date('{0}', 'yyyy-mm-dd hh24:mi:ss'), to_date('{1}', 'yyyy-mm-dd hh24:mi:ss'), :patient_id, :employee_id, :take)",
+                string sqlStr = String.Format(@"insert into treatment(clinic_name, start_time, end_time, patient_id, employee_id, take)
+                    values(:clinic_name, to_timestamp('{0}', 'yyyy-mm-dd hh24:mi:ss'), to_timestamp('{1}', 'yyyy-mm-dd hh24:mi:ss'), :patient_id, :employee_id, :take)",
                     treat.start_time.ToString("yyyy-mm-dd hh24:mi:ss"),
                     treat.end_time.ToString("yyyy-mm-dd hh24:mi:ss"));
                 cmd.CommandText = sqlStr;
@@ -115,22 +115,28 @@ namespace WebAPIs.Models
                 cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = treat.doc_id;
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
+
+                string sql = "select TREATMENT_INCRE.currval from dual";
+                cmd = DatabaseHelper.GetInstance().conn.CreateCommand();
+                cmd.CommandText = sql;
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return reader[0].ToString();
+                }
             }
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                return -1;
             }
-
-            //select the max id;
-            return 0;
+            return null;
         }
 
         public static bool Comment(Evaluation item)
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            cmd.Transaction = cmd.Connection.BeginTransaction();
             try
             {
                 string sqlStr =
@@ -174,9 +180,9 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+
             }
-            return doctorIdName;
+            return null;
         }
 
         public static string GetNameById(string id)
@@ -202,15 +208,11 @@ namespace WebAPIs.Models
 
         }
 
-        public static ArrayList GetTreatmentInfo(string patient_id, int month, int year)
+        //Test Passed
+        public static ArrayList GetTreatmentInfo(string patient_id)
         {
-            DateTime minTime = new DateTime(year, month, 1);
-            DateTime maxTime = new DateTime(year, month == 12 ? 1 : month + 1, 1);
-            string sqlStr = String.Format(@"select * from treatment where patient_id='{0}' 
-            and end_time >= to_date('{1}', 'yyyy-mm-dd hh24:mi:ss') and end_time<to_date('{2}', 'yyyy-mm-dd hh24:mi:ss')",
-            patient_id,
-            minTime.ToString("yyyy-mm-dd hh24:mi:ss"),
-            maxTime.ToString("yyyy-mm-dd hh24:mi:ss"));
+            string sqlStr = String.Format(@"select * from treatment where patient_id='{0}'",
+            patient_id);
 
             ArrayList treatInfo = new ArrayList();
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
@@ -223,13 +225,13 @@ namespace WebAPIs.Models
                     {
                         treat_id = reader[0].ToString(),
                         clinic = reader[1].ToString(),
-                        start_time = (DateTime)reader[2],
-                        end_time = (DateTime)reader[3],
+                        start_time = Convert.ToDateTime(reader[2]),
+                        end_time = Convert.ToDateTime(reader[3]),
                         patient_id = reader[4].ToString(),
                         doc_id = reader[5].ToString(),
-                        take = (int)reader[6],
-                        pay = (Double)reader[7],
-                        pay_time = (DateTime)reader[8]
+                        take = Convert.ToInt32(reader[6]),
+                        pay = Convert.ToDouble(reader[7]),
+                        pay_time = Convert.ToDateTime(reader[8])
                     });
                 }
                 return treatInfo;
@@ -241,7 +243,7 @@ namespace WebAPIs.Models
             return null;
         }
 
-        public static ArrayList GetAllConsumption(string patient_id, string treat_id)
+        public static ArrayList GetAllConsumption(string treat_id)
         {
             ArrayList consumptionInfo = new ArrayList();
             try
@@ -251,7 +253,7 @@ namespace WebAPIs.Models
                 string sqlStr = String.Format(
                   @"select *
                  from treatment
-                 where treat_id ={0}", treat_id);
+                 where treat_id ='{0}'", treat_id);
                 OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
@@ -260,13 +262,13 @@ namespace WebAPIs.Models
                     {
                         treat_id = reader[0].ToString(),
                         clinic = reader[1].ToString(),
-                        start_time = (DateTime)reader[2],
-                        end_time = (DateTime)reader[3],
+                        start_time = Convert.ToDateTime(reader[2]),
+                        end_time = Convert.ToDateTime(reader[3]),
                         patient_id = reader[4].ToString(),
                         doc_id = reader[5].ToString(),
-                        take = (int)reader[6],
-                        pay = (Double)reader[7],
-                        pay_time = (DateTime)reader[8]
+                        take = Convert.ToInt32(reader[6]),
+                        pay = Convert.ToDouble(reader[7]),
+                        pay_time = Convert.ToDateTime(reader[8])
                     });
                 }
                 #endregion
@@ -276,7 +278,7 @@ namespace WebAPIs.Models
                 sqlStr = String.Format(
                   @"select exam_id, type, exam_time, employee_id, pay, pay_time
                  from examination natural join examine
-                 where treat_id ={0}", treat_id);
+                 where treat_id ='{0}'", treat_id);
 
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 OracleDataReader reader_1 = cmd.ExecuteReader();
@@ -286,10 +288,10 @@ namespace WebAPIs.Models
                     {
                         exam_id = reader_1[0].ToString(),
                         type = reader_1[1].ToString(),
-                        exam_time = (DateTime)reader_1[2],
+                        exam_time = Convert.ToDateTime(reader_1[2]),
                         employee_id = reader_1[3].ToString(),
-                        pay = (double)reader_1[4],
-                        pay_time = (DateTime)reader_1[5]
+                        pay = Convert.ToDouble(reader_1[4]),
+                        pay_time = Convert.ToDateTime(reader_1[5])
                     });
                 }
 
@@ -310,10 +312,10 @@ namespace WebAPIs.Models
                         pres_id = reader_2[0].ToString(),
                         treat_id = reader_2[1].ToString(),
                         employee_id = reader_2[2].ToString(),
-                        make_time = (DateTime)reader_2[3],
-                        done_time = (DateTime)reader_2[4],
-                        pay = (double)reader_2[5],
-                        pay_time = (DateTime)reader_2[6]
+                        make_time = Convert.ToDateTime(reader_2[3]),
+                        done_time = Convert.ToDateTime(reader_2[4]),
+                        pay = Convert.ToDouble(reader_2[5]),
+                        pay_time = Convert.ToDateTime(reader_2[6])
                     });
                 }
                 #endregion
@@ -333,10 +335,10 @@ namespace WebAPIs.Models
                         surg_id = reader_3[0].ToString(),
                         treat_id = reader_3[1].ToString(),
                         surgery_name = reader_3[2].ToString(),
-                        start_time = (DateTime)reader_3[3],
-                        end_time = (DateTime)reader_3[4],
-                        pay = (double)reader_3[5],
-                        pay_time = (DateTime)reader_3[6]
+                        start_time = Convert.ToDateTime(reader_3[3]),
+                        end_time = Convert.ToDateTime(reader_3[4]),
+                        pay = Convert.ToDouble(reader_3[5]),
+                        pay_time = Convert.ToDateTime(reader_3[6])
                     });
                 }
                 #endregion
@@ -346,7 +348,7 @@ namespace WebAPIs.Models
                 ArrayList hosInfo = new ArrayList();
                 sqlStr = String.Format(
                     @"select *
-                    from surgery
+                    from hospitalization
                     where treat_id='{0}'", treat_id);
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 OracleDataReader reader_4 = cmd.ExecuteReader();
@@ -358,10 +360,10 @@ namespace WebAPIs.Models
                         treat_id = reader_4[1].ToString(),
                         nurse_id = reader_4[2].ToString(),
                         bed_num = reader_4[3].ToString(),
-                        in_time = (DateTime)reader_4[4],
-                        out_time = (DateTime)reader_4[5],
-                        pay = (double)reader_4[6],
-                        pay_time = (DateTime)reader_4[7]
+                        in_time = Convert.ToDateTime(reader_4[4]),
+                        out_time = Convert.ToDateTime(reader_4[5]),
+                        pay = Convert.ToDouble(reader_4[6]),
+                        pay_time = Convert.ToDateTime(reader_4[7])
                     });
                 }
                 #endregion
@@ -378,7 +380,7 @@ namespace WebAPIs.Models
             {
 
             }
-            return null;
+            return consumptionInfo;
         }
     }
 

@@ -244,5 +244,27 @@ namespace WebAPIs.Models
             return null;
         }
 
+        public static string GetPatientIdByTreatmentId(string id)
+        {
+            string sqlStr = @"select * from treatment natural join patient";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader[1].ToString().Equals(id))
+                        return reader[0].ToString();
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
     }
 }
