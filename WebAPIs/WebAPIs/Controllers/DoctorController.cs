@@ -44,16 +44,26 @@ namespace WebAPIs.Controllers
             // treatment natural join takes using(treat_id)
             // tekes.doc_id若为空 取出这条数据组成数组
             // 设置takes表treat_id对应记录的doc_id为当前doc_id
-            ArrayList list = DoctorHelper.GetAllTreatment(doc_id);
-            if (list.Count == 0)
+            try
             {
-                list.Add("0");
+                ArrayList list = DoctorHelper.GetAllTreatment(doc_id);
+                if (list.Count == null)
+                {
+                    list.Add("0");
+                }
+                else
+                {
+                    list.Insert(0, "1");
+                }
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+
             }
-            else
+            catch (Exception e)
             {
-                list.Insert(0, "1");
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
             }
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+
             return response;
         }
         /// <summary>
@@ -61,6 +71,7 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/TakesRegistration/{treatment_id}")]
         public HttpResponseMessage TakesRegistration(string treatment_id)
@@ -85,12 +96,14 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// Test Failed.
         [HttpGet]
         [Route("api/Doctor/WriteExamination/{treatment_id}/{exam_type}")]
         public HttpResponseMessage WriteExamination(string treatment_id, string exam_type)
         {
             HttpResponseMessage response = new HttpResponseMessage();
             string doc_id = HttpContext.Current.User.Identity.Name;
+            doc_id = "16687";
             switch (int.Parse(exam_type))
             {
                 case 0:
@@ -118,6 +131,7 @@ namespace WebAPIs.Controllers
         /// 获取ALL medicine的所有信息
         /// </summary>
         /// <returns></returns>
+        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/GetMedicineList")]
         public HttpResponseMessage GetAllMedicine()
@@ -128,25 +142,19 @@ namespace WebAPIs.Controllers
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
         }
-        /// <summary>
-        /// 获取药品ID
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("api/Doctor/GetMedicine/{name}")]
-        public HttpResponseMessage GetMedicine(string name)
-        {
-            // 从medicine拿到相关药品的id
-            HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent("123斯达舒321");
-            return response;
-        }
+
         /// <summary>
         /// 开处方
         /// </summary>
+        /// <example>
+        /// Post的Json格式：
+        /// <code>
+        /// ["treat_id",{ id: '11', number: '2' }, { id: '13', number: '2' }, { id: '114', number: '5' }, { id: '611', number: '2' }];
+        /// </code>
+        /// </example>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// Test passed
         [HttpPost]
         [Route("api/Doctor/WritePrescription")]
         public HttpResponseMessage WritePrescription(dynamic obj)
@@ -170,6 +178,8 @@ namespace WebAPIs.Controllers
                     num.Add(number);
                 }
                 string doc_id = HttpContext.Current.User.Identity.Name;
+                doc_id = "16656";
+                // doc_id随机分配一个
                 // prescription表创建一条记录
                 // 设置pres_id treat_id doc_id从药剂师中随机挑选 time
                 // 其他空值
@@ -190,6 +200,7 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/WriteSurgey/{treatment_id}/{surgey_name}")]
         public HttpResponseMessage WriteSurgey(string treatment_id, string surgey_name)
@@ -197,6 +208,11 @@ namespace WebAPIs.Controllers
             // surgery表插入数据
             // 设置surg_id treat_id surgey_name start_time end_time pay
             HttpResponseMessage response = new HttpResponseMessage();
+            if (!DoctorHelper.WriteSurgery(treatment_id, surgey_name))
+            {
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Content = new StringContent("添加失败！");
+            }
             return response;
         }
         /// <summary>
@@ -204,7 +220,8 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        [HttpPost]
+        /// Test Passed
+        [HttpGet]
         [Route("api/Doctor/WriteHospitalization/{treatment_id}")]
         public HttpResponseMessage WriteHospitalization(string treatment_id)
         {
@@ -213,6 +230,15 @@ namespace WebAPIs.Controllers
             // 设置hos_id treat_id nurse_id随机生成，在employee表查找 bed_num需要唯一 in_time系统获取
             // out_time空 pay随机生成
             HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                DoctorHelper.WriteHospitalization(treatment_id);
+            }
+            catch (Exception e)
+            {
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Content = new StringContent(e.Message);
+            }
             return response;
         }
     }

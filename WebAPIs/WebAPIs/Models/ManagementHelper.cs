@@ -83,8 +83,8 @@ namespace WebAPIs.Models
                   from evaluation
                   group by employee_id)
                   select employee_id,dept_name,clinic_name,post,name,sex
-                  from ComplaintedDoctor natural join employee
-                  where em_percent>='{0}'", percent);
+                  from ComplaintedDoctor natural join employee natural join identity 
+                  where em_percent>='{0}'", percent);// 这里sql语句有问题 没有join identity现在加上了
             cmd.CommandText = sqlStr;
 
 

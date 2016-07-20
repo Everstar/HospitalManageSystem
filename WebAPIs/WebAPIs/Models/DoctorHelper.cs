@@ -42,7 +42,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
@@ -119,26 +119,35 @@ namespace WebAPIs.Models
             }
             return null;
         }
-
-        public static bool  WriteExamination(string treat_id, string employee_id, int type){
+        // Exam id 木有写完....
+        // 写完了
+        public static bool WriteExamination(string treat_id, string employee_id, int type)
+        {
             if (type < 0 || type > 2) return false;
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            OracleTransaction transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            OracleTransaction transaction = cmd.Connection.BeginTransaction();
             cmd.Transaction = transaction;
             string sqlStr;
             try
             {
-                
-                sqlStr = @"insert into examination
+
+                sqlStr = @"insert into examination(exam_id, type, exam_time, employee_id)
                 values(null, :type, systimestamp, :employee_id)";
                 cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("type" ,OracleDbType.Int32).Value = type;
+                cmd.Parameters.Add("type", OracleDbType.Int32).Value = type;
                 cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = employee_id;
                 cmd.ExecuteNonQuery();
 
                 //select related exam_id
+                sqlStr = @"select EXAM_INCREMENT.CURRVAL from dual";
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.CommandText = sqlStr;
+                var reader = cmd.ExecuteReader();
                 string exam_id = "";
+                if (reader.Read())
+                    exam_id = reader[0].ToString();
+
                 switch (type)
                 {
                     case 2:
@@ -146,6 +155,8 @@ namespace WebAPIs.Models
                         @"insert into XRay 
                         values('{0}', :checkpoint, :from_picture, :picture)", exam_id);
                         cmd = new OracleCommand();
+                        // 没加text啊。。
+                        cmd.CommandText = sqlStr;
                         cmd.Connection = DatabaseHelper.GetInstance().conn;
                         cmd.Transaction = transaction;
                         cmd.Parameters.Add("checkpoint", OracleDbType.Varchar2, 100).Value = ConstHelper.checkpoint;
@@ -158,6 +169,8 @@ namespace WebAPIs.Models
                         @"insert into gastroscope 
                         values('{0}', :from_picture, :diagnoses, :picture)", exam_id);
                         cmd = new OracleCommand();
+                        // 没加text啊。。
+                        cmd.CommandText = sqlStr;
                         cmd.Connection = DatabaseHelper.GetInstance().conn;
                         cmd.Transaction = transaction;
                         cmd.Parameters.Add("from_picture", OracleDbType.Varchar2, 2000).Value = ConstHelper.from_picture_Gas;
@@ -168,14 +181,31 @@ namespace WebAPIs.Models
                     case 0:
                         sqlStr = String.Format(
                         @"insert into blood
-                        values('{0}', {1}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10},
-                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})",exam_id,
-                        ConstHelper.wbc, ConstHelper.neut_percent,ConstHelper.lymph_percent,
-                        ConstHelper.mono_percent, ConstHelper.eo_percent, ConstHelper.baso_percent,
-                        ConstHelper.neut_num, ConstHelper.lymph_num, ConstHelper.mono_num, ConstHelper.eo_num,
-                        ConstHelper.baso_num, ConstHelper.rbc, ConstHelper.hgb, ConstHelper.hct, ConstHelper.mcv,
-                        ConstHelper.mch, ConstHelper.mchc, ConstHelper.rdw, ConstHelper.plt, ConstHelper.mpv, 
-                        ConstHelper.pct, ConstHelper.pdw
+                        values('{0}', {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10},
+                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})", 
+                        exam_id,
+                        ConstHelper.wbc, 
+                        ConstHelper.neut_percent, 
+                        ConstHelper.lymph_percent,
+                        ConstHelper.mono_percent, 
+                        ConstHelper.eo_percent,
+                        ConstHelper.baso_percent,
+                        ConstHelper.neut_num, 
+                        ConstHelper.lymph_num, 
+                        ConstHelper.mono_num, 
+                        ConstHelper.eo_num,
+                        ConstHelper.baso_num, 
+                        ConstHelper.rbc,
+                        ConstHelper.hgb,
+                        ConstHelper.hct,
+                        ConstHelper.mcv,
+                        ConstHelper.mch,
+                        ConstHelper.mchc, 
+                        ConstHelper.rdw,
+                        ConstHelper.plt, 
+                        ConstHelper.mpv,
+                        ConstHelper.pct, 
+                        ConstHelper.pdw
                         );
                         cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                         cmd.Transaction = transaction;
@@ -194,7 +224,7 @@ namespace WebAPIs.Models
 
         public static bool WritePrescription(string treat_id, string employee_id, ArrayList medicine_id, ArrayList num)
         {
-            string sqlStr = @"insert into prescription
+            string sqlStr = @"insert into prescription(pres_id, treat_id, employee_id, make_time, done_time)
                 values(null, :treat_id, :employee_id, systimestamp, null)";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             OracleTransaction transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -206,9 +236,15 @@ namespace WebAPIs.Models
                 cmd.ExecuteNonQuery();
 
                 //select pres_id;
+                sqlStr = @"select PRESCRIPTION_INCREMENT.CURRVAL from dual";
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.CommandText = sqlStr;
+                OracleDataReader reader = cmd.ExecuteReader();
                 string pres_id = "";
+                if (reader.Read())
+                    pres_id = reader[0].ToString();
 
-                sqlStr = @"insert into prescribe
+                sqlStr = @"insert into prescribe(pres_id, medicine_id, num)
                         values(:pres_id, :medicine_id, :num)";
                 for (int i = 0; i < medicine_id.Count; ++i)
                 {
@@ -217,6 +253,7 @@ namespace WebAPIs.Models
                     cmd.Parameters.Add("pres_id", OracleDbType.Varchar2, 20).Value = pres_id;
                     cmd.Parameters.Add("medicine_id", OracleDbType.Varchar2, 20).Value = medicine_id[i];
                     cmd.Parameters.Add("num", OracleDbType.Int32).Value = num[i];
+                    cmd.ExecuteNonQuery();
                 }
                 transaction.Commit();
                 return true;
@@ -224,13 +261,15 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 transaction.Rollback();
+                // 增加一个throw语句 以用于处理异常
+                throw e;
             }
             return false;
         }
 
         public static bool WriteSurgery(string treat_id, string surgery_name)
         {
-            string sqlStr = @"insert into surgery
+            string sqlStr = @"insert into surgery(surg_id, treat_id, surgery_name, start_time, end_time)
                 values(null, :treat_id, :surgery_name, systimestamp, null)";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -248,10 +287,11 @@ namespace WebAPIs.Models
             }
             return false;
         }
-
-        public static bool WriteHospitalization(string treat_id, string nurse_id, string bed_num)
+        // 不需要传入nurse_id, bed_num
+        // 改成自动分配了
+        public static bool WriteHospitalization(string treat_id)
         {
-            string sqlStr = @"insert into hospitalization
+            string sqlStr = @"insert into hospitalization(hos_id, treat_id, employee_id, bed_num, in_time, out_time)
             values(null, :treat_id, :employee_id, :bed_num, systimestamp, null)";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -267,6 +307,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
+                throw e;
             }
             return false;
         }
