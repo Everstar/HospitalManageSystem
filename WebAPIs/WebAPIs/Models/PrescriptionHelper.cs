@@ -36,7 +36,7 @@ namespace WebAPIs.Models
                         where employee.employee_id = '{0}' and prescription.done_time = null);
                    with patientinfo(name, sex, treat_id) as(
                         select name, sex, patient_id
-                        from identity natural join patient natural join consulation natural join treatment);
+                        from identity natural join patient natural join treatment);
                    select *
                    from patientinfo natural join prewithdoc",pharmacistId);
 
