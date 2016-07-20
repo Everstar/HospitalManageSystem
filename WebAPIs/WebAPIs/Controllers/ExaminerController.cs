@@ -197,10 +197,10 @@ namespace WebAPIs.Controllers
         //return {name,sex}
         [HttpGet]
         [Route("api/Examiner/GetPatientById/{examInfo}")]
-        public HttpResponseMessage GetPatientNameById(string examineId)
+        public HttpResponseMessage GetPatientNameById(string examInfo)
         {
  
-            ArrayList list = ExaminerHelper.GetPatientByExamId(examineId);
+            ArrayList list = ExaminerHelper.GetPatientByExamId(examInfo);
 
             HttpResponseMessage response = new HttpResponseMessage();
 

@@ -35,8 +35,8 @@ namespace WebAPIs.Models
                     @" with prewithdoc(pres_id) as
                          (select pres_id
                           from prescription ,employee
-                          where employee.employee_id = '{0}'and employee.employee_ID=prescription.employee_ID and prescription.done_time = null)
-                       select pres_id, name, sex 
+                          where employee.employee_id = '{0}'and employee.employee_ID=prescription.employee_ID and prescription.done_time is null)
+                       select unique pres_id, name, sex 
                        from identity natural join patient natural join treatment natural join prewithdoc", pharmacistId);
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
