@@ -11,9 +11,12 @@ namespace WebAPIs.Models.DataModels
         public string clinic { get; set; }
         public DateTime start_time { get; set; }
         public DateTime end_time { get; set; }
+        public string patient_id { get; set; }
         public string doc_id { get; set; }
+        public int take { get; set; }
         public double pay { get; set; }
         public DateTime pay_time { get; set; }
+
 
     }
 }

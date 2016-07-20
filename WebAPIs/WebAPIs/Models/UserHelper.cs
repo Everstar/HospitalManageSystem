@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,6 +9,7 @@ using WebAPIs.Providers;
 using WebAPIs.Models.UnifiedTable;
 using System.Globalization;
 using Oracle.ManagedDataAccess.Client;
+using System.Collections;
 
 namespace WebAPIs.Models
 {
@@ -16,7 +18,7 @@ namespace WebAPIs.Models
         private static int _cnt = 0;
 
         //SignUp as Patient
-        public static bool SignUp(SignUpUser item)
+        public static string SignUp(SignUpUser item)
         {
             //check if the credit_num is used
             string sqlStr =
@@ -29,7 +31,8 @@ namespace WebAPIs.Models
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                return false;
+                //查询语句不需要回滚
+                return "Already exise";
             }
             var strBirth = item.birth.ToString().Split(' ')[0];
             //sign up patient
@@ -38,20 +41,7 @@ namespace WebAPIs.Models
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-
                 cmd.CommandText = sqlStr;
-
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("name", OracleDbType.Varchar2, 40).Value = item.name;
-                cmd.Parameters.Add("sex", OracleDbType.Char, 1).Value = item.sex;
-                cmd.Parameters.Add("birth", OracleDbType.Date).Value = item.birth.ToShortDateString();
-                cmd.ExecuteNonQuery();//这里貌似没意义，问一下？？？
-
-                sqlStr = "insert into patient values (:credit_num, :password)";
-                cmd.CommandText = sqlStr;
-                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
-                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.passwd;
-                    
 
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("name", item.name);
@@ -70,9 +60,10 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                return false;
+                return "Insert failed, message:" + e.Message + " " + strBirth;
             }
-            return true;
+            string i = "d";
+            return "Ok";
         }
 
 
@@ -95,7 +86,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+
             }
             return null;
         }
@@ -116,7 +107,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+                //无需做任何操作
             }
             return null;
         }
@@ -137,11 +128,11 @@ namespace WebAPIs.Models
                 if (reader.Read())
                 {
                     return new PatientInfo(
-                        reader[0].ToString(), 
-                        reader[1].ToString(), 
+                        reader[0].ToString(),
+                        reader[1].ToString(),
                         reader[2].ToString(),
-                        reader[3].ToString(), 
-                        reader[4].ToString(), 
+                        reader[3].ToString(),
+                        reader[4].ToString(),
                         Convert.ToDateTime(reader[5].ToString()));
                 }
             }
@@ -185,6 +176,41 @@ namespace WebAPIs.Models
             }
             return null;
         }
+        /// <summary>
+        /// 获取所有用户信息
+        /// </summary>
+        /// <returns></returns>
+        public static ArrayList GetAllEmployee()
+        {
+            string sqlStr = @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth 
+                            from employee natural join identity";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                ArrayList list = new ArrayList();
+                while (reader.Read())
+                {
+                    list.Add(new EmployeeInfo(
+                        reader[0].ToString(),
+                        reader[1].ToString(),
+                        reader[2].ToString(),
+                        reader[3].ToString(),
+                        reader[4].ToString(),
+                        reader[5].ToString(),
+                        Convert.ToDouble(reader[6].ToString()),
+                        reader[7].ToString(),
+                        reader[8].ToString(),
+                        Convert.ToDateTime(reader[9].ToString())));
+                }
+                return list;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
 
         public static PatientInfo GetPatientInfoByCredNum(string num)
         {
@@ -215,5 +241,6 @@ namespace WebAPIs.Models
             }
             return null;
         }
+
     }
 }

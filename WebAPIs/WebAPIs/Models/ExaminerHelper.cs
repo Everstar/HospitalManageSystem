@@ -11,6 +11,7 @@ namespace WebAPIs.Models
 {
     public class ExaminerHelper
     {
+        // Test Passed
         public static ArrayList GetAllExamination(string doc_id)//获得该检验医生的所有检查记录
         {
             ArrayList AllExamination = new ArrayList();
@@ -25,7 +26,6 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("doc_id", OracleDbType.Varchar2, 5).Value = doc_id;
 
             OracleDataReader reader = cmd.ExecuteReader();
-            
             try
             {
                 while (reader.Read())

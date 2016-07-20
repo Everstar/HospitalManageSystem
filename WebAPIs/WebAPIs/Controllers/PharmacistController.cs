@@ -79,5 +79,26 @@ namespace WebAPIs.Controllers
             }
             return response;
         }
+
+
+
+        [HttpGet]
+        [Route("api/Pharmacist/FinishPrescription/{pres_id}")]
+        public HttpResponseMessage FinishPrescription(string pres_id)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            if (PrescriptionHelper.UpdateDoneTime(pres_id))
+            {
+                response.Content = new StringContent("完成配药");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            else
+            {
+                response.Content = new StringContent("数据库更新失败");
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+            return response;
+        }
     }
 }
