@@ -95,7 +95,6 @@ namespace WebAPIs.Models
 
         }
 
-        // 0:验血 1：胃镜 2：XRay
 
         public static ArrayList GetPatientByExamId(string examineID)
         {
@@ -109,7 +108,9 @@ namespace WebAPIs.Models
                       where examine.exam_id = '{0}')
                  select identity.name, identity.sex 
                  from patient natural join identity, treatmentid
-                 where patient.patient_id=treatmentid.patient_id", examineID);
+                 where patient.patient_id=treatmentid.patient_id",examineID);
+
+  
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
