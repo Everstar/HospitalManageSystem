@@ -192,10 +192,6 @@ namespace WebAPIs.Models
             return false;
         }
 
-<<<<<<< HEAD
-        
-    
-=======
         public static bool WritePrescription(string treat_id, string employee_id, ArrayList medicine_id, ArrayList num)
         {
             string sqlStr = @"insert into prescription
@@ -316,7 +312,6 @@ namespace WebAPIs.Models
             }
             return null;
         }
->>>>>>> 6b8d3e2dbd419af9f472c0998855cb05255818d7
 
         //private static bool SetBedUsed(string bed_num)
         //{
