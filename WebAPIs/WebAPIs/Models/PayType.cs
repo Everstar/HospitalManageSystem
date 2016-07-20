@@ -11,6 +11,6 @@ namespace WebAPIs.Models
         Exam,
         Pres,
         Surg,
-        Hosp
+        Hos
     }
 }
