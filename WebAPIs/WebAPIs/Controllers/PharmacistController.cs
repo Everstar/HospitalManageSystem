@@ -39,12 +39,16 @@ namespace WebAPIs.Controllers
                 response.Content = new StringContent("查找失败");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
+            else if(list.Count==0)
+            {
+                response.Content = new StringContent("查询列表空");
+                response.StatusCode = HttpStatusCode.OK;
+            }
             else
             {
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
                 response.StatusCode = HttpStatusCode.OK;
             }
-            
             return response;
         }
         /// <summary>
@@ -68,6 +72,11 @@ namespace WebAPIs.Controllers
             {
                 response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else if(list.Count==0)
+            {
+                response.Content = new StringContent("查询列表空");
+                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {
