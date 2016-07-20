@@ -14,6 +14,12 @@ using System.Web;
 
 namespace WebAPIs.Controllers
 {
+    /// <summary>
+    /// this part if finished!
+    /// 
+    /// </summary>
+
+
     //[Authorize(Roles = "Pharmacist")]
     [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PharmacistController : BaseController

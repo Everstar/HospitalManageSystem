@@ -76,5 +76,26 @@ namespace WebAPIs.Controllers
            
             return response;
         }
+
+        [HttpGet]
+        [Route("api/Nurse/OutHospital/{hospitalId}")]
+        public HttpResponseMessage OutHospital(string hospitalId)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            if (NurseHelper.OutHospital(hospitalId))
+            {
+                response.Content = new StringContent("出院成功");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            else
+            {
+                response.Content = new StringContent("更新失败");
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+
+            return response;
+        }
+
     }
 }
