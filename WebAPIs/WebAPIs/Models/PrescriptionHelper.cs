@@ -67,7 +67,8 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                 @"select name, num, unit
                   from prescription natural join prescribe natural join medicine
-				  where  pres_id='{0}'", pres_id);
+				  where pres_id='{0}'", pres_id);
+
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
   

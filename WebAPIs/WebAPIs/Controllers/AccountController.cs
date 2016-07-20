@@ -164,11 +164,11 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public HttpResponseMessage SingOut()
+        public HttpResponseMessage SignOut()
         {
             var accountModel = new AccountModel();
             accountModel.Logout();
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.Moved);
         }
     }
 }
