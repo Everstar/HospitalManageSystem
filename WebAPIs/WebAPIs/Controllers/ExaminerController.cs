@@ -194,26 +194,24 @@ namespace WebAPIs.Controllers
 
 
         //dnoe
-        // 0:验血 1：胃镜 2：XRay
+        //return {name,sex}
         [HttpGet]
         [Route("api/Examiner/GetPatientById/{examInfo}")]
-        public HttpResponseMessage GetPatientNameById(string examInfo)
+        public HttpResponseMessage GetPatientNameById(string examineId)
         {
-            string examineId = examInfo.Substring(0, 20);
-            char type = examInfo[20];
-
-            ArrayList list = ExaminerHelper.GetPatientByExamId(examineId,type);
+ 
+            ArrayList list = ExaminerHelper.GetPatientByExamId(examineId);
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if (list[0]== "查询失败")
+            if (list==null)
             {
                 response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
-            else if(list[0]== "Examine Type Error!")
+            else if(list.Count==0)
             {
-                response.Content = new StringContent("不存在的检测类型！");
+                response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.BadRequest;
             }
             else
