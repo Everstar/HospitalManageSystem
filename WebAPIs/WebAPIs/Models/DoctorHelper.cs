@@ -126,7 +126,7 @@ namespace WebAPIs.Models
             if (type < 0 || type > 2) return false;
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            OracleTransaction transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            OracleTransaction transaction = cmd.Connection.BeginTransaction();
             cmd.Transaction = transaction;
             string sqlStr;
             try
@@ -141,7 +141,7 @@ namespace WebAPIs.Models
 
                 //select related exam_id
                 sqlStr = @"select EXAM_INCREMENT.CURRVAL from dual";
-                cmd = new OracleCommand();
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 cmd.CommandText = sqlStr;
                 var reader = cmd.ExecuteReader();
                 string exam_id = "";
@@ -181,14 +181,31 @@ namespace WebAPIs.Models
                     case 0:
                         sqlStr = String.Format(
                         @"insert into blood
-                        values('{0}', {1}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10},
-                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})", exam_id,
-                        ConstHelper.wbc, ConstHelper.neut_percent, ConstHelper.lymph_percent,
-                        ConstHelper.mono_percent, ConstHelper.eo_percent, ConstHelper.baso_percent,
-                        ConstHelper.neut_num, ConstHelper.lymph_num, ConstHelper.mono_num, ConstHelper.eo_num,
-                        ConstHelper.baso_num, ConstHelper.rbc, ConstHelper.hgb, ConstHelper.hct, ConstHelper.mcv,
-                        ConstHelper.mch, ConstHelper.mchc, ConstHelper.rdw, ConstHelper.plt, ConstHelper.mpv,
-                        ConstHelper.pct, ConstHelper.pdw
+                        values('{0}', {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10},
+                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})", 
+                        exam_id,
+                        ConstHelper.wbc, 
+                        ConstHelper.neut_percent, 
+                        ConstHelper.lymph_percent,
+                        ConstHelper.mono_percent, 
+                        ConstHelper.eo_percent,
+                        ConstHelper.baso_percent,
+                        ConstHelper.neut_num, 
+                        ConstHelper.lymph_num, 
+                        ConstHelper.mono_num, 
+                        ConstHelper.eo_num,
+                        ConstHelper.baso_num, 
+                        ConstHelper.rbc,
+                        ConstHelper.hgb,
+                        ConstHelper.hct,
+                        ConstHelper.mcv,
+                        ConstHelper.mch,
+                        ConstHelper.mchc, 
+                        ConstHelper.rdw,
+                        ConstHelper.plt, 
+                        ConstHelper.mpv,
+                        ConstHelper.pct, 
+                        ConstHelper.pdw
                         );
                         cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                         cmd.Transaction = transaction;

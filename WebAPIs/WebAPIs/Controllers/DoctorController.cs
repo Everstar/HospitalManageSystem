@@ -103,6 +103,7 @@ namespace WebAPIs.Controllers
         {
             HttpResponseMessage response = new HttpResponseMessage();
             string doc_id = HttpContext.Current.User.Identity.Name;
+            doc_id = "16687";
             switch (int.Parse(exam_type))
             {
                 case 0:
@@ -177,7 +178,8 @@ namespace WebAPIs.Controllers
                     num.Add(number);
                 }
                 string doc_id = HttpContext.Current.User.Identity.Name;
-                doc_id = "16687";
+                doc_id = "16656";
+                // doc_id随机分配一个
                 // prescription表创建一条记录
                 // 设置pres_id treat_id doc_id从药剂师中随机挑选 time
                 // 其他空值

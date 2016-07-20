@@ -18,7 +18,7 @@ namespace WebAPIs.Models
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
-            string sqlStr = 
+            string sqlStr =
                @"select exam_id,type,exam_time,pay,pay_time
                 from examination
                 where employee_id=:doc_id";
@@ -30,8 +30,8 @@ namespace WebAPIs.Models
             {
                 while (reader.Read())
                 {
-                    AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(), 
-                         (DateTime)reader[2],  Convert.ToDouble(reader[3]),(DateTime)reader[4]));
+                    AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(),
+                         (DateTime)reader[2], Convert.ToDouble(reader[3]), (DateTime)reader[4]));
                 }
                 return AllExamination;
             }
@@ -45,7 +45,7 @@ namespace WebAPIs.Models
 
         public static bool MakeXRayExamination(PartXRayInfo partXrayInfo)//插入XRay的检查结果
         {
-            XrayInfo xray = new XrayInfo(partXrayInfo.checkpoint,partXrayInfo.from_picture, partXrayInfo.picture);
+            XrayInfo xray = new XrayInfo(partXrayInfo.checkpoint, partXrayInfo.from_picture, partXrayInfo.picture);
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -54,7 +54,7 @@ namespace WebAPIs.Models
                 string sqlStr = String.Format(
                   @"insert into XRay
                 values('{0}','{1}','{2}', {3})
-               ", xray.exam_id,xray.checkpoint,xray.from_picture,xray.picture);
+               ", xray.exam_id, xray.checkpoint, xray.from_picture, xray.picture);
                 cmd.CommandText = sqlStr;
                 cmd.ExecuteNonQuery();
             }
@@ -67,7 +67,7 @@ namespace WebAPIs.Models
         }
         public static bool MakeGastroscopeExamination(string from_picture, string diagnoses, string picture)//插入胃镜检查结果
         {
-            GastroscopeInfo gastroscope = new GastroscopeInfo(from_picture, diagnoses ,picture);
+            GastroscopeInfo gastroscope = new GastroscopeInfo(from_picture, diagnoses, picture);
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -76,7 +76,7 @@ namespace WebAPIs.Models
                 string sqlStr = String.Format(
                   @"insert into XRay
                 values('{0}','{1}','{2}', {3})
-               ",gastroscope.exam_id,gastroscope.from_picture,gastroscope.diagnoses,gastroscope.picture);
+               ", gastroscope.exam_id, gastroscope.from_picture, gastroscope.diagnoses, gastroscope.picture);
                 cmd.CommandText = sqlStr;
                 cmd.ExecuteNonQuery();
             }
@@ -96,22 +96,39 @@ namespace WebAPIs.Models
         }
 
         // 0:验血 1：胃镜 2：XRay
-        //public static ArrayList GetPatientByExamId(string examineID)
-        //{
-        //    ArrayList patientInfo = new ArrayList();
 
-        //    string sqlStr = String.Format(
-        //       @"with treatmentid(treat_id) as(
-        //              select treatment.treat_id
-        //              from treatment natural join examine natural join examination
-        //              where examine");
+        public static ArrayList GetPatientByExamId(string examineID)
+        {
 
-        //    OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            ArrayList patientInfo = new ArrayList();
 
-        //    return patientInfo;
+            string sqlStr = String.Format(
+               @"with treatmentid(patient_id) as(
+                      select treatment.patient_id
+                      from treatment natural join examine
+                      where examine.exam_id = '{0}')
+                 select identity.name, identity.sex 
+                 from patient natural join identity, treatmentid
+                 where patient.patient_id=treatmentid.patient_id", examineID);
+
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
 
 
-            
-        //} 
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    patientInfo.Add(reader[0].ToString());
+                    patientInfo.Add(reader[1].ToString());
+                }
+                return patientInfo;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return patientInfo;
+        }
     }
 }
