@@ -203,7 +203,7 @@ namespace WebAPIs.Controllers
             string patient_id = HttpContext.Current.User.Identity.Name;
 
             // treatment表调取数据
-            ArrayList list = PatientHelper.GetAllConsumption(patient_id);
+            ArrayList list = PatientHelper.GetTreatmentInfo(patient_id);
             ArrayList returnList = new ArrayList();
 
             HttpResponseMessage response = new HttpResponseMessage();
@@ -251,7 +251,7 @@ namespace WebAPIs.Controllers
         }
 
         [HttpGet]
-        [Route("api/Patient/GetAllCost/{treatmentId")]
+        [Route("api/Patient/GetAllCost/{treatmentId}")]
         public HttpResponseMessage GetAllCost(string treatmentId)
         {
             HttpResponseMessage response = new HttpResponseMessage();

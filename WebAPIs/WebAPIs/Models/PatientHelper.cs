@@ -213,7 +213,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                @"select name
                 from employee natural join identity
-                where patient_id='{0}'", id);
+                where employee_id='{0}'", id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
             {
