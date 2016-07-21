@@ -21,7 +21,6 @@ namespace WebAPIs.Controllers
 
 
     //[Authorize(Roles = "Pharmacist")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class PharmacistController : BaseController
     {
         /// <summary>

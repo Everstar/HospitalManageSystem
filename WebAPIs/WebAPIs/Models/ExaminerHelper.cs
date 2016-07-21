@@ -43,9 +43,9 @@ namespace WebAPIs.Models
         }
 
 
-        public static bool MakeXRayExamination(PartXRayInfo partXrayInfo)//插入XRay的检查结果
+        public static bool MakeXRayExamination(XrayInfo partXrayInfo)//插入XRay的检查结果
         {
-            XrayInfo xray = new XrayInfo(partXrayInfo.checkpoint, partXrayInfo.from_picture, partXrayInfo.picture);
+            XrayInfo xray = partXrayInfo;
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -53,10 +53,11 @@ namespace WebAPIs.Models
             {
                 string sqlStr = String.Format(
                   @"insert into XRay
-                values('{0}','{1}','{2}', {3})
-               ", xray.exam_id, xray.checkpoint, xray.from_picture, xray.picture);
+                values('{0}','{1}','{2}','{3}')",
+                  xray.exam_id, xray.checkpoint, xray.from_picture, xray.picture);
                 cmd.CommandText = sqlStr;
                 cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
             }
             catch (Exception e)
             {

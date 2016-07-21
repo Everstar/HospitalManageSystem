@@ -22,7 +22,6 @@ namespace WebAPIs.Controllers
     /// is finished
     /// </summary>
     //[Authorize(Roles = "Nurse")]
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class NurseController : BaseController
     {
         public string accessRoles = "Nurse";
