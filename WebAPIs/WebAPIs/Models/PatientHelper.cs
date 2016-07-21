@@ -97,22 +97,22 @@ namespace WebAPIs.Models
             return null;
         }
 
+        //Test Passed
         public static string RegisterTreat(Treatment treat)
         {
-            OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            OracleCommand cmd = DatabaseHelper.GetInstance().conn.CreateCommand();
             cmd.Transaction = cmd.Connection.BeginTransaction();
             try
             {
-                string sqlStr = String.Format(@"insert into treatment(clinic_name, start_time, end_time, patient_id, employee_id, take)
-                    values(:clinic_name, to_timestamp('{0}', 'yyyy-mm-dd hh24:mi:ss'), to_timestamp('{1}', 'yyyy-mm-dd hh24:mi:ss'), :patient_id, :employee_id, :take)",
-                    treat.start_time.ToString("yyyy-mm-dd hh24:mi:ss"),
-                    treat.end_time.ToString("yyyy-mm-dd hh24:mi:ss"));
+                string sqlStr = String.Format("insert into treatment(treat_id, clinic_name, start_time, end_time, patient_id, employee_id, take)" +
+                    "values(null, :clinic_name, to_timestamp('{0}', 'yyyy/mm/dd hh24:mi:ss'), to_timestamp('{1}','yyyy/mm/dd hh24:mi:ss'), :patient_id, :employee_id, :take)",
+                    Formater.ToString(treat.start_time),
+                    Formater.ToString(treat.end_time));
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("clinic_name", OracleDbType.Varchar2, 20).Value = treat.clinic;
                 cmd.Parameters.Add("patient_id", OracleDbType.Varchar2, 9).Value = treat.patient_id;
-                cmd.Parameters.Add("take", OracleDbType.Int32).Value = 0;
                 cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = treat.doc_id;
+                cmd.Parameters.Add("take", OracleDbType.Int32).Value = 0;
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
 
@@ -131,7 +131,6 @@ namespace WebAPIs.Models
             }
             return null;
         }
-
         public static bool Comment(Evaluation item)
         {
             OracleCommand cmd = new OracleCommand();
@@ -403,6 +402,61 @@ namespace WebAPIs.Models
 
             }
             return consumptionInfo;
+        }
+
+
+        public static ArrayList GetCommentByDocId(string docId)
+        {
+            string sqlStr = String.Format(
+                @"select content
+                  from evaluation
+                  where employee_id='{0}'", docId);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            ArrayList commentList = new ArrayList();
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while(reader.Read())
+                {
+                    commentList.Add(reader[0].ToString());
+                }
+                return commentList;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public static EmployeeWithComment GetDoctor(string docId)
+        {
+            string sqlStr = string.Format(
+                @"select employee.avatar_path, identity.name, identity.sex, employee.clinic_name, employee.post, employee.profile
+                  from employee natural join identity
+                  where employee.employee_id = '{0}'",docId);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            EmployeeWithComment employeeWithComment = new EmployeeWithComment();
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if(reader.Read())
+                {
+                    employeeWithComment.pic_url = reader[0].ToString();
+                    employeeWithComment.name = reader[1].ToString();
+                    employeeWithComment.sex = reader[2].ToString();
+                    employeeWithComment.clinic = reader[3].ToString();
+                    employeeWithComment.post = reader[4].ToString();
+                    employeeWithComment.profile = reader[5].ToString();
+                    return employeeWithComment;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
         }
     }
 

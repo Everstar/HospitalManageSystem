@@ -198,7 +198,7 @@ namespace WebAPIs.Controllers
         [Route("api/Patient/GetTreatmentID")]
         public HttpResponseMessage GetTreatmentID()
         {
-            bool isLogin = GenerateUserInfoByCookie();
+            HttpResponseMessage response = new HttpResponseMessage();
 
             string patient_id = HttpContext.Current.User.Identity.Name;
 
@@ -206,7 +206,6 @@ namespace WebAPIs.Controllers
             ArrayList list = PatientHelper.GetTreatmentInfo(patient_id);
             ArrayList returnList = new ArrayList();
 
-            HttpResponseMessage response = new HttpResponseMessage();
             if (list == null)
             {
                 response.Content = new StringContent("查询失败");
