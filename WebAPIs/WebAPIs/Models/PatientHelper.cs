@@ -403,6 +403,61 @@ namespace WebAPIs.Models
             }
             return consumptionInfo;
         }
+
+
+        public static ArrayList GetCommentByDocId(string docId)
+        {
+            string sqlStr = String.Format(
+                @"select content
+                  from evaluation
+                  where employee_id='{0}'", docId);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            ArrayList commentList = new ArrayList();
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while(reader.Read())
+                {
+                    commentList.Add(reader[0].ToString());
+                }
+                return commentList;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public static EmployeeWithComment GetDoctor(string docId)
+        {
+            string sqlStr = string.Format(
+                @"select employee.avatar_path, identity.name, identity.sex, employee.clinic_name, employee.post, employee.profile
+                  from employee natural join identity
+                  where employee.employee_id = '{0}'",docId);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            EmployeeWithComment employeeWithComment = new EmployeeWithComment();
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if(reader.Read())
+                {
+                    employeeWithComment.pic_url = reader[0].ToString();
+                    employeeWithComment.name = reader[1].ToString();
+                    employeeWithComment.sex = reader[2].ToString();
+                    employeeWithComment.clinic = reader[3].ToString();
+                    employeeWithComment.post = reader[4].ToString();
+                    employeeWithComment.profile = reader[5].ToString();
+                    return employeeWithComment;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
     }
 
 }
