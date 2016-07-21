@@ -63,24 +63,26 @@ namespace WebAPIs.Models
                 cmd.Transaction.Commit();
                 return true;
             }
-
-            //异常这里我还要研究一下
             catch (Exception ex)
             {
                 cmd.Transaction.Rollback();
                 return false;
             }
             return true;
-
         }
 
-
-        //获取投诉率高于percent的医生
-
-
+        /// <summary>
+        /// 获取投诉率高于percent的医生
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="percent"></param>
+        /// <returns>医生组成的ArrayList</returns>
         public static ArrayList GetComplaintedDoctor(int year, int month, double percent)//获取投诉率高于percent的医生
         {
+            // 投诉率处理
             percent = 1 - percent / 100;
+            percent *= 5;
             int begin_year = year;
             int begin_month = month;
             int end_year, end_month;
@@ -133,7 +135,7 @@ namespace WebAPIs.Models
                 {
                     ComplaintedDoctor.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(),
                                     reader[2].ToString(), reader[3].ToString(),
-                                    Convert.ToDouble(reader[5])));
+                                    Convert.ToDouble(reader[4])));
                 }
                 return ComplaintedDoctor;
             }
@@ -143,8 +145,6 @@ namespace WebAPIs.Models
                 return null;
             }
             return null;
-
-
         }
 
 
@@ -165,16 +165,28 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("Pfri", item.Friday);
             cmd.Parameters.Add("Psat", item.Saturday);
             cmd.Parameters.Add("Psun", item.Sunday);
-            if (cmd.ExecuteNonQuery() == 0)
+            if (cmd.ExecuteNonQuery() == 1)
+            {
+                cmd.Transaction.Commit();
+                return true;
+                
+            }
+            else
             {
                 cmd.Transaction.Rollback();
                 return false;
             }
-            else
-                return true;
         }
-        static public bool AddEmployee(Employee item)
+        static public bool AddEmployee(Identity identity, Employee item)
         {
+            try
+            {
+                SignUpEmployee(identity);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
@@ -264,6 +276,51 @@ namespace WebAPIs.Models
                 return null;
             }
             return null;
+        }
+
+        public static string SignUpEmployee(Identity item)
+        {
+            //check if the credit_num is used
+            string sqlStr =
+                @"select * from identity
+                  where credit_num = :credit_num";
+
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            cmd.Parameters.Add("credit_num", item.credit_num);
+            OracleDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                //查询语句不需要回滚
+                throw new Exception("Already exise");
+            }
+
+            DateTime dt = DateTime.Parse(item.birth.ToString());
+            var strBirth = item.birth.Year.ToString() + "/" + item.birth.Month.ToString() + "/" + item.birth.Day.ToString();
+            //sign up employee
+            try
+            {
+                sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
+                    + strBirth + "', 'yyyy/mm/dd'))";
+                cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.CommandText = sqlStr;
+
+                cmd.Parameters.Add("credit_num", item.credit_num);
+                cmd.Parameters.Add("name", item.name);
+                cmd.Parameters.Add("sex", item.sex);
+                if (1 != cmd.ExecuteNonQuery())
+                {
+                    throw new Exception("插入失败！");
+                }
+
+                cmd.Transaction.Commit();
+            }
+            catch (Exception e)
+            {
+                cmd.Transaction.Rollback();
+                throw new Exception( "Insert employee into identity table failed, message:" + e.Message + " Birth format:" + strBirth);
+            }
+            return "Ok";
         }
     }
 }

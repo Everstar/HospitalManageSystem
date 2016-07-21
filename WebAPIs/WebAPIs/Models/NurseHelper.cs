@@ -42,7 +42,7 @@ namespace WebAPIs.Models
                         reader[3].ToString(),
                         double.Parse(reader[4].ToString()),
                         int.Parse(reader[5].ToString()),
-                        (DateTime)reader[6]
+                        Formater.ToDateTime(reader, 6)
                          ));
                 }
                 return hospitalization;

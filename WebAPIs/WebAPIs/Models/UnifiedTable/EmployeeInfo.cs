@@ -19,9 +19,13 @@ namespace WebAPIs.Models.UnifiedTable
         public char sex { get; set; }
         public DateTime birth { get; set; }
         public double compliant_rate { get; set; }
+        public string skill { get; set; }
+        public string profile { get; set; }
+        public string avatar_path { get; set; }
 
         public EmployeeInfo(string id, string num, string pw, string dm, string cn,
-            string post, double salary, string name, string sex, DateTime birth)
+            string post, double salary, string name, string sex, DateTime birth, string skill, string profile,
+            string avatar_path)
         {
             employee_id = id;
             credit_num = num;
@@ -33,6 +37,9 @@ namespace WebAPIs.Models.UnifiedTable
             this.name = name;
             this.sex = sex[0];
             this.birth = birth;
+            this.skill = skill;
+            this.avatar_path = avatar_path;
+            this.profile = profile;
         }
 
         public EmployeeInfo(string dept_name, string clinic_name, string post, string name, string sex)

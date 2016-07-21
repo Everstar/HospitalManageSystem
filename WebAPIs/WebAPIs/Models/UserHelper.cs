@@ -149,7 +149,7 @@ namespace WebAPIs.Models
         public static EmployeeInfo GetEmployeeInfo(string id)
         {
             string sqlStr = String.Format(
-               @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth
+               @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth, skill, profile, avatar_path
                 from employee natural join identity
                 where employee_id='{0}'",
                id);
@@ -169,7 +169,11 @@ namespace WebAPIs.Models
                         Convert.ToDouble(reader[6].ToString()),
                         reader[7].ToString(),
                         reader[8].ToString(),
-                        Convert.ToDateTime(reader[9].ToString()));
+                        Convert.ToDateTime(reader[9].ToString()),
+                        reader[10].ToString(),
+                        reader[11].ToString(),
+                        reader[12].ToString()
+                        );
                 }
             }
             catch (Exception e)
@@ -203,7 +207,11 @@ namespace WebAPIs.Models
                         Convert.ToDouble(reader[6].ToString()),
                         reader[7].ToString(),
                         reader[8].ToString(),
-                        Convert.ToDateTime(reader[9].ToString())));
+                        Convert.ToDateTime(reader[9].ToString()),
+                        reader[10].ToString(),
+                        reader[11].ToString(),
+                        reader[12].ToString()
+                        ));
                 }
                 return list;
             }

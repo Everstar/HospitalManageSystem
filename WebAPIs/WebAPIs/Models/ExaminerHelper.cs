@@ -29,19 +29,19 @@ namespace WebAPIs.Models
             {
                 while (reader.Read())
                 {
-                    var time1 = new DateTime();
-                    var time2 = new DateTime();
+                    //var time1 = new DateTime();
+                    //var time2 = new DateTime();
 
-                    if (!reader[2].ToString().Equals(""))
-                    {
-                        time1 = Convert.ToDateTime(reader[2]);
-                    }
-                    if (!reader[4].ToString().Equals(""))
-                    {
-                        time1 = Convert.ToDateTime(reader[4]);
-                    }
+                    //if (!reader[2].ToString().Equals(""))
+                    //{
+                    //    time1 = Convert.ToDateTime(reader[2]);
+                    //}
+                    //if (!reader[4].ToString().Equals(""))
+                    //{
+                    //    time1 = Convert.ToDateTime(reader[4]);
+                    //}
                     AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(),
-                        time1, Convert.ToDouble(reader[3]), time2));
+                        Formater.ToDateTime(reader, 2), Convert.ToDouble(reader[3]), Formater.ToDateTime(reader, 4)));
                 }
                 return AllExamination;
             }

@@ -25,27 +25,17 @@ namespace WebAPIs.Models
                 OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    DateTime time = new DateTime();
-
-                    if (reader[8].ToString().Equals(""))
-                    {
-                        time = new DateTime();
-                    }
-                    else
-                    {
-                        time = (DateTime)reader[8];
-                    }
                     treatInfo.Add(new Treatment
                     {
                         treat_id = reader[0].ToString(),
                         clinic = reader[1].ToString(),
-                        start_time = (DateTime)reader[2],
-                        end_time = (DateTime)reader[3],
+                        start_time = Formater.ToDateTime(reader, 2),
+                        end_time = Formater.ToDateTime(reader, 3),
                         patient_id = reader[4].ToString(),
                         doc_id = reader[5].ToString(),
                         take = int.Parse(reader[6].ToString()),
                         pay = double.Parse(reader[7].ToString()),
-                        pay_time = time
+                        pay_time = Formater.ToDateTime(reader, 8)
                     });
                 }
                 return treatInfo;

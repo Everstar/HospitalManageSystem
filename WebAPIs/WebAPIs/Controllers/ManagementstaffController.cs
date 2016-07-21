@@ -58,11 +58,23 @@ namespace WebAPIs.Controllers
         [Route("api/ManagementStaff/SetEmployee")]
         public HttpResponseMessage SetEmployee(dynamic obj)
         {
-            string department = obj.department.Value;
-            string clinic = obj.clinic.Value;
-            string post = obj.post.Value;
-            string salary = obj.salary.Value;
             HttpResponseMessage response = new HttpResponseMessage();
+
+            var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
+            try
+            {
+                string department = employee.GetValue("dept_name").ToString();
+                string clinic = employee.GetValue("clinic_name").ToString();
+                string post = employee.GetValue("post").ToString();
+                string salary = obj.salary.Value;
+                string id = employee.GetValue("id").ToString();
+                ManagementHelper.SetEmployee(id, department, clinic, post, double.Parse(salary));
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
             // 增加人员 删除人员 
             return response;
         }
@@ -130,12 +142,18 @@ namespace WebAPIs.Controllers
         [Route("api/ManagementStaff/SetDutyTime")]
         public HttpResponseMessage SetDutyTime(dynamic obj)
         {
+            var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
+
             string room_num = obj.room_num.Value;
             string Monday = obj.Monday.Value;
             string Tuesday = obj.Tuesday.Value;
-            string wednesday = obj.wednesday.Value;
+            string Wednesday = obj.Wednesday.Value;
             string Thursday = obj.Thursday.Value;
             string Friday = obj.Friday.Value;
+            string Saturday = obj.Saturday.Value;
+            string Sunday = obj.Sunday.Value;
+            Duty item = new Duty(room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday);
+            ManagementHelper.SetDuty(item);
             // duty表生成id
             // 设置room_num
             // max_limit设置成随机数
@@ -167,9 +185,16 @@ namespace WebAPIs.Controllers
             emp.post = employee.GetValue("post").ToString();
             emp.salary = double.Parse(employee.GetValue("salary").ToString());
             emp.department = employee.GetValue("dept_name").ToString();
+
+            Identity identity = new Identity();
+            identity.credit_num = emp.credit_num;
+            identity.name = employee.GetValue("name").ToString();
+            identity.sex = char.Parse(employee.GetValue("sex").ToString());
+            identity.birth =  Convert.ToDateTime(employee.GetValue("birth").ToString());
+
             try
             {
-                ManagementHelper.AddEmployee(emp);
+                ManagementHelper.AddEmployee(identity, emp);
             }
             catch (Exception e)
             {
