@@ -22,7 +22,57 @@ namespace WebAPIs.Controllers
     [Authorize(Roles = "Patient,Managementstaff")]
     public class PatientController : ApiController
     {
+        [HttpPost]
+        [Route("api/Patient/PayFor")]
+        public HttpResponseMessage PayFor(dynamic obj)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+            string pay = "";
+            string id = "";
+            string type = "";
+            try
+            {
+                pay = obj.pay.Value;
+                id = obj.id.Value;
+                type = obj.type.Value;
+            }
+            catch (Exception e)
+            {
 
+            }
+            PayType typeP = PayType.Treat;
+            switch (int.Parse(type))
+            {
+                case 0:
+                    typeP = PayType.Treat;
+                    break;
+                case 1:
+                    typeP = PayType.Exam;
+                    break;
+                case 2:
+                    typeP = PayType.Pres;
+                    break;
+                case 3:
+                    typeP = PayType.Surg;
+                    break;
+                case 4:
+                    typeP = PayType.Hos;
+                    break;
+                default:
+                    typeP = PayType.Treat;
+                    break;
+            }
+            try
+            {
+                PayHelper.Pay(double.Parse(pay), typeP, id);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
+        }
         //done
         //获取所有科室名称
         public HttpResponseMessage GetAllClinic()

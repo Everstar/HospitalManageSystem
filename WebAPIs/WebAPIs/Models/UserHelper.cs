@@ -39,14 +39,18 @@ namespace WebAPIs.Models
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 cmd.CommandText = sqlStr;
+                cmd.Transaction = cmd.Connection.BeginTransaction();
 
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("name", item.name);
                 cmd.Parameters.Add("sex", item.sex);
                 cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
+
 
                 sqlStr = "insert into patient values (null, :credit_num, :password, null)";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.Transaction = cmd.Connection.BeginTransaction();
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("password", item.passwd);
                 cmd.ExecuteNonQuery();

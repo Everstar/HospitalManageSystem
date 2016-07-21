@@ -51,7 +51,7 @@ namespace WebAPIs.Models
             {
                 string sqlStr =
                 @"update employee
-                 set department=:Pdep,clinic=:Pcl,post=:Ppos,salary=:Psal
+                 set dept_name=:Pdep,clinic_name=:Pcl,post=:Ppos,salary=:Psal
                  where employee_id=:Pemp";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("Pdep", department);
@@ -270,7 +270,8 @@ namespace WebAPIs.Models
             {
                 string sqlStr =
                 @"Insert into EMPLOYEE (EMPLOYEE_ID,CREDIT_NUM,PASSWORD,DEPT_NAME,CLINIC_NAME,POST,SALARY,DUTY_ID,AVATAR_PATH,PROFILE,SKILL)
-                    values (null,:credit_num, :password, :dept_name, :clinic_name, :post, :salary,null,null,null,null);";
+                    values (null,:credit_num, :password, :dept_name, :clinic_name, :post, :salary,null,null,null,null)";
+                cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
                 cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.password;
                 cmd.Parameters.Add("dept_name", OracleDbType.Varchar2, 20).Value = item.department;
@@ -395,21 +396,18 @@ namespace WebAPIs.Models
         public static string SignUpEmployee(Identity item)
         {
             //check if the credit_num is used
-            string sqlStr =
-                @"select * from identity
-                  where credit_num = :credit_num";
+            string sqlStr = @"select count_credit(:credit_num) from dual";
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             cmd.Parameters.Add("credit_num", item.credit_num);
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                //查询语句不需要回滚
-                throw new Exception("Already exise");
+                if (Convert.ToInt32(reader[0]) > 0)
+                    //查询语句不需要回滚
+                    throw new Exception("Already exise");
             }
 
-            DateTime dt = DateTime.Parse(item.birth.ToString());
             var strBirth = item.birth.Year.ToString() + "/" + item.birth.Month.ToString() + "/" + item.birth.Day.ToString();
             //sign up employee
             try
@@ -417,6 +415,7 @@ namespace WebAPIs.Models
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.Transaction = cmd.Connection.BeginTransaction();
                 cmd.CommandText = sqlStr;
 
                 cmd.Parameters.Add("credit_num", item.credit_num);

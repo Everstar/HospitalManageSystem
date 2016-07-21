@@ -163,17 +163,15 @@ namespace WebAPIs.Models
             if (type < 0 || type > 2) return false;
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            OracleTransaction transaction = cmd.Connection.BeginTransaction();
-            cmd.Transaction = transaction;
+            cmd.Transaction = cmd.Connection.BeginTransaction();
             string sqlStr;
             try
             {
-
-                sqlStr = @"insert into examination(exam_id, type, exam_time, employee_id)
-                values(null, :type, systimestamp, :employee_id)";
+                sqlStr = @"insert into examination(exam_id, type, exam_time, employee_id, pay)
+                values(null, :type, systimestamp, :employee_id, 15)";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("type", OracleDbType.Int32).Value = type;
-                cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = employee_id;
+                cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = GetFreeExaminerId();
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
 
@@ -191,76 +189,12 @@ namespace WebAPIs.Models
                 cmd.Transaction = cmd.Connection.BeginTransaction();
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
-                switch (type)
-                {
-                    case 2:
-                        sqlStr = String.Format(
-                        @"insert into XRay 
-                        values('{0}', :checkpoint, :from_picture, :picture)", exam_id);
-                        cmd = new OracleCommand();
-                        // 没加text啊。。
-                        cmd.CommandText = sqlStr;
-                        cmd.Connection = DatabaseHelper.GetInstance().conn;
-                        cmd.Transaction = transaction;
-                        cmd.Parameters.Add("checkpoint", OracleDbType.Varchar2, 100).Value = ConstHelper.checkpoint;
-                        cmd.Parameters.Add("from_picture", OracleDbType.Varchar2, 2000).Value = ConstHelper.from_picture_XRay;
-                        cmd.Parameters.Add("picture", OracleDbType.Varchar2, 200).Value = "";
-                        cmd.ExecuteNonQuery();
-                        break;
-                    case 1:
-                        sqlStr = String.Format(
-                        @"insert into gastroscope 
-                        values('{0}', :from_picture, :diagnoses, :picture)", exam_id);
-                        cmd = new OracleCommand();
-                        // 没加text啊。。
-                        cmd.CommandText = sqlStr;
-                        cmd.Connection = DatabaseHelper.GetInstance().conn;
-                        cmd.Transaction = transaction;
-                        cmd.Parameters.Add("from_picture", OracleDbType.Varchar2, 2000).Value = ConstHelper.from_picture_Gas;
-                        cmd.Parameters.Add("diagnoses", OracleDbType.Varchar2, 100).Value = ConstHelper.diagnoses;
-                        cmd.Parameters.Add("picture", OracleDbType.Varchar2, 200).Value = "";
-                        cmd.ExecuteNonQuery();
-                        break;
-                    case 0:
-                        sqlStr = String.Format(
-                        @"insert into blood
-                        values('{0}', {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10},
-                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})",
-                        exam_id,
-                        ConstHelper.wbc,
-                        ConstHelper.neut_percent,
-                        ConstHelper.lymph_percent,
-                        ConstHelper.mono_percent,
-                        ConstHelper.eo_percent,
-                        ConstHelper.baso_percent,
-                        ConstHelper.neut_num,
-                        ConstHelper.lymph_num,
-                        ConstHelper.mono_num,
-                        ConstHelper.eo_num,
-                        ConstHelper.baso_num,
-                        ConstHelper.rbc,
-                        ConstHelper.hgb,
-                        ConstHelper.hct,
-                        ConstHelper.mcv,
-                        ConstHelper.mch,
-                        ConstHelper.mchc,
-                        ConstHelper.rdw,
-                        ConstHelper.plt,
-                        ConstHelper.mpv,
-                        ConstHelper.pct,
-                        ConstHelper.pdw
-                        );
-                        cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-                        cmd.Transaction = transaction;
-                        cmd.ExecuteNonQuery();
-                        break;
-                }
-                cmd.Transaction.Commit();
                 return true;
             }
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
+                throw e;
             }
             return false;
         }
@@ -293,7 +227,7 @@ namespace WebAPIs.Models
                 for (int i = 0; i < medicine_id.Count; ++i)
                 {
                     cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-                    cmd.Transaction = transaction;
+                    cmd.Transaction = cmd.Connection.BeginTransaction();
                     cmd.Parameters.Add("pres_id", OracleDbType.Varchar2, 20).Value = pres_id;
                     cmd.Parameters.Add("medicine_id", OracleDbType.Varchar2, 20).Value = medicine_id[i];
                     cmd.Parameters.Add("num", OracleDbType.Int32).Value = num[i];
@@ -312,12 +246,11 @@ namespace WebAPIs.Models
                     cmd.Transaction.Commit();
 
                 }
-                transaction.Commit();
                 return true;
             }
             catch (Exception e)
             {
-                transaction.Rollback();
+                cmd.Transaction.Rollback();
                 // 增加一个throw语句 以用于处理异常
                 throw e;
             }
@@ -374,6 +307,28 @@ namespace WebAPIs.Models
         {
             ArrayList list = new ArrayList();
             string sqlStr = "select employee_id from employee where post='Nurse'";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(reader[0].ToString());
+                }
+                Random rand = new Random();
+                return list[rand.Next(0, list.Count - 1)].ToString();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return null;
+        }
+        public static string GetFreeExaminerId()
+        {
+            ArrayList list = new ArrayList();
+            string sqlStr = "select employee_id from employee where post='Examiner'";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
             {

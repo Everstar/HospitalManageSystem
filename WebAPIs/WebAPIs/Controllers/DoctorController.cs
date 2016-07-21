@@ -136,22 +136,31 @@ namespace WebAPIs.Controllers
             HttpResponseMessage response = new HttpResponseMessage();
             string doc_id = HttpContext.Current.User.Identity.Name;
             //doc_id = "16687";
-            switch (int.Parse(exam_type))
+            try
             {
-                case 0:
-                case 1:
-                case 2:
-                    if (!DoctorHelper.WriteExamination(treatment_id, doc_id, int.Parse(exam_type)))
-                    {
+
+                switch (int.Parse(exam_type))
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                        if (!DoctorHelper.WriteExamination(treatment_id, doc_id, int.Parse(exam_type)))
+                        {
+                            response.StatusCode = HttpStatusCode.BadRequest;
+                            response.Content = new StringContent("insert table failed");
+                        }
+                        break;
+                    default:
+                        response.Content = new StringContent("exam_type invalid");
                         response.StatusCode = HttpStatusCode.BadRequest;
-                        response.Content = new StringContent("insert table failed");
-                    }
-                    break;
-                default:
-                    response.Content = new StringContent("exam_type invalid");
-                    response.StatusCode = HttpStatusCode.BadRequest;
-                    break;
+                        break;
+                }
             }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+            }
+ 
             // 开了检查单子 没交费 没做检查
             // examination表设置exam_Id, type, doc_id
             // 其他留空
