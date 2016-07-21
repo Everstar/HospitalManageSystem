@@ -33,10 +33,15 @@ namespace WebAPIs.Controllers
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if (list.Count == 0)
+            if (list == null)
             {
-                response.Content = new StringContent("获取信息失败");
+                response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else if (list.Count == 0)
+            {
+                response.Content = new StringContent("查询列表空");
+                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {
@@ -58,10 +63,15 @@ namespace WebAPIs.Controllers
             // 返回医生的所有信息
             ArrayList list = PatientHelper.GetEmployeeOfClinic(clinicName);
 
-            if (list.Count == 0)
+            if (list == null)
             {
-                response.Content = new StringContent("科室名错误，未找到相关科室医生");
+                response.Content = new StringContent("查询失败,请检查科室名是否正确或服务器内部错误");
                 response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else if (list.Count == 0)
+            {
+                response.Content = new StringContent("查询列表空");
+                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {
@@ -110,6 +120,8 @@ namespace WebAPIs.Controllers
             string pattern = @"\d+";
             string employeeId = Regex.Match(url, pattern, RegexOptions.IgnoreCase).Value;
 
+            string patientId = HttpContext.Current.User.Identity.Name;
+
             if (employeeId == null || employeeId.Equals(""))
             {
                 // 这url不合法
@@ -123,18 +135,25 @@ namespace WebAPIs.Controllers
                 EmployeeInfo employeeInfo = UserHelper.GetEmployeeInfo(employeeId);
 
                 //判断医生是否有空
-                
+
+                if (employeeInfo == null)
+                {
+                    response.Content = new StringContent("医生不存在");
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                }
 
                 // 创建挂号记录
                 Treatment treatment = new Treatment();
                 //设置预约挂号时间段
+
+                treatment.patient_id = patientId;
+
                 DateTime treatTime = Convert.ToDateTime(time);
+                DateTime treatEndTime = treatTime .AddHours(1);
 
                 treatment.start_time = treatTime;
+                treatment.end_time = treatEndTime;
 
-                treatTime.AddHours(1);
-
-                treatment.end_time = treatTime;
                 //添加医生Id
 
                 treatment.doc_id = employeeId;
@@ -143,8 +162,8 @@ namespace WebAPIs.Controllers
                
                 treatment.clinic = employeeInfo.clinic;
                 // 设置挂号金额
-
-                // 填充支付时间
+                Random ran = new Random();
+                treatment.pay = 100 * ran.NextDouble();
 
                 // treatment 表插入一条记录
                 string treatment_id = PatientHelper.RegisterTreat(treatment);
@@ -169,31 +188,117 @@ namespace WebAPIs.Controllers
             return response;
         }
 
-
-        //update needed
+        /// <summary>
+        ///  //update needed
+        /// </summary>
+        /// <returns></returns>
+       
         //获取患者自己的医疗记录
-        [HttpPost]
+        [HttpGet]
         [Route("api/Patient/GetTreatmentID")]
-        public HttpResponseMessage GetTreatmentID(dynamic obj)
+        public HttpResponseMessage GetTreatmentID()
         {
-            bool isLogin = GenerateUserInfoByCookie();
+            HttpResponseMessage response = new HttpResponseMessage();
 
             string patient_id = HttpContext.Current.User.Identity.Name;
-            string month = obj.month.Value;
-            string year = obj.year.Value;
-            // treatment表调取数据
-            ArrayList list = new ArrayList();
-            list.Add(new Treatment());
-            list.Add(new Treatment());
-            list.Add(new Treatment());
-            list.Add(new Treatment());
 
-            HttpResponseMessage response = new HttpResponseMessage();
-            response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
-            response.StatusCode = HttpStatusCode.OK;
+            // treatment表调取数据
+            ArrayList list = PatientHelper.GetTreatmentInfo(patient_id);
+            ArrayList returnList = new ArrayList();
+
+            if (list == null)
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else if (list.Count == 0)
+            {
+                response.Content = new StringContent("查询列表空");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            else
+            {
+
+                for(int i = 0; i < list.Count; i++)
+                {
+                    Treatment treatment = (Treatment)list[i];
+
+                    TreatPayInfo treatPayInfo = new TreatPayInfo();
+
+                    treatPayInfo.docName = PatientHelper.GetDoctorNameById(treatment.doc_id);
+
+                    treatPayInfo.pay = treatment.pay;
+                    treatPayInfo.clinicName = treatment.clinic;
+                    treatPayInfo.treatId = treatment.treat_id;
+                    treatPayInfo.treatTime = treatment.start_time.ToString();
+                    if (treatment.pay_time.Year == 1)
+                    {
+                        treatPayInfo.isPay = false;
+                    }
+                    else
+                    {
+                        treatPayInfo.isPay = true;
+                    }
+
+                    returnList.Add(treatPayInfo);
+                }
+
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(returnList));
+                response.StatusCode = HttpStatusCode.OK;
+            }
             return response;
         }
 
+        [HttpGet]
+        [Route("api/Patient/GetAllCost/{treatmentId}")]
+        public HttpResponseMessage GetAllCost(string treatmentId)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            ArrayList list = PatientHelper.GetAllConsumption(treatmentId);
+            ArrayList returnList = new ArrayList();
+            if (list == null)
+            {
+                response.Content = new StringContent("查询失败");
+                response.StatusCode = HttpStatusCode.NotFound;
+            }
+            else if (list.Count == 0)
+            {
+                response.Content = new StringContent("查询列表空");
+                response.StatusCode = HttpStatusCode.OK;
+            }
+            else
+            {
+                for(int i = 1; i < list.Count; i++)
+                {
+                    ArrayList costList = (ArrayList)list[i];
+                    ArrayList payList = new ArrayList();
+                    for(int j = 0; j < costList.Count; j++)
+                    {
+                        Examination examination = (Examination)payList[i];
+                        DetailCostInfo detailCostInfo = new DetailCostInfo();
+                        detailCostInfo.cost = examination.pay;
+                        detailCostInfo.costId = examination.exam_id;
+                        detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.employee_id);
+                        detailCostInfo.startTime = examination.exam_time.ToString();
+                        if (examination.pay_time.Year == 1)
+                        {
+                            detailCostInfo.isPay = false;
+                        }
+                        else
+                        {
+                            detailCostInfo.isPay = true;
+                        }
+                    }
+                    returnList.Add(payList);
+                }
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(returnList));
+                response.StatusCode = HttpStatusCode.OK;
+            }
+
+
+            return response;
+        }
 
         //done
         [HttpPost]
@@ -240,7 +345,12 @@ namespace WebAPIs.Controllers
             return response;
         }
 
-
+        /// <summary>
+        /// has been replaced by GetAllCost
+        /// </summary>
+        /// <param name="treatment_id"></param>
+        /// <returns></returns>
+        /* 
         //update needed
         [HttpPost]
         [Route("api/Patient/GetAllConsumption")]
@@ -259,13 +369,10 @@ namespace WebAPIs.Controllers
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
             return response;
-        }
-
+        }*/
 
         [HttpGet]
         [Route("api/Patient/GetDoctorIdName/{treatment_id}")]
-
-
         //done
         //根据医疗流水号找到相关医生的id和name,返回一个arraylist{doc_id,doc_name}
         public HttpResponseMessage GetDoctorIdName(string treatment_id)
@@ -288,6 +395,42 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+        [HttpGet]
+        [Route("api/Patient/GetSingleEmployee/{employeeId}")]
+        public HttpResponseMessage GetSingleEmployee(string employeeId)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            EmployeeWithComment employeeWithComment = PatientHelper.GetDoctor(employeeId);
+
+            if (employeeWithComment == null)
+            {
+                response.Content = new StringContent("未找到医生");
+                response.StatusCode = HttpStatusCode.NotFound;
+                
+            }
+            else
+            {
+                employeeWithComment.comment = PatientHelper.GetCommentByDocId(employeeId);
+                if (employeeWithComment.comment == null)
+                {
+                    response.Content = new StringContent("查询失败");
+                    response.StatusCode = HttpStatusCode.NotFound;
+                }
+                else if (employeeWithComment.comment.Count == 0)
+                {
+                    response.Content = new StringContent("评论列表空");
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Content = new StringContent(JsonObjectConverter.ObjectToJson(employeeWithComment));
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+            }
+
+            return response;
+        }
 
     }
 }

@@ -12,6 +12,7 @@ namespace WebAPIs.Models.UnifiedTable
         public string employee_id { get; set; }
         public string bed_num { get; set; }
         public double pay { get; set; }
+        public string patient_name { get; set; }
         public int rank { get; set; }
         public DateTime in_time { get; set; }
         public DateTime out_time { get; set; }
@@ -28,6 +29,14 @@ namespace WebAPIs.Models.UnifiedTable
             this.pay = pay;
             this.rank = rank;
             this.bed_num = bed_num;
+        }
+        public HospitalInfo(string hos, string patient, string bed, int rank, DateTime in_time)
+        {
+            this.hos_id = hos;
+            this.patient_name = patient;
+            this.bed_num = bed;
+            this.in_time = in_time;
+            this.rank = rank;
         }
     }
 }

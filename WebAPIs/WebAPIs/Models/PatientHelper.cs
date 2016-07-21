@@ -39,31 +39,64 @@ namespace WebAPIs.Models
         //only contain department, clinic, post, name, sex info
         public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
-            ArrayList employees = new ArrayList();
+            ArrayList list = new ArrayList();
             string sqlStr = String.Format(
-               @"select dept_name, clinic_name, post, name, sex
-                from employee natural join identity natural join clinic
-                where clinic_name='{0}'",
-                clinic_name);
+                @"select avatar_path, employee_id, name, post, skill
+                  from employee natural join identity
+                  where employee.clinic_name = '{0}'", clinic_name);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-            OracleDataReader reader = cmd.ExecuteReader();
             try
             {
+                OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    employees.Add(new EmployeeInfo(
-                        reader[0].ToString(),
-                        reader[1].ToString(),
-                        reader[2].ToString(),
-                        reader[3].ToString(),
-                        reader[4].ToString()));
+                    EmployeeInfoWithRank employeeInfoWithRank = new EmployeeInfoWithRank();
+                    employeeInfoWithRank.pic_url = reader[0].ToString();
+                    employeeInfoWithRank.employee_id = reader[1].ToString();
+                    employeeInfoWithRank.name = reader[2].ToString();
+                    employeeInfoWithRank.post = reader[3].ToString();
+                    employeeInfoWithRank.skill = reader[4].ToString();
+                    list.Add(employeeInfoWithRank);
                 }
-            }
-            catch (Exception e)
-            {
 
             }
-            return employees;
+            catch(Exception e)
+            {
+                return null;
+            }
+            for(int i = 0; i < list.Count; i++)
+            {
+                EmployeeInfoWithRank employeeInfoWithRank = (EmployeeInfoWithRank)list[i];
+                string subSqlStr = String.Format(
+                    @"select count(*), sum(rank)
+                      from evaluation
+                      where evaluation.employee_id = '{0}'",employeeInfoWithRank.employee_id);
+
+                OracleCommand subCmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+
+                try
+                {
+                    OracleDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        if (Convert.ToInt32(reader[0]) == 0)
+                        {
+                            employeeInfoWithRank.rank = -1;
+                        }
+                        else
+                        {
+                            employeeInfoWithRank.rank = (int)(Convert.ToInt32(reader[1]) / Convert.ToInt32(reader[0]));
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    return null;
+                }
+
+               
+            }
+            return list;
         }
 
         public static Duty GetEmployeeDutyTime(string id)
@@ -97,22 +130,22 @@ namespace WebAPIs.Models
             return null;
         }
 
+        //Test Passed
         public static string RegisterTreat(Treatment treat)
         {
-            OracleCommand cmd = new OracleCommand();
-            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            OracleCommand cmd = DatabaseHelper.GetInstance().conn.CreateCommand();
             cmd.Transaction = cmd.Connection.BeginTransaction();
             try
             {
-                string sqlStr = String.Format(@"insert into treatment(clinic_name, start_time, end_time, patient_id, employee_id, take)
-                    values(:clinic_name, to_timestamp('{0}', 'yyyy-mm-dd hh24:mi:ss'), to_timestamp('{1}', 'yyyy-mm-dd hh24:mi:ss'), :patient_id, :employee_id, :take)",
-                    treat.start_time.ToString("yyyy-mm-dd hh24:mi:ss"),
-                    treat.end_time.ToString("yyyy-mm-dd hh24:mi:ss"));
+                string sqlStr = String.Format("insert into treatment(treat_id, clinic_name, start_time, end_time, patient_id, employee_id, take)" +
+                    "values(null, :clinic_name, to_timestamp('{0}', 'yyyy/mm/dd hh24:mi:ss'), to_timestamp('{1}','yyyy/mm/dd hh24:mi:ss'), :patient_id, :employee_id, :take)",
+                    Formater.ToString(treat.start_time),
+                    Formater.ToString(treat.end_time));
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("clinic_name", OracleDbType.Varchar2, 20).Value = treat.clinic;
                 cmd.Parameters.Add("patient_id", OracleDbType.Varchar2, 9).Value = treat.patient_id;
-                cmd.Parameters.Add("take", OracleDbType.Int32).Value = 0;
                 cmd.Parameters.Add("employee_id", OracleDbType.Varchar2, 5).Value = treat.doc_id;
+                cmd.Parameters.Add("take", OracleDbType.Int32).Value = 0;
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
 
@@ -131,7 +164,6 @@ namespace WebAPIs.Models
             }
             return null;
         }
-
         public static bool Comment(Evaluation item)
         {
             OracleCommand cmd = new OracleCommand();
@@ -206,6 +238,28 @@ namespace WebAPIs.Models
             }
             return null;
 
+        }
+
+        public static string GetDoctorNameById(string id)
+        {
+            string sqlStr = String.Format(
+               @"select name
+                from employee natural join identity
+                where employee_id='{0}'", id);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return reader[0].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
         }
 
         //Test Passed
@@ -381,6 +435,61 @@ namespace WebAPIs.Models
 
             }
             return consumptionInfo;
+        }
+
+
+        public static ArrayList GetCommentByDocId(string docId)
+        {
+            string sqlStr = String.Format(
+                @"select content
+                  from evaluation
+                  where employee_id='{0}'", docId);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            ArrayList commentList = new ArrayList();
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while(reader.Read())
+                {
+                    commentList.Add(reader[0].ToString());
+                }
+                return commentList;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public static EmployeeWithComment GetDoctor(string docId)
+        {
+            string sqlStr = string.Format(
+                @"select employee.avatar_path, identity.name, identity.sex, employee.clinic_name, employee.post, employee.profile
+                  from employee natural join identity
+                  where employee.employee_id = '{0}'",docId);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            EmployeeWithComment employeeWithComment = new EmployeeWithComment();
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if(reader.Read())
+                {
+                    employeeWithComment.pic_url = reader[0].ToString();
+                    employeeWithComment.name = reader[1].ToString();
+                    employeeWithComment.sex = reader[2].ToString();
+                    employeeWithComment.clinic = reader[3].ToString();
+                    employeeWithComment.post = reader[4].ToString();
+                    employeeWithComment.profile = reader[5].ToString();
+                    return employeeWithComment;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
         }
     }
 

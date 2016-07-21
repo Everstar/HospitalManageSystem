@@ -149,7 +149,7 @@ namespace WebAPIs.Models
         public static EmployeeInfo GetEmployeeInfo(string id)
         {
             string sqlStr = String.Format(
-               @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth
+               @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth, skill, profile, avatar_path
                 from employee natural join identity
                 where employee_id='{0}'",
                id);
@@ -169,7 +169,11 @@ namespace WebAPIs.Models
                         Convert.ToDouble(reader[6].ToString()),
                         reader[7].ToString(),
                         reader[8].ToString(),
-                        Convert.ToDateTime(reader[9].ToString()));
+                        Convert.ToDateTime(reader[9].ToString()),
+                        reader[10].ToString(),
+                        reader[11].ToString(),
+                        reader[12].ToString()
+                        );
                 }
             }
             catch (Exception e)
@@ -203,7 +207,11 @@ namespace WebAPIs.Models
                         Convert.ToDouble(reader[6].ToString()),
                         reader[7].ToString(),
                         reader[8].ToString(),
-                        Convert.ToDateTime(reader[9].ToString())));
+                        Convert.ToDateTime(reader[9].ToString()),
+                        reader[10].ToString(),
+                        reader[11].ToString(),
+                        reader[12].ToString()
+                        ));
                 }
                 return list;
             }
@@ -256,6 +264,28 @@ namespace WebAPIs.Models
                 {
                     if (reader[1].ToString().Equals(id))
                         return reader[0].ToString();
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public static string GetTreatmentIdByExamId(string exam_id)
+        {
+            string sqlStr = @"select * from examine";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader[0].ToString().Equals(exam_id))
+                        return reader[1].ToString();
                 }
                 return null;
             }

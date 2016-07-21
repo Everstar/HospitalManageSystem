@@ -17,7 +17,6 @@ namespace WebAPIs.Models
             ArrayList AllExamination = new ArrayList();
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr =
                @"select exam_id,type,exam_time,pay,pay_time
                 from examination
@@ -30,14 +29,25 @@ namespace WebAPIs.Models
             {
                 while (reader.Read())
                 {
+                    //var time1 = new DateTime();
+                    //var time2 = new DateTime();
+
+                    //if (!reader[2].ToString().Equals(""))
+                    //{
+                    //    time1 = Convert.ToDateTime(reader[2]);
+                    //}
+                    //if (!reader[4].ToString().Equals(""))
+                    //{
+                    //    time1 = Convert.ToDateTime(reader[4]);
+                    //}
                     AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(),
-                         (DateTime)reader[2], Convert.ToDouble(reader[3]), (DateTime)reader[4]));
+                        Formater.ToDateTime(reader, 2), Convert.ToDouble(reader[3]), Formater.ToDateTime(reader, 4)));
                 }
                 return AllExamination;
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
@@ -66,32 +76,63 @@ namespace WebAPIs.Models
             }
             return true;
         }
-        public static bool MakeGastroscopeExamination(string from_picture, string diagnoses, string picture)//插入胃镜检查结果
+
+        public static bool MakeGastroscopeExamination(GastroscopeInfo item)
         {
-            GastroscopeInfo gastroscope = new GastroscopeInfo(from_picture, diagnoses, picture);
+            //  GastroscopeInfo gastroscope = new GastroscopeInfo(from_picture, diagnoses, picture);
+
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             try
             {
-                string sqlStr = String.Format(
-                  @"insert into XRay
-                values('{0}','{1}','{2}', {3})
-               ", gastroscope.exam_id, gastroscope.from_picture, gastroscope.diagnoses, gastroscope.picture);
+
+                string sqlStr =
+                  @"insert into Gastroscope(exam_id,from_picture,diagnoses,picture)
+                values(:exam_id,:frompicture,:diagnoses,:picture)";
+
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("exam_id", item.exam_id);
+                cmd.Parameters.Add("frompicture", OracleDbType.Varchar2, 2000).Value = item.from_picture;
+                cmd.Parameters.Add("diagnoses", OracleDbType.Varchar2, 2000).Value = item.diagnoses;
+                cmd.Parameters.Add("picture", OracleDbType.Varchar2, 200).Value = item.picture;
+                cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
+                return true;
+            }
+            catch (Exception e)
+            {
+                cmd.Transaction.Rollback();
+                throw e;
+                return false;
+            }
+            return false;
+        }
+
+        public static bool MakeBloodExamination(Blood item)
+        {
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            try
+            {
+                string sqlStr = string.Format(
+                    @"insert into blood
+                    values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}'
+                            ,'{15}','{16}','{17}','{18}','{19}','{20}','{21}', '{22}')", item.exam_id, item.wbc, item.neut_percent, item.lymph_percent,
+                    item.eo_percent, item.baso_percent, item.neut_num, item.lymph_num, item.mono_num, item.eo_num, item.baso_num,
+                    item.rbc, item.hgb, item.hct, item.mcv, item.mch, item.mchc, item.rdw,
+                    item.plt, item.mpv, item.pdw, item.pct);
                 cmd.CommandText = sqlStr;
                 cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
+                return true;
             }
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
                 return false;
             }
-            return true;
-        }
-
-        public static bool MakeBloodExamination(Blood item)
-        {
-            //TODO
             return false;
 
         }

@@ -21,6 +21,7 @@ namespace WebAPIs.Controllers
     public class DoctorController : BaseController
     {
         /// <summary>
+        /// Pending to Test
         /// 获取挂号到该医生的挂号单
         /// </summary>
         /// <example>
@@ -35,7 +36,6 @@ namespace WebAPIs.Controllers
         /// </code>
         /// </example>
         /// <returns>所有接诊挂号单(需要cookie获取employee_id)</returns>
-        /// Pending to test
         [HttpGet]
         public HttpResponseMessage GetAllTreatment()
         {
@@ -96,11 +96,11 @@ namespace WebAPIs.Controllers
             return response;
         }
         /// <summary>
+        /// Test Passed.
         /// 接诊
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/TakesRegistration/{treatment_id}")]
         public HttpResponseMessage TakesRegistration(string treatment_id)
@@ -123,12 +123,12 @@ namespace WebAPIs.Controllers
             return response;
         }
         /// <summary>
+        /// Test Passed.
         /// 开检查单
         /// exam_type ∈ {“blood” : 0, “gastroscope” : 1, “xray” : 2}
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test Passed.
         [HttpGet]
         [Route("api/Doctor/WriteExamination/{treatment_id}/{exam_type}")]
         public HttpResponseMessage WriteExamination(string treatment_id, string exam_type)
@@ -160,10 +160,10 @@ namespace WebAPIs.Controllers
             return response;
         }
         /// <summary>
+        /// Test Passed
         /// 获取ALL medicine的所有信息
         /// </summary>
         /// <returns></returns>
-        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/GetMedicineList")]
         public HttpResponseMessage GetAllMedicine()
@@ -176,6 +176,7 @@ namespace WebAPIs.Controllers
         }
 
         /// <summary>
+        /// Test passed
         /// 开处方
         /// </summary>
         /// <example>
@@ -186,7 +187,6 @@ namespace WebAPIs.Controllers
         /// </example>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test passed
         [HttpPost]
         [Route("api/Doctor/WritePrescription")]
         public HttpResponseMessage WritePrescription(dynamic obj)
@@ -247,11 +247,11 @@ namespace WebAPIs.Controllers
             return response;
         }
         /// <summary>
+        /// Test Passed
         /// 开手术单
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/WriteSurgey/{treatment_id}/{surgey_name}")]
         public HttpResponseMessage WriteSurgey(string treatment_id, string surgey_name)
@@ -267,11 +267,11 @@ namespace WebAPIs.Controllers
             return response;
         }
         /// <summary>
+        /// Test Passed
         /// 开住院单
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test Passed
         [HttpGet]
         [Route("api/Doctor/WriteHospitalization/{treatment_id}")]
         public HttpResponseMessage WriteHospitalization(string treatment_id)
