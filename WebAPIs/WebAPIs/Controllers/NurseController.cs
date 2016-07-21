@@ -16,6 +16,11 @@ using Newtonsoft.Json.Linq;
 
 namespace WebAPIs.Controllers
 {
+
+    /// <summary>
+    /// 
+    /// is finished
+    /// </summary>
     //[Authorize(Roles = "Nurse")]
     public class NurseController : BaseController
     {
