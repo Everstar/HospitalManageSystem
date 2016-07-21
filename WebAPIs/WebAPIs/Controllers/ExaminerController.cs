@@ -20,14 +20,11 @@ namespace WebAPIs.Controllers
     public class ExaminerController : BaseController
     {
         /// <summary>
+        /// Test Passed
         /// 获取检查单
         /// </summary>
         /// <param name="docId"></param>
         /// <returns></returns>
-
-
-        // Done
-        // Test Passed
         [HttpGet]
         [Route("api/Examiner/GetExamination/{docId}")]
         public HttpResponseMessage GetExamination(string docId)
@@ -36,7 +33,7 @@ namespace WebAPIs.Controllers
             // get ALL Examination FROM Specific doc_id
             // examination表查找doc_id匹配的数据
             // 序列化返回
-            ArrayList list=ExaminerHelper.GetAllExamination(docId);
+            ArrayList list = ExaminerHelper.GetAllExamination(docId);
             if (list.Count == 0)
             {
                 response.Content = new StringContent("未找到相关检测记录");
@@ -48,16 +45,16 @@ namespace WebAPIs.Controllers
                 response.StatusCode = HttpStatusCode.OK;
             }
 
-            
+
             //response.Content = new StringContent(JsonObjectConverter.ObjectToJson(new Examination()));
             return response;
         }
         /// <summary>
+        /// Test Passed
         /// X光检查
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// Test Passed
         //done
         [HttpPost]
         [Route("api/Examiner/MakeXRayExamination")]
@@ -66,7 +63,7 @@ namespace WebAPIs.Controllers
             HttpResponseMessage response = new HttpResponseMessage();
             // 存储文件到数据库
             //一个对象反序列化的过程
-            XrayInfo xrayInfo = await ReadAndSaveFile();
+            XrayInfo xrayInfo = (XrayInfo)await ReadAndSaveFile();
             string jsonStr = "";
             try
             {
@@ -91,11 +88,11 @@ namespace WebAPIs.Controllers
                 response.Content = new StringContent("检测结果插入表中");
                 response.StatusCode = HttpStatusCode.OK;
             }
-            
+
             return response;
         }
 
-        private async Task<XrayInfo> ReadAndSaveFile()
+        private async Task<Object> ReadAndSaveFile()
         {
             string root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/Uploads");
 
@@ -108,13 +105,45 @@ namespace WebAPIs.Controllers
             string guid = Guid.NewGuid().ToString();
             string path = Path.Combine(root, guid + "_" + provider.FileData.First().Headers.ContentDisposition.FileName.Replace("\"", ""));
             File.Move(finfo.FullName, path);
+            var formData = provider.FormData;
+            int type = 10;
+            try
+            {
+                type = int.Parse(formData.GetValues("type").FirstOrDefault());
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
-            string exam_id = provider.FormData.GetValues("exam_id").FirstOrDefault();
-            string checkpoint = provider.FormData.GetValues("checkpoint").FirstOrDefault();
-            string from_picture = provider.FormData.GetValues("from_picture").FirstOrDefault();
-            string picture = path;
+            // 新建一个对象
+            Object info = new object();
+            string exam_id;
+            string checkpoint;
+            string from_picture;
+            string picture;
+            string diagnoses;
 
-            XrayInfo info = new XrayInfo(exam_id, checkpoint, from_picture, picture);
+            switch (type)
+            {
+                case 0:
+                    break;
+                case 1:
+                    exam_id = formData.GetValues("exam_id").FirstOrDefault();
+                    diagnoses = formData.GetValues("diagnoses").FirstOrDefault();
+                    from_picture = formData.GetValues("from_picture").FirstOrDefault();
+                    info = new GastroscopeInfo(from_picture, diagnoses, path);
+                    break;
+                case 2:
+                    exam_id = formData.GetValues("exam_id").FirstOrDefault();
+                    checkpoint = formData.GetValues("checkpoint").FirstOrDefault();
+                    from_picture = formData.GetValues("from_picture").FirstOrDefault();
+                    info = new XrayInfo(exam_id, checkpoint, from_picture, path);
+                    break;
+                default:
+                    return null;
+            }
+
             return info;
         }
         /// <summary>
@@ -122,48 +151,40 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// 
-
-        //done
         [HttpPost]
         [Route("api/Examiner/MakeGastroscopeExamination")]
-        public HttpResponseMessage MakeGastroscopeExamination(dynamic obj)
+        public async Task<HttpResponseMessage> MakeGastroscopeExamination()
         {
-            /*string exam_id = obj.exam_id.Value;
-            string diagnoses = obj.diagnoses.Value;
-            string from_picture = obj.from_picture.Value;*/
-            var picture = obj.picture;
-
-            Gastroscope gastroscope = new Gastroscope();
-
             HttpResponseMessage response = new HttpResponseMessage();
-
+            GastroscopeInfo gastroInfo;
             try
             {
-                gastroscope = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), gastroscope);
+                gastroInfo = (GastroscopeInfo)await ReadAndSaveFile();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                response.Content = new StringContent("post数据格式错误\nReceives:\n" + JsonObjectConverter.ObjectToJson(obj));
+                response.Content = new StringContent(e.Message);
+                return response;
+            }
+            try
+            {
+                if (!ExaminerHelper.MakeGastroscopeExamination(gastroInfo))
+                {
+                    response.Content = new StringContent("由于某种原因插入检查结果不成功");
+                    response.StatusCode = HttpStatusCode.Forbidden;
+                }
+                else
+                {
+                    response.Content = new StringContent("检测结果插入成功" +JsonObjectConverter.ObjectToJson(gastroInfo));
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
                 response.StatusCode = HttpStatusCode.BadRequest;
             }
 
-           
-
-            if(!ExaminerHelper.MakeGastroscopeExamination(gastroscope.from_picture,gastroscope.diagnoses, picture))
-            {
-                response.Content = new StringContent("由于某种原因插入检查结果不成功");
-                response.StatusCode = HttpStatusCode.Forbidden;
-            }
-            else
-            {
-                response.Content = new StringContent("检测结果插入成功");
-                response.StatusCode = HttpStatusCode.OK;
-            }
-
-
-            // 胃镜表插入
-            
             return response;
         }
         /// <summary>
@@ -171,8 +192,6 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        /// 
-
         //update needed
         [HttpPost]
         [Route("api/Examiner/MakeBloodExamination")]
@@ -203,11 +222,20 @@ namespace WebAPIs.Controllers
             string pdw = obj.pdw.Value;
             string pct = obj.pct.Value;
 
-           
-
-
-            // Blood表插入
             HttpResponseMessage response = new HttpResponseMessage();
+
+            Blood blood = new Blood();
+            try
+            {
+                blood = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), blood);
+                ExaminerHelper.MakeBloodExamination(blood, "fuck");
+            }
+            catch(Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+            // Blood表插入
             return response;
         }
 
@@ -219,17 +247,17 @@ namespace WebAPIs.Controllers
         [Route("api/Examiner/GetPatientById/{examInfo}")]
         public HttpResponseMessage GetPatientNameById(string examInfo)
         {
- 
+
             ArrayList list = ExaminerHelper.GetPatientByExamId(examInfo);
 
             HttpResponseMessage response = new HttpResponseMessage();
 
-            if (list==null)
+            if (list == null)
             {
                 response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
-            else if(list.Count==0)
+            else if (list.Count == 0)
             {
                 response.Content = new StringContent("查询失败");
                 response.StatusCode = HttpStatusCode.BadRequest;
@@ -239,7 +267,7 @@ namespace WebAPIs.Controllers
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
                 response.StatusCode = HttpStatusCode.OK;
             }
-            
+
             return response;
         }
     }

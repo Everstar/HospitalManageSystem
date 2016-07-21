@@ -19,9 +19,8 @@ namespace WebAPIs.Controllers
     //[Authorize(Roles = "Nurse")]
     public class NurseController : BaseController
     {
-        public string accessRoles = "Nurse";
-
         /// <summary>
+        /// Test Passed
         /// 获取住院信息
         /// </summary>
         /// <param name="nurseId"></param>

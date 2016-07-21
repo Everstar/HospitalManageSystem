@@ -11,6 +11,7 @@ using WebAPIs.Models.DataModels;
 using WebAPIs.Providers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Controllers
 {
@@ -68,8 +69,8 @@ namespace WebAPIs.Controllers
         /// <param name="percent"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/ManagementStaff/GetComplaintedDoctor/{percent}")]
-        public HttpResponseMessage GetComplaintedDoctor(double percent)
+        [Route("api/ManagementStaff/GetComplaintedDoctor/{year}/{month}/{percent}")]
+        public HttpResponseMessage GetComplaintedDoctor(int year, int month, string percent)
         {
             // 被投诉是指某个医生的Rank小于等于两颗星星
             // 在evaluation表找到每一个doc_id下的数据总数 找到doc_id对应的rank小于等于2的数量
@@ -77,17 +78,47 @@ namespace WebAPIs.Controllers
             // 记录下这个医生的doc_id
             // 返回一个doc_id的列表
             HttpResponseMessage response = new HttpResponseMessage();
-
-            ArrayList list = ManagementHelper.GetComplaintedDoctor(percent);
+            JArray strArray = new JArray();
+            ArrayList list = null;
+            try
+            {
+                list = ManagementHelper.GetComplaintedDoctor(year, month, double.Parse(percent));
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
 
             if (list == null)
             {
-                response.Content = new StringContent("查询失败");
+                response.Content = new StringContent("查询过程出现异常");
                 response.StatusCode = HttpStatusCode.NotFound;
             }
             else
             {
-                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                if (list.Count == 0)
+                {
+                    strArray.Add("0");
+                    response.Content = new StringContent(JsonObjectConverter.ObjectToJson(strArray));
+                }
+                else
+                {
+                    strArray.Add("1");
+                    for (int i = 1; i < list.Count; i++)
+                    {
+                        EmployeeInfo emp = (EmployeeInfo)list[i];
+                        JObject obj = new JObject();
+                        obj.Add("department", emp.department);
+                        obj.Add("clinic", emp.clinic);
+                        obj.Add("id", emp.employee_id);
+                        obj.Add("name", emp.name);
+                        obj.Add("compliant_rate", emp.compliant_rate.ToString());
+                        strArray.Add(obj);
+                    }
+                }
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(strArray));
                 response.StatusCode = HttpStatusCode.OK;
             }
             return response;
@@ -124,6 +155,7 @@ namespace WebAPIs.Controllers
         [Route("api/ManagementStaff/AddEmployee")]
         public HttpResponseMessage AddEmployee(dynamic obj)
         {
+            HttpResponseMessage response = new HttpResponseMessage();
             var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
             Employee emp = new Employee();
             emp.clinic = employee.GetValue("clinic_name").ToString();
@@ -131,8 +163,35 @@ namespace WebAPIs.Controllers
             emp.password = employee.GetValue("password").ToString();
             emp.post = employee.GetValue("post").ToString();
             emp.salary = double.Parse(employee.GetValue("salary").ToString());
+            emp.department = employee.GetValue("dept_name").ToString();
+            try
+            {
+                ManagementHelper.AddEmployee(emp);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+            response.Content = new StringContent("添加成功！" + JsonObjectConverter.ObjectToJson(emp));
             // 数据库中插入
+            return response;
+        }
+        [HttpGet]
+        [Route("api/ManagementStaff/DeleteEmployee/{employee_id}")]
+        public HttpResponseMessage DeleteEmployee(string employee_id)
+        {
             HttpResponseMessage response = new HttpResponseMessage();
+            try
+            {
+                ManagementHelper.DeleteEmployee(employee_id);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
+            response.Content = new StringContent("更新成功！");
             return response;
         }
     }

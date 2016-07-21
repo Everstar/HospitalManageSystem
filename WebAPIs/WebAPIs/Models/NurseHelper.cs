@@ -17,19 +17,19 @@ namespace WebAPIs.Models
             ArrayList hospitalization = new ArrayList();
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            string sqlStr = 
+            string sqlStr =
                 @"select hos_id,treat_id,employee_id,bed_num,pay,rank,in_time,out_time,pay_time
                 from hospitalization natural join bed 
                 where employee_id=:Pnurse_id and out_time is null";
             cmd.CommandText = sqlStr;
-            cmd.Parameters.Add("Pnurse_id", nurse_id);            
+            cmd.Parameters.Add("Pnurse_id", nurse_id);
             OracleDataReader reader = cmd.ExecuteReader();
-            
+
             try
             {
                 while (reader.Read())
                 {
-                    hospitalization.Add(new 
+                    hospitalization.Add(new
                         HospitalInfo(
                         reader[0].ToString(),
                         reader[1].ToString(),
@@ -49,6 +49,7 @@ namespace WebAPIs.Models
             return null;
         }
 
+
         public static bool OutHospital(string hospitalId)
         {
             OracleCommand cmd = new OracleCommand();
@@ -63,13 +64,17 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("Hos_id", hospitalId);
             try
             {
-                cmd.ExecuteNonQuery();
+                if (1 != cmd.ExecuteNonQuery())
+                {
+                    throw new Exception("更改失败！");
+                }
                 cmd.Transaction.Commit();
                 return true;
             }
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
+                throw e;
             }
             return false;
 

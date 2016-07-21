@@ -18,6 +18,7 @@ namespace WebAPIs.Models.UnifiedTable
         public string name { get; set; }
         public char sex { get; set; }
         public DateTime birth { get; set; }
+        public double compliant_rate { get; set; }
 
         public EmployeeInfo(string id, string num, string pw, string dm, string cn,
             string post, double salary, string name, string sex, DateTime birth)
@@ -42,7 +43,7 @@ namespace WebAPIs.Models.UnifiedTable
             this.name = name;
             this.sex = sex[0];
         }
-        public EmployeeInfo(string employee_id ,string dept_name, string clinic_name, string post, string name, string sex)
+        public EmployeeInfo(string employee_id, string dept_name, string clinic_name, string post, string name, string sex)
         {
             this.employee_id = employee_id;
             this.department = dept_name;
@@ -50,6 +51,23 @@ namespace WebAPIs.Models.UnifiedTable
             this.post = post;
             this.name = name;
             this.sex = sex[0];
+        }
+        public EmployeeInfo(string id, string name, string dept_name, string clinic_name, string post, double salary)
+        {
+            this.employee_id = id;
+            this.name = name;
+            this.department = dept_name;
+            this.clinic = clinic_name;
+            this.post = post;
+            this.salary = salary;
+        }
+        public EmployeeInfo(string dept_name, string clinic_name, string id, string name, double rate)
+        {
+            this.employee_id = id;
+            this.name = name;
+            this.department = dept_name;
+            this.clinic = clinic_name;
+            this.compliant_rate = rate;
         }
     }
 }

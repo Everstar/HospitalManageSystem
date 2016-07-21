@@ -17,17 +17,20 @@ namespace WebAPIs.Models
         {
             ArrayList AllEmployee = new ArrayList();
             string sqlStr = String.Format(
-               @"select dept_name,clinic_name,post,name,sex
-                from employee;");
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+               @"select employee_id,name,dept_name,clinic_name,post,salary
+                from employee natural join identity");
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.CommandText = sqlStr;
+            OracleDataReader reader = cmd.ExecuteReader();
+
             try
             {
-                OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    AllEmployee.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                        reader[3].ToString(), reader[4].ToString()));
+                    AllEmployee.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(),
+                                    reader[2].ToString(), reader[3].ToString(),
+                                    reader[4].ToString(), Convert.ToDouble(reader[5])));
                 }
                 return AllEmployee;
             }
@@ -55,75 +58,93 @@ namespace WebAPIs.Models
                 cmd.Parameters.Add("Ppos", post);
                 cmd.Parameters.Add("Psal", salary);
                 cmd.Parameters.Add("Pemp", employee_id);
-
+                cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
+                return true;
             }
 
             //异常这里我还要研究一下
             catch (Exception ex)
             {
+                cmd.Transaction.Rollback();
                 return false;
             }
             return true;
 
         }
-   
+
 
         //获取投诉率高于percent的医生
 
 
-        public static ArrayList GetComplaintedDoctor(double percent)//获取投诉率高于percent的医生
+        public static ArrayList GetComplaintedDoctor(int year, int month, double percent)//获取投诉率高于percent的医生
         {
+
+            int begin_year = year;
+            int begin_month = month;
+            int end_year, end_month;
+            if (begin_month == 12)
+            {
+                end_month = 1;
+                end_year = begin_year + 1;
+            }
+            else
+            {
+                end_month = begin_month + 1;
+                end_year = begin_year;
+            }
+            string beginTime, endTime;
+            if (begin_month < 10)
+            {
+                beginTime = begin_year.ToString() + "-0" + begin_month.ToString();
+            }
+            else
+            {
+                beginTime = begin_year.ToString() + "-" + begin_month.ToString();
+            }
+            if (end_month < 10)
+            {
+                endTime = end_year.ToString() + "-0" + end_month.ToString();
+            }
+            else
+            {
+                endTime = end_year.ToString() + "-" + end_month.ToString();
+            }
             ArrayList ComplaintedDoctor = new ArrayList();
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr = String.Format(
-               @"with ComplaintedDoctor(em_id,em_percent) as
-                 (select employee_id ,avg(rank)
-                  from evaluation
-                  group by employee_id)
-                  select employee_id,dept_name,clinic_name,post,name,sex
-                  from ComplaintedDoctor natural join employee natural join identity 
-                  where em_percent>='{0}'", percent);// 这里sql语句有问题 没有join identity现在加上了
+                        @"with badDoc(id,rate) as 
+                                (select evaluation.employee_id,avg(rank)
+                                from evaluation join treatment on evaluation.treat_id=treatment.treat_id
+                                where treatment.end_time>to_date('{0}', 'yyyy-mm') and treatment.end_time<to_date('{1}', 'yyyy-mm')
+                                group by evaluation.employee_id)
+                        select employee.dept_name,employee.clinic_name,badDoc.id,identity.name,badDoc.rate
+                        from badDoc join employee on badDoc.id=employee.employee_id join identity on employee.credit_num=identity.credit_num",
+                        beginTime, endTime);
             cmd.CommandText = sqlStr;
-
-
-            int i = 0;
+            OracleDataReader reader = cmd.ExecuteReader();
 
             try
             {
-                OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    if (i == 0)
-                    {
-                        ComplaintedDoctor.Add(1);
-                        ComplaintedDoctor.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                            reader[3].ToString(), reader[4].ToString(), reader[5].ToString()));
-                        i++;
-                    }
-                    else
-                    {
-                        ComplaintedDoctor.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString(),
-                            reader[3].ToString(), reader[4].ToString(), reader[5].ToString()));
-                    }
-
-                }
-                if (i == 0)
-                {
-                    ComplaintedDoctor.Add(0);
+                    ComplaintedDoctor.Add(new EmployeeInfo(reader[0].ToString(), reader[1].ToString(),
+                                    reader[2].ToString(), reader[3].ToString(),
+                                    Convert.ToDouble(reader[5])));
                 }
                 return ComplaintedDoctor;
             }
             catch (Exception e)
             {
+                throw e;
                 return null;
             }
             return null;
+
+
         }
 
-
-        //duty类的id什么时候设置
 
         public static bool SetDuty(Duty item)
         {
@@ -133,7 +154,6 @@ namespace WebAPIs.Models
             string sqlStr =
                 @"insert into duty
                 values (null, :Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
-            cmd.Parameters.Add("Pduty_id", item.duty_id);
             cmd.CommandText = sqlStr;
             cmd.Parameters.Add("Proom_num", item.room_num);
             cmd.Parameters.Add("Pmon", item.Monday);
@@ -150,6 +170,98 @@ namespace WebAPIs.Models
             }
             else
                 return true;
+        }
+        static public bool AddEmployee(Employee item)
+        {
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            try
+            {
+                string sqlStr =
+                @"insert into employee(exployee_id, credit_num, password, dept_name, clinic_name, post, salary,duty_id)
+                  values (null, :credit_num, :password, :dept_name, :clinic_name, :post, :salary,null);
+                ";
+                cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
+                cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.password;
+                cmd.Parameters.Add("dept_name", OracleDbType.Varchar2, 20).Value = item.department;
+                cmd.Parameters.Add("clinic_name", OracleDbType.Varchar2, 20).Value = item.clinic;
+                cmd.Parameters.Add("post", OracleDbType.Varchar2, 20).Value = item.post;
+                cmd.Parameters.Add("salary", OracleDbType.Double).Value = item.salary;
+                cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                cmd.Transaction.Rollback();
+                throw ex;
+                return false;
+            }
+            return false;
+        }
+        static public bool DeleteEmployee(string employee_id)
+        {
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            try
+            {
+                string sqlStr =
+              @"update employee
+                 set salary=-1
+                where employee_id=:employeeid;";
+                cmd.CommandText = sqlStr;
+                cmd.Parameters.Add("employeeid", OracleDbType.Varchar2, 5).Value = employee_id;
+                if (cmd.ExecuteNonQuery() != 1)
+                {
+                    throw new Exception("更新失败！");
+                }
+                else
+                {
+                    cmd.Transaction.Commit();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                cmd.Transaction.Rollback();
+                throw ex;
+                return false;
+            }
+            return false;
+        }
+
+
+        static public ArrayList GetDutyByClinic(string clinic)
+        {
+            ArrayList dutyByClinic = new ArrayList();
+            string sqlStr =
+               @"select employee_id,name,room_num,monday,tuesday,wednesday,thursday,friday,saturday,sunday
+                from own natural join duty natural join employee natural join identity
+                where clinic_name=':clinic'";
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("clinic", OracleDbType.Varchar2, 20).Value = clinic;
+            OracleDataReader reader = cmd.ExecuteReader();
+
+            try
+            {
+                while (reader.Read())
+                {
+                    dutyByClinic.Add(new DutyByClinic(reader[0].ToString(), reader[1].ToString(),
+                                    reader[2].ToString(), reader[3].ToString(),
+                                    reader[4].ToString(), reader[5].ToString(), reader[6].ToString(), reader[7].ToString(), reader[8].ToString(),
+                                    reader[9].ToString()));
+                }
+                return dutyByClinic;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
         }
     }
 }
