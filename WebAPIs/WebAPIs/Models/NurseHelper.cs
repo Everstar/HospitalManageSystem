@@ -10,6 +10,11 @@ using WebAPIs.Models.UnifiedTable;
 using WebAPIs.Providers;
 namespace WebAPIs.Models
 {
+
+    /// <summary>
+    /// 
+    /// is finished
+    /// </summary>
     public class NurseHelper//获得该护士照顾的所有病人
     {
         public static ArrayList GetHospitalizationInfo(string nurse_id)

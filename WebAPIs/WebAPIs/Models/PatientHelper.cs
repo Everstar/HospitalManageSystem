@@ -208,6 +208,28 @@ namespace WebAPIs.Models
 
         }
 
+        public static string GetDoctorNameById(string id)
+        {
+            string sqlStr = String.Format(
+               @"select name
+                from employee natural join identity
+                where patient_id='{0}'", id);
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    return reader[0].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+
         //Test Passed
         public static ArrayList GetTreatmentInfo(string patient_id)
         {
