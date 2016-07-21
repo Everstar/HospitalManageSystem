@@ -76,30 +76,6 @@ namespace WebAPIs.Models
             }
             return true;
         }
-        //public static bool MakeGastroscopeExamination(string from_picture, string diagnoses, string picture)//插入胃镜检查结果
-        //{
-        //    GastroscopeInfo gastroscope = new GastroscopeInfo(from_picture, diagnoses, picture);
-        //    OracleCommand cmd = new OracleCommand();
-        //    cmd.Connection = DatabaseHelper.GetInstance().conn;
-        //    cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
-        //    try
-        //    {
-        //        string sqlStr = String.Format(
-        //          @"insert into Gastroscope
-        //        values('{0}','{1}','{2}', '{3}')
-        //       ", gastroscope.exam_id, gastroscope.from_picture, gastroscope.diagnoses, gastroscope.picture);
-        //        cmd.CommandText = sqlStr;
-        //        cmd.ExecuteNonQuery();
-        //        cmd.Transaction.Commit();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        cmd.Transaction.Rollback();
-        //        throw e;
-        //        return false;
-        //    }
-        //    return true;
-        //}
 
         public static bool MakeGastroscopeExamination(GastroscopeInfo item)
         {
@@ -127,6 +103,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
+                throw e;
                 return false;
             }
             return false;

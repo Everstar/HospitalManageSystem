@@ -257,6 +257,8 @@ namespace WebAPIs.Controllers
             try
             {
                 blood = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), blood);
+
+                // Blood表插入
                 ExaminerHelper.MakeBloodExamination(blood);
             }
             catch(Exception e)
@@ -264,7 +266,6 @@ namespace WebAPIs.Controllers
                 response.Content = new StringContent(e.Message);
                 response.StatusCode = HttpStatusCode.BadRequest;
             }
-            // Blood表插入
             return response;
         }
 

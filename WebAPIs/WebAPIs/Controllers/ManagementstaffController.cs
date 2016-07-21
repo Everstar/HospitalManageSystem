@@ -29,6 +29,8 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetAllEmployee()
         {
             // 数据库中找到所有employee的信息
+            // 如果工资为-1
+            // 则不显示
             // 序列化成Json
             ArrayList list = ManagementHelper.GetAllEmployee();
 

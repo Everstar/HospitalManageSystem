@@ -16,9 +16,10 @@ namespace WebAPIs.Models
         static public ArrayList GetAllEmployee()
         {
             ArrayList AllEmployee = new ArrayList();
+            // 把工资为-1的员工都过滤
             string sqlStr = String.Format(
                @"select employee_id,name,dept_name,clinic_name,post,salary
-                from employee natural join identity");
+                from employee natural join identity where salary != -1");
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.CommandText = sqlStr;
@@ -211,7 +212,7 @@ namespace WebAPIs.Models
                 string sqlStr =
               @"update employee
                  set salary=-1
-                where employee_id=:employeeid;";
+                where employee_id=:employeeid";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("employeeid", OracleDbType.Varchar2, 5).Value = employee_id;
                 if (cmd.ExecuteNonQuery() != 1)
