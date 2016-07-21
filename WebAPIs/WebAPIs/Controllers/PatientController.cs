@@ -395,6 +395,42 @@ namespace WebAPIs.Controllers
             return response;
         }
 
+        [HttpGet]
+        [Route("api/Patient/GetSingleEmployee/{employeeId}")]
+        public HttpResponseMessage GetSingleEmployee(string employeeId)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+
+            EmployeeWithComment employeeWithComment = PatientHelper.GetDoctor(employeeId);
+
+            if (employeeWithComment == null)
+            {
+                response.Content = new StringContent("未找到医生");
+                response.StatusCode = HttpStatusCode.NotFound;
+                
+            }
+            else
+            {
+                employeeWithComment.comment = PatientHelper.GetCommentByDocId(employeeId);
+                if (employeeWithComment.comment == null)
+                {
+                    response.Content = new StringContent("查询失败");
+                    response.StatusCode = HttpStatusCode.NotFound;
+                }
+                else if (employeeWithComment.comment.Count == 0)
+                {
+                    response.Content = new StringContent("评论列表空");
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Content = new StringContent(JsonObjectConverter.ObjectToJson(employeeWithComment));
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+            }
+
+            return response;
+        }
 
     }
 }
