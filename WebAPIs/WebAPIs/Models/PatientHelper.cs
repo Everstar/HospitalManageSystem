@@ -39,31 +39,64 @@ namespace WebAPIs.Models
         //only contain department, clinic, post, name, sex info
         public static ArrayList GetEmployeeOfClinic(string clinic_name)
         {
-            ArrayList employees = new ArrayList();
+            ArrayList list = new ArrayList();
             string sqlStr = String.Format(
-               @"select dept_name, clinic_name, post, name, sex
-                from employee natural join identity natural join clinic
-                where clinic_name='{0}'",
-                clinic_name);
+                @"select avatar_path, employee_id, name, post, skill
+                  from employee natural join identity
+                  where employee.clinic_name = '{0}'", clinic_name);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-            OracleDataReader reader = cmd.ExecuteReader();
             try
             {
+                OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    employees.Add(new EmployeeInfo(
-                        reader[0].ToString(),
-                        reader[1].ToString(),
-                        reader[2].ToString(),
-                        reader[3].ToString(),
-                        reader[4].ToString()));
+                    EmployeeInfoWithRank employeeInfoWithRank = new EmployeeInfoWithRank();
+                    employeeInfoWithRank.pic_url = reader[0].ToString();
+                    employeeInfoWithRank.employee_id = reader[1].ToString();
+                    employeeInfoWithRank.name = reader[2].ToString();
+                    employeeInfoWithRank.post = reader[3].ToString();
+                    employeeInfoWithRank.skill = reader[4].ToString();
+                    list.Add(employeeInfoWithRank);
                 }
-            }
-            catch (Exception e)
-            {
 
             }
-            return employees;
+            catch(Exception e)
+            {
+                return null;
+            }
+            for(int i = 0; i < list.Count; i++)
+            {
+                EmployeeInfoWithRank employeeInfoWithRank = (EmployeeInfoWithRank)list[i];
+                string subSqlStr = String.Format(
+                    @"select count(*), sum(rank)
+                      from evaluation
+                      where evaluation.employee_id = '{0}'",employeeInfoWithRank.employee_id);
+
+                OracleCommand subCmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+
+                try
+                {
+                    OracleDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        if (Convert.ToInt32(reader[0]) == 0)
+                        {
+                            employeeInfoWithRank.rank = -1;
+                        }
+                        else
+                        {
+                            employeeInfoWithRank.rank = (int)(Convert.ToInt32(reader[1]) / Convert.ToInt32(reader[0]));
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    return null;
+                }
+
+               
+            }
+            return list;
         }
 
         public static Duty GetEmployeeDutyTime(string id)
