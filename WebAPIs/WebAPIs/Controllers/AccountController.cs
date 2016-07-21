@@ -77,7 +77,7 @@ namespace WebAPIs.Controllers
         /// 获取用户的信息
         /// </summary>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()

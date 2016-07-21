@@ -15,7 +15,7 @@ using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Controllers
 {
-    //[Authorize(Roles = "Managementstaff")]
+    [Authorize(Roles = "Managementstaff")]
     public class ManagementstaffController : BaseController
     {
         /// <summary>
@@ -143,9 +143,9 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage SetDutyTime(dynamic obj)
         {
             var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
-
-            string room_num = obj.room_num.Value;
-            string Monday = obj.Monday.Value;
+            string emp_id = employee.GetValue("employee_id").ToString();
+            string room_num = employee.GetValue("").ToString();
+            string Monday = employee.GetValue("Monday").ToString();
             string Tuesday = obj.Tuesday.Value;
             string Wednesday = obj.Wednesday.Value;
             string Thursday = obj.Thursday.Value;
@@ -153,7 +153,7 @@ namespace WebAPIs.Controllers
             string Saturday = obj.Saturday.Value;
             string Sunday = obj.Sunday.Value;
             Duty item = new Duty(room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday);
-            ManagementHelper.SetDuty(item);
+            ManagementHelper.SetDuty(item, emp_id);
             // duty表生成id
             // 设置room_num
             // max_limit设置成随机数

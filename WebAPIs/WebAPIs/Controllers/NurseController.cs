@@ -21,7 +21,7 @@ namespace WebAPIs.Controllers
     /// 
     /// is finished
     /// </summary>
-    //[Authorize(Roles = "Nurse")]
+    [Authorize(Roles = "Nurse")]
     public class NurseController : BaseController
     {
         /// <summary>

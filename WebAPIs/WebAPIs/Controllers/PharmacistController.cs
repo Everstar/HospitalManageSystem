@@ -20,7 +20,7 @@ namespace WebAPIs.Controllers
     /// </summary>
 
 
-    //[Authorize(Roles = "Pharmacist")]
+    [Authorize(Roles = "Pharmacist")]
     public class PharmacistController : BaseController
     {
         /// <summary>

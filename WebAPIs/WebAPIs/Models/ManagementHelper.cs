@@ -147,8 +147,7 @@ namespace WebAPIs.Models
             return null;
         }
 
-
-        public static bool SetDuty(Duty item)
+        public static bool insertDuty(Duty item)
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
@@ -165,18 +164,95 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("Pfri", item.Friday);
             cmd.Parameters.Add("Psat", item.Saturday);
             cmd.Parameters.Add("Psun", item.Sunday);
-            if (cmd.ExecuteNonQuery() == 1)
-            {
-                cmd.Transaction.Commit();
-                return true;
-                
-            }
-            else
+            if (cmd.ExecuteNonQuery() == 0)
             {
                 cmd.Transaction.Rollback();
                 return false;
             }
+            else
+            {
+                cmd.Transaction.Commit();
+                return true;
+            }
         }
+
+
+        //public static bool SetDuty(Duty item)
+        //{
+        //    OracleCommand cmd = new OracleCommand();
+        //    cmd.Connection = DatabaseHelper.GetInstance().conn;
+        //    cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+        //    string sqlStr =
+        //        @"insert into duty
+        //        values (null, :Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
+        //    cmd.CommandText = sqlStr;
+        //    cmd.Parameters.Add("Proom_num", item.room_num);
+        //    cmd.Parameters.Add("Pmon", item.Monday);
+        //    cmd.Parameters.Add("Ptue", item.Tuesday);
+        //    cmd.Parameters.Add("Pwed", item.Wednesday);
+        //    cmd.Parameters.Add("Pthu", item.Thursday);
+        //    cmd.Parameters.Add("Pfri", item.Friday);
+        //    cmd.Parameters.Add("Psat", item.Saturday);
+        //    cmd.Parameters.Add("Psun", item.Sunday);
+        //    if (cmd.ExecuteNonQuery() == 1)
+        //    {
+        //        cmd.Transaction.Commit();
+        //        return true;
+
+        //    }
+        //    else
+        //    {
+        //        cmd.Transaction.Rollback();
+        //        return false;
+        //    }
+        //}
+        public static bool SetDuty(Duty item, string employee_id)
+        {
+            try
+            {
+                insertDuty(item);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            OracleCommand geetDutycmd = new OracleCommand();
+            geetDutycmd.Connection = DatabaseHelper.GetInstance().conn;
+            string sqlStr1 = @"select DUTY_INCREMENT.CURRVAL from dual";
+            geetDutycmd.CommandText = sqlStr1;
+            OracleDataReader reader1 = geetDutycmd.ExecuteReader();
+            string duty_id = "";
+            try
+            {
+                reader1.Read();
+                duty_id = reader1[0].ToString();
+            }
+            catch
+            {
+
+            }
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            string sqlStr = String.Format(@"update employee
+                            set duty_id={0}
+                            where employee_id=:employee", duty_id);
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("employee", OracleDbType.Varchar2, 5).Value = employee_id;
+            if (cmd.ExecuteNonQuery() != 1)
+            {
+                cmd.Transaction.Rollback();
+                return false;
+            }
+            else
+            {
+                cmd.Transaction.Commit();
+                return true;
+            }
+            return false;
+        }
+
+
         static public bool AddEmployee(Identity identity, Employee item)
         {
             try

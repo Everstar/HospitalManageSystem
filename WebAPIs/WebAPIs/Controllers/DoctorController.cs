@@ -17,7 +17,7 @@ using WebAPIs.Models.UnifiedTable;
 
 namespace WebAPIs.Controllers
 {
-    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor")]
     public class DoctorController : BaseController
     {
         /// <summary>

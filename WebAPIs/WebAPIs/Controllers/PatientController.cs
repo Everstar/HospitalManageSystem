@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Remoting.Contexts;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Http;
@@ -18,7 +19,7 @@ using WebAPIs.Providers;
 namespace WebAPIs.Controllers
 {
     // 权限设置
-    //[Authorize(Roles = "Patient")]
+    [Authorize(Roles = "Patient")]
     public class PatientController : BaseController
     {
 
@@ -58,20 +59,26 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetEmployee(string clinicName)
         {
             HttpResponseMessage response = new HttpResponseMessage();
+
             // 返回所有当前科室下所有医生的所有信息
             // employee表找到clinic符合的医生
             // 返回医生的所有信息
-            ArrayList list = PatientHelper.GetEmployeeOfClinic(clinicName);
+            ArrayList list = null;
+            try
+            {
+                list = PatientHelper.GetEmployeeOfClinic(clinicName);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message + " ClinicName:" + clinicName);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
 
             if (list == null)
             {
-                response.Content = new StringContent("查询失败,请检查科室名是否正确或服务器内部错误");
+                response.Content = new StringContent("查询失败,请检查科室名是否正确或服务器内部错误 ClinicName:"+clinicName);
                 response.StatusCode = HttpStatusCode.NotFound;
-            }
-            else if (list.Count == 0)
-            {
-                response.Content = new StringContent("查询列表空");
-                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {

@@ -62,7 +62,7 @@ namespace WebAPIs.Models
             }
             catch(Exception e)
             {
-                return null;
+                throw e;
             }
             for(int i = 0; i < list.Count; i++)
             {
@@ -72,11 +72,11 @@ namespace WebAPIs.Models
                       from evaluation
                       where evaluation.employee_id = '{0}'",employeeInfoWithRank.employee_id);
 
-                OracleCommand subCmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                OracleCommand subCmd = new OracleCommand(subSqlStr, DatabaseHelper.GetInstance().conn);
 
                 try
                 {
-                    OracleDataReader reader = cmd.ExecuteReader();
+                    OracleDataReader reader = subCmd.ExecuteReader();
                     if (reader.Read())
                     {
                         if (Convert.ToInt32(reader[0]) == 0)
@@ -91,10 +91,8 @@ namespace WebAPIs.Models
                 }
                 catch(Exception e)
                 {
-                    return null;
+                    throw e;
                 }
-
-               
             }
             return list;
         }

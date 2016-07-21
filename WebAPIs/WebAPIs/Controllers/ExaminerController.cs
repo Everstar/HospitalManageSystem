@@ -18,7 +18,7 @@ using Newtonsoft.Json.Linq;
 
 namespace WebAPIs.Controllers
 {
-    //[Authorize(Roles = "Examiner")]
+    [Authorize(Roles = "Examiner")]
     public class ExaminerController : BaseController
     {
         /// <summary>
