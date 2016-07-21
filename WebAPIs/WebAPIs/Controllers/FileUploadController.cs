@@ -13,6 +13,10 @@ namespace WebAPIs.Controllers
 {
     public class FileUploadController : ApiController
     {
+        /// <summary>
+        /// 上传文件测试路径1
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("api/upload2")]
         public Task<HttpResponseMessage> UploadImagePost()
@@ -50,6 +54,10 @@ namespace WebAPIs.Controllers
             );
             return task;
         }
+        /// <summary>
+        /// 上传文件测试路径2
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("api/upload")]
         public async Task<string> Upload()

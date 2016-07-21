@@ -122,10 +122,10 @@ namespace WebAPIs.Models
                                 from evaluation join treatment on evaluation.treat_id=treatment.treat_id
                                 where treatment.end_time>to_date('{0}', 'yyyy-mm') and treatment.end_time<to_date('{1}', 'yyyy-mm')
                                 group by evaluation.employee_id)
-                        select employee.dept_name,employee.clinic_name,badDoc.id,identity.name,badDoc.rate
+                        select employee.dept_name,employee.clinic_name,badDoc.id,identity.name,(5-badDoc.rate)*20
                         from badDoc join employee on badDoc.id=employee.employee_id join identity on employee.credit_num=identity.credit_num
                         where rate<'{2}'",
-                        beginTime, endTime,percent);
+                        beginTime, endTime, percent);
             cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
 
@@ -214,7 +214,7 @@ namespace WebAPIs.Models
             }
             catch (Exception ex)
             {
-
+                throw ex;
             }
             OracleCommand geetDutycmd = new OracleCommand();
             geetDutycmd.Connection = DatabaseHelper.GetInstance().conn;
@@ -227,9 +227,9 @@ namespace WebAPIs.Models
                 reader1.Read();
                 duty_id = reader1[0].ToString();
             }
-            catch
+            catch (Exception e)
             {
-
+                throw e;
             }
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
@@ -269,9 +269,8 @@ namespace WebAPIs.Models
             try
             {
                 string sqlStr =
-                @"insert into employee(exployee_id, credit_num, password, dept_name, clinic_name, post, salary,duty_id)
-                  values (null, :credit_num, :password, :dept_name, :clinic_name, :post, :salary,null);
-                ";
+                @"Insert into EMPLOYEE (EMPLOYEE_ID,CREDIT_NUM,PASSWORD,DEPT_NAME,CLINIC_NAME,POST,SALARY,DUTY_ID,AVATAR_PATH,PROFILE,SKILL)
+                    values (null,:credit_num, :password, :dept_name, :clinic_name, :post, :salary,null,null,null,null);";
                 cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
                 cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.password;
                 cmd.Parameters.Add("dept_name", OracleDbType.Varchar2, 20).Value = item.department;
@@ -286,9 +285,48 @@ namespace WebAPIs.Models
             {
                 cmd.Transaction.Rollback();
                 throw ex;
-                return false;
             }
             return false;
+        }
+        private string GetRandomAvatarPath()
+        {
+            string path = @"..\..\image\avatars\avatar (";
+            Random rand = new Random();
+            switch (rand.Next(1, 9))
+            {
+                case 1:
+                    path += "1";
+                    break;
+                case 2:
+                    path += "2";
+                    break;
+                    path += "3";
+                case 3:
+                    break;
+                    path += "4";
+                case 4:
+                    break;
+                    path += "5";
+                case 5:
+                    break;
+                    path += "6";
+                case 6:
+                    break;
+                    path += "7";
+                case 7:
+                    break;
+                    path += "8";
+                case 8:
+                    break;
+                    path += "9";
+                case 9:
+                    break;
+                default:
+                    path += "9";
+                    break;
+            }
+            path += @").jpg";
+            return path;
         }
         static public bool DeleteEmployee(string employee_id)
         {
@@ -394,7 +432,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                throw new Exception( "Insert employee into identity table failed, message:" + e.Message + " Birth format:" + strBirth);
+                throw new Exception("Insert employee into identity table failed, message:" + e.Message + " Birth format:" + strBirth);
             }
             return "Ok";
         }

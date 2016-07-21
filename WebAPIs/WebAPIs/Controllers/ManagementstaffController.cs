@@ -16,14 +16,15 @@ using WebAPIs.Models.UnifiedTable;
 namespace WebAPIs.Controllers
 {
     [Authorize(Roles = "Managementstaff")]
-    public class ManagementstaffController : BaseController
+    public class ManagementstaffController : ApiController
     {
         /// <summary>
-        /// Test Passed
         /// 查询人事信息
         /// </summary>
         /// <permission cref="Managementstaff"></permission>
         /// <returns></returns>
+        /// Test Passed
+        /// 
         [HttpGet]
         [Route("api/ManagementStaff/GetAllEmployee")]
         public HttpResponseMessage GetAllEmployee()
@@ -54,6 +55,7 @@ namespace WebAPIs.Controllers
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// 
         [HttpPost]
         [Route("api/ManagementStaff/SetEmployee")]
         public HttpResponseMessage SetEmployee(dynamic obj)
@@ -81,7 +83,9 @@ namespace WebAPIs.Controllers
         /// <summary>
         /// 查询投诉率大于n%的医生
         /// </summary>
-        /// <param name="percent"></param>
+        /// <param name="year">年份</param>
+        /// <param name="month">月份</param>
+        /// <param name="percent">百分比000-100</param>
         /// <returns></returns>
         [HttpGet]
         [Route("api/ManagementStaff/GetComplaintedDoctor/{year}/{month}/{percent}")]
@@ -138,27 +142,41 @@ namespace WebAPIs.Controllers
             }
             return response;
         }
+        /// <summary>
+        /// 设置员工工作的时间
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("api/ManagementStaff/SetDutyTime")]
         public HttpResponseMessage SetDutyTime(dynamic obj)
         {
+            HttpResponseMessage response = new HttpResponseMessage();
+
             var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
             string emp_id = employee.GetValue("employee_id").ToString();
-            string room_num = employee.GetValue("").ToString();
+            string room_num = employee.GetValue("clinic_num").ToString();
             string Monday = employee.GetValue("Monday").ToString();
-            string Tuesday = obj.Tuesday.Value;
-            string Wednesday = obj.Wednesday.Value;
-            string Thursday = obj.Thursday.Value;
-            string Friday = obj.Friday.Value;
-            string Saturday = obj.Saturday.Value;
-            string Sunday = obj.Sunday.Value;
+            string Tuesday = employee.GetValue("Tuesday").ToString();
+            string Wednesday = employee.GetValue("Wednesday").ToString();
+            string Thursday = employee.GetValue("Thursday").ToString();
+            string Friday = employee.GetValue("Friday").ToString();
+            string Saturday = employee.GetValue("Saturday").ToString();
+            string Sunday = employee.GetValue("Sunday").ToString();
             Duty item = new Duty(room_num, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday);
-            ManagementHelper.SetDuty(item, emp_id);
+            // 插入数据
+            try
+            {
+                ManagementHelper.SetDuty(item, emp_id);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+            }
             // duty表生成id
             // 设置room_num
             // max_limit设置成随机数
             // 日期随便设置了 上下午。。。
-            HttpResponseMessage response = new HttpResponseMessage();
             return response;
         }
         /// <summary>
@@ -177,20 +195,30 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage AddEmployee(dynamic obj)
         {
             HttpResponseMessage response = new HttpResponseMessage();
-            var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
             Employee emp = new Employee();
-            emp.clinic = employee.GetValue("clinic_name").ToString();
-            emp.credit_num = employee.GetValue("credit_num").ToString();
-            emp.password = employee.GetValue("password").ToString();
-            emp.post = employee.GetValue("post").ToString();
-            emp.salary = double.Parse(employee.GetValue("salary").ToString());
-            emp.department = employee.GetValue("dept_name").ToString();
-
             Identity identity = new Identity();
-            identity.credit_num = emp.credit_num;
-            identity.name = employee.GetValue("name").ToString();
-            identity.sex = char.Parse(employee.GetValue("sex").ToString());
-            identity.birth =  Convert.ToDateTime(employee.GetValue("birth").ToString());
+
+
+            try
+            {
+                var employee = JsonConvert.DeserializeObject(JsonObjectConverter.ObjectToJson(obj)) as JObject;
+                emp.clinic = employee.GetValue("clinic_name").ToString();
+                emp.credit_num = employee.GetValue("credit_num").ToString();
+                emp.password = employee.GetValue("password").ToString();
+                emp.post = employee.GetValue("post").ToString();
+                emp.salary = double.Parse(employee.GetValue("salary").ToString());
+                emp.department = employee.GetValue("dept_name").ToString();
+
+                identity.credit_num = emp.credit_num;
+                identity.name = employee.GetValue("name").ToString();
+                identity.sex = char.Parse(employee.GetValue("sex").ToString());
+                identity.birth = Convert.ToDateTime(employee.GetValue("birth").ToString());
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent("数据格式错误:"+e.Message);
+                return response;
+            }
 
             try
             {
@@ -200,11 +228,17 @@ namespace WebAPIs.Controllers
             {
                 response.Content = new StringContent(e.Message);
                 response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
             }
             response.Content = new StringContent("添加成功！" + JsonObjectConverter.ObjectToJson(emp));
             // 数据库中插入
             return response;
         }
+        /// <summary>
+        /// 删除雇员信息 通过设置工资为-1标注
+        /// </summary>
+        /// <param name="employee_id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("api/ManagementStaff/DeleteEmployee/{employee_id}")]
         public HttpResponseMessage DeleteEmployee(string employee_id)

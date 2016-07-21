@@ -164,6 +164,8 @@ namespace WebAPIs.Models
         }
         public static bool Comment(Evaluation item)
         {
+            ArrayList doc_id_name = GetDoctorIdName(item.treat_id);
+            item.doc_id = doc_id_name[0].ToString();
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = cmd.Connection.BeginTransaction();
@@ -185,6 +187,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
+                throw e;
             }
             return false;
         }
@@ -210,17 +213,14 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
 
         public static string GetNameById(string id)
         {
-            string sqlStr = String.Format(
-                @"select name
-                from patient natural join identity
-                where patient_id='{0}'", id);
+            string sqlStr = String.Format(@"select get_name('{0}', 0) from dual", id);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
             {
@@ -232,7 +232,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
 
@@ -277,20 +277,20 @@ namespace WebAPIs.Models
                     {
                         treat_id = reader[0].ToString(),
                         clinic = reader[1].ToString(),
-                        start_time = Convert.ToDateTime(reader[2]),
-                        end_time = Convert.ToDateTime(reader[3]),
+                        start_time = Formater.ToDateTime(reader, 2),
+                        end_time = Formater.ToDateTime(reader, 3),
                         patient_id = reader[4].ToString(),
                         doc_id = reader[5].ToString(),
                         take = Convert.ToInt32(reader[6]),
                         pay = Convert.ToDouble(reader[7]),
-                        pay_time = Convert.ToDateTime(reader[8])
+                        pay_time = Formater.ToDateTime(reader, 8)
                     });
                 }
                 return treatInfo;
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
@@ -314,13 +314,13 @@ namespace WebAPIs.Models
                     {
                         treat_id = reader[0].ToString(),
                         clinic = reader[1].ToString(),
-                        start_time = Convert.ToDateTime(reader[2]),
-                        end_time = Convert.ToDateTime(reader[3]),
+                        start_time = Formater.ToDateTime(reader, 2),
+                        end_time = Formater.ToDateTime(reader, 3),
                         patient_id = reader[4].ToString(),
                         doc_id = reader[5].ToString(),
                         take = Convert.ToInt32(reader[6]),
                         pay = Convert.ToDouble(reader[7]),
-                        pay_time = Convert.ToDateTime(reader[8])
+                        pay_time = Formater.ToDateTime(reader, 8)
                     });
                 }
                 #endregion
@@ -340,10 +340,10 @@ namespace WebAPIs.Models
                     {
                         exam_id = reader_1[0].ToString(),
                         type = reader_1[1].ToString(),
-                        exam_time = Convert.ToDateTime(reader_1[2]),
+                        exam_time = Formater.ToDateTime(reader_1, 2),
                         employee_id = reader_1[3].ToString(),
                         pay = Convert.ToDouble(reader_1[4]),
-                        pay_time = Convert.ToDateTime(reader_1[5])
+                        pay_time = Formater.ToDateTime(reader_1, 5)
                     });
                 }
 
@@ -364,10 +364,10 @@ namespace WebAPIs.Models
                         pres_id = reader_2[0].ToString(),
                         treat_id = reader_2[1].ToString(),
                         employee_id = reader_2[2].ToString(),
-                        make_time = Convert.ToDateTime(reader_2[3]),
-                        done_time = Convert.ToDateTime(reader_2[4]),
+                        make_time = Formater.ToDateTime(reader_2, 3),
+                        done_time = Formater.ToDateTime(reader_2, 4),
                         pay = Convert.ToDouble(reader_2[5]),
-                        pay_time = Convert.ToDateTime(reader_2[6])
+                        pay_time = Formater.ToDateTime(reader_2, 6)
                     });
                 }
                 #endregion
@@ -387,10 +387,10 @@ namespace WebAPIs.Models
                         surg_id = reader_3[0].ToString(),
                         treat_id = reader_3[1].ToString(),
                         surgery_name = reader_3[2].ToString(),
-                        start_time = Convert.ToDateTime(reader_3[3]),
-                        end_time = Convert.ToDateTime(reader_3[4]),
+                        start_time = Formater.ToDateTime(reader_3, 3),
+                        end_time = Formater.ToDateTime(reader_3, 4),
                         pay = Convert.ToDouble(reader_3[5]),
-                        pay_time = Convert.ToDateTime(reader_3[6])
+                        pay_time = Formater.ToDateTime(reader_3, 6)
                     });
                 }
                 #endregion
@@ -412,10 +412,10 @@ namespace WebAPIs.Models
                         treat_id = reader_4[1].ToString(),
                         nurse_id = reader_4[2].ToString(),
                         bed_num = reader_4[3].ToString(),
-                        in_time = Convert.ToDateTime(reader_4[4]),
-                        out_time = Convert.ToDateTime(reader_4[5]),
+                        in_time = Formater.ToDateTime(reader_4, 4),
+                        out_time = Formater.ToDateTime(reader_4, 5),
                         pay = Convert.ToDouble(reader_4[6]),
-                        pay_time = Convert.ToDateTime(reader_4[7])
+                        pay_time = Formater.ToDateTime(reader_4, 7)
                     });
                 }
                 #endregion
@@ -430,7 +430,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return consumptionInfo;
         }
@@ -439,17 +439,21 @@ namespace WebAPIs.Models
         public static ArrayList GetCommentByDocId(string docId)
         {
             string sqlStr = String.Format(
-                @"select content
-                  from evaluation
-                  where employee_id='{0}'", docId);
+               @"select content, name, avatar_path
+                  from evaluation, patient natural join identity
+                  where employee_id='{0}' and evaluation.patient_id=patient.patient_id", docId);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             ArrayList commentList = new ArrayList();
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
-                while(reader.Read())
+                while (reader.Read())
                 {
-                    commentList.Add(reader[0].ToString());
+                    CommentInfo commentInfo = new CommentInfo();
+                    commentInfo.comment = reader[0].ToString();
+                    commentInfo.patientName = reader[1].ToString();
+                    commentInfo.pic_url = reader[2].ToString();
+                    commentList.Add(commentInfo);
                 }
                 return commentList;
             }

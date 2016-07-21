@@ -18,7 +18,7 @@ using WebAPIs.Models.UnifiedTable;
 namespace WebAPIs.Controllers
 {
     [Authorize(Roles = "Doctor")]
-    public class DoctorController : BaseController
+    public class DoctorController : ApiController
     {
         /// <summary>
         /// Pending to Test

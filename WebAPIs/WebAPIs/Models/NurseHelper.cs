@@ -74,6 +74,22 @@ namespace WebAPIs.Models
                     throw new Exception("更改失败！");
                 }
                 cmd.Transaction.Commit();
+                // 找到bed_num
+                cmd = new OracleCommand();
+                cmd.Connection = DatabaseHelper.GetInstance().conn;
+                sqlStr = String.Format("select bed_num from hospitalization where hos_id = '{0}'", hospitalId);
+                cmd.CommandText = sqlStr;
+                var reader = cmd.ExecuteReader();
+                reader.Read();
+                string bed_num = reader[0].ToString();
+
+                // 更新Bed表
+                cmd = DatabaseHelper.GetInstance().conn.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.CommandText = "set_bed_used";
+                cmd.Parameters.Add("num", OracleDbType.Varchar2).Direction = System.Data.ParameterDirection.Input;
+                cmd.Parameters["num"].Value = bed_num;
+                cmd.ExecuteNonQuery();
                 return true;
             }
             catch (Exception e)
