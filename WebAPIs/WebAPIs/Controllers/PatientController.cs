@@ -198,15 +198,14 @@ namespace WebAPIs.Controllers
         [Route("api/Patient/GetTreatmentID")]
         public HttpResponseMessage GetTreatmentID()
         {
-            bool isLogin = GenerateUserInfoByCookie();
+            HttpResponseMessage response = new HttpResponseMessage();
 
             string patient_id = HttpContext.Current.User.Identity.Name;
 
             // treatment表调取数据
-            ArrayList list = PatientHelper.GetAllConsumption(patient_id);
+            ArrayList list = PatientHelper.GetTreatmentInfo(patient_id);
             ArrayList returnList = new ArrayList();
 
-            HttpResponseMessage response = new HttpResponseMessage();
             if (list == null)
             {
                 response.Content = new StringContent("查询失败");
@@ -251,7 +250,7 @@ namespace WebAPIs.Controllers
         }
 
         [HttpGet]
-        [Route("api/Patient/GetAllCost/{treatmentId")]
+        [Route("api/Patient/GetAllCost/{treatmentId}")]
         public HttpResponseMessage GetAllCost(string treatmentId)
         {
             HttpResponseMessage response = new HttpResponseMessage();

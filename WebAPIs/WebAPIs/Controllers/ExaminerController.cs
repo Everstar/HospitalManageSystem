@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.IO;
 using WebAPIs.Models.UnifiedTable;
+using System.Web;
+using Newtonsoft.Json.Linq;
 
 namespace WebAPIs.Controllers
 {
@@ -26,14 +28,25 @@ namespace WebAPIs.Controllers
         /// <param name="docId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Examiner/GetExamination/{docId}")]
-        public HttpResponseMessage GetExamination(string docId)
+        [Route("api/Examiner/GetExamination")]
+        public HttpResponseMessage GetExamination()
         {
             HttpResponseMessage response = new HttpResponseMessage();
+            string docId = HttpContext.Current.User.Identity.Name;
             // get ALL Examination FROM Specific doc_id
             // examination表查找doc_id匹配的数据
             // 序列化返回
-            ArrayList list = ExaminerHelper.GetAllExamination(docId);
+            ArrayList list = null;
+            JArray resArray = new JArray();
+            try
+            {
+                list = ExaminerHelper.GetAllExamination(docId);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                return response;
+            }
             if (list.Count == 0)
             {
                 response.Content = new StringContent("未找到相关检测记录");
@@ -41,7 +54,23 @@ namespace WebAPIs.Controllers
             }
             else
             {
-                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
+                
+                foreach (ExaminationInfo item in list)
+                {
+                    JObject obj = new JObject();
+                    string treat_id = UserHelper.GetTreatmentIdByExamId(item.exam_id);
+                    string patient_id = UserHelper.GetPatientIdByTreatmentId(treat_id);
+                    PatientInfo patient_info = UserHelper.GetPatientInfo(patient_id);
+                    if (patient_info == null)
+                        continue;
+                    obj.Add("exam_id", item.exam_id);
+                    obj.Add("name", patient_info.name);
+                    obj.Add("sex", patient_info.sex);
+                    obj.Add("type", item.type);
+                    obj.Add("exam_time", item.exam_time);
+                    resArray.Add(obj);
+                }
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(resArray));
                 response.StatusCode = HttpStatusCode.OK;
             }
 
@@ -228,7 +257,7 @@ namespace WebAPIs.Controllers
             try
             {
                 blood = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), blood);
-                ExaminerHelper.MakeBloodExamination(blood, "fuck");
+                ExaminerHelper.MakeBloodExamination(blood);
             }
             catch(Exception e)
             {

@@ -79,7 +79,7 @@ namespace WebAPIs.Models
 
         public static ArrayList GetComplaintedDoctor(int year, int month, double percent)//获取投诉率高于percent的医生
         {
-
+            percent = 1 - percent / 100;
             int begin_year = year;
             int begin_month = month;
             int end_year, end_month;
@@ -120,8 +120,9 @@ namespace WebAPIs.Models
                                 where treatment.end_time>to_date('{0}', 'yyyy-mm') and treatment.end_time<to_date('{1}', 'yyyy-mm')
                                 group by evaluation.employee_id)
                         select employee.dept_name,employee.clinic_name,badDoc.id,identity.name,badDoc.rate
-                        from badDoc join employee on badDoc.id=employee.employee_id join identity on employee.credit_num=identity.credit_num",
-                        beginTime, endTime);
+                        from badDoc join employee on badDoc.id=employee.employee_id join identity on employee.credit_num=identity.credit_num
+                        where rate<'{2}'",
+                        beginTime, endTime,percent);
             cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
 

@@ -17,7 +17,6 @@ namespace WebAPIs.Models
             ArrayList AllExamination = new ArrayList();
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             string sqlStr =
                @"select exam_id,type,exam_time,pay,pay_time
                 from examination
@@ -30,14 +29,25 @@ namespace WebAPIs.Models
             {
                 while (reader.Read())
                 {
+                    var time1 = new DateTime();
+                    var time2 = new DateTime();
+
+                    if (!reader[2].ToString().Equals(""))
+                    {
+                        time1 = Convert.ToDateTime(reader[2]);
+                    }
+                    if (!reader[4].ToString().Equals(""))
+                    {
+                        time1 = Convert.ToDateTime(reader[4]);
+                    }
                     AllExamination.Add(new ExaminationInfo(reader[0].ToString(), reader[1].ToString(),
-                         (DateTime)reader[2], Convert.ToDouble(reader[3]), (DateTime)reader[4]));
+                        time1, Convert.ToDouble(reader[3]), time2));
                 }
                 return AllExamination;
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
@@ -122,7 +132,7 @@ namespace WebAPIs.Models
             return false;
         }
 
-        public static bool MakeBloodExamination(Blood item, string exam_id)
+        public static bool MakeBloodExamination(Blood item)
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
@@ -132,7 +142,7 @@ namespace WebAPIs.Models
                 string sqlStr = string.Format(
                     @"insert into blood
                     values('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}'
-                            ,'{15}','{16}','{17}','{18}','{19}','{20}','{21}', '{22}')", exam_id, item.wbc, item.neut_percent, item.lymph_percent,
+                            ,'{15}','{16}','{17}','{18}','{19}','{20}','{21}', '{22}')", item.exam_id, item.wbc, item.neut_percent, item.lymph_percent,
                     item.eo_percent, item.baso_percent, item.neut_num, item.lymph_num, item.mono_num, item.eo_num, item.baso_num,
                     item.rbc, item.hgb, item.hct, item.mcv, item.mch, item.mchc, item.rdw,
                     item.plt, item.mpv, item.pdw, item.pct);

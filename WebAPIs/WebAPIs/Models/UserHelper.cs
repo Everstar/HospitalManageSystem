@@ -266,5 +266,27 @@ namespace WebAPIs.Models
             return null;
         }
 
+        public static string GetTreatmentIdByExamId(string exam_id)
+        {
+            string sqlStr = @"select * from examine";
+            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+
+            try
+            {
+                OracleDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader[0].ToString().Equals(exam_id))
+                        return reader[1].ToString();
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            return null;
+        }
+
     }
 }
