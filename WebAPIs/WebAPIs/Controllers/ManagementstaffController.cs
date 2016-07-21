@@ -19,6 +19,7 @@ namespace WebAPIs.Controllers
     public class ManagementstaffController : BaseController
     {
         /// <summary>
+        /// Test Passed
         /// 查询人事信息
         /// </summary>
         /// <permission cref="Managementstaff"></permission>
@@ -29,7 +30,7 @@ namespace WebAPIs.Controllers
         {
             // 数据库中找到所有employee的信息
             // 序列化成Json
-            ArrayList list=ManagementHelper.GetAllEmployee();
+            ArrayList list = ManagementHelper.GetAllEmployee();
 
             HttpResponseMessage response = new HttpResponseMessage();
             if (list.Count == 0)
@@ -43,7 +44,7 @@ namespace WebAPIs.Controllers
 
                 response.StatusCode = HttpStatusCode.OK;
             }
-            
+
             return response;
         }
         /// <summary>

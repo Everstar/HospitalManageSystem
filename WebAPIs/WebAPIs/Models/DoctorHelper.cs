@@ -138,6 +138,7 @@ namespace WebAPIs.Models
         }
         // Exam id 木有写完....
         // 写完了
+        // Test Passed
         public static bool WriteExamination(string treat_id, string employee_id, int type)
         {
             if (type < 0 || type > 2) return false;
@@ -199,29 +200,29 @@ namespace WebAPIs.Models
                         sqlStr = String.Format(
                         @"insert into blood
                         values('{0}', {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10},
-                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})", 
+                        {11}, {12}, {13}, {14}, {15}, {16}, {17}, {18}, {19}, {20}, {21}, {22})",
                         exam_id,
-                        ConstHelper.wbc, 
-                        ConstHelper.neut_percent, 
+                        ConstHelper.wbc,
+                        ConstHelper.neut_percent,
                         ConstHelper.lymph_percent,
-                        ConstHelper.mono_percent, 
+                        ConstHelper.mono_percent,
                         ConstHelper.eo_percent,
                         ConstHelper.baso_percent,
-                        ConstHelper.neut_num, 
-                        ConstHelper.lymph_num, 
-                        ConstHelper.mono_num, 
+                        ConstHelper.neut_num,
+                        ConstHelper.lymph_num,
+                        ConstHelper.mono_num,
                         ConstHelper.eo_num,
-                        ConstHelper.baso_num, 
+                        ConstHelper.baso_num,
                         ConstHelper.rbc,
                         ConstHelper.hgb,
                         ConstHelper.hct,
                         ConstHelper.mcv,
                         ConstHelper.mch,
-                        ConstHelper.mchc, 
+                        ConstHelper.mchc,
                         ConstHelper.rdw,
-                        ConstHelper.plt, 
+                        ConstHelper.plt,
                         ConstHelper.mpv,
-                        ConstHelper.pct, 
+                        ConstHelper.pct,
                         ConstHelper.pdw
                         );
                         cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
