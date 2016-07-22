@@ -161,7 +161,7 @@ namespace WebAPIs.Controllers
                     exam_id = formData.GetValues("exam_id").FirstOrDefault();
                     diagnoses = formData.GetValues("diagnoses").FirstOrDefault();
                     from_picture = formData.GetValues("from_picture").FirstOrDefault();
-                    info = new GastroscopeInfo(from_picture, diagnoses, path);
+                    info = new GastroscopeInfo(exam_id, from_picture, diagnoses, path);
                     break;
                 case 2:
                     exam_id = formData.GetValues("exam_id").FirstOrDefault();

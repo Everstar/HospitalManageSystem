@@ -350,7 +350,9 @@ namespace WebAPIs.Models
 
         public static string GetFreeBedNum()
         {
+            
             string sqlStr = "select get_free_bed() from dual";
+            sqlStr = "select bed_num from bed where used = 0";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
             {

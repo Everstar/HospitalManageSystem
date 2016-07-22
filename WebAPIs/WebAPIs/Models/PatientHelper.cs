@@ -43,7 +43,7 @@ namespace WebAPIs.Models
             string sqlStr = String.Format(
                 @"select avatar_path, employee_id, name, post, skill
                   from employee natural join identity
-                  where employee.clinic_name = '{0}'", clinic_name);
+                  where employee.clinic_name = '{0}' and employee.salary !=-1", clinic_name);
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
             {

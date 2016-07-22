@@ -280,6 +280,7 @@ namespace WebAPIs.Models
                 cmd.Parameters.Add("salary", OracleDbType.Double).Value = item.salary;
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
+
                 return true;
             }
             catch (Exception ex)
