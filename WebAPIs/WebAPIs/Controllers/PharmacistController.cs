@@ -15,13 +15,13 @@ using System.Web;
 namespace WebAPIs.Controllers
 {
     /// <summary>
-    /// this part if finished!
+    /// this part is finished!
     /// 
     /// </summary>
 
 
-    //[Authorize(Roles = "Pharmacist")]
-    public class PharmacistController : BaseController
+    [Authorize(Roles = "Pharmacist")]
+    public class PharmacistController : ApiController
     {
         /// <summary>
         /// 查询配药单
@@ -43,11 +43,6 @@ namespace WebAPIs.Controllers
             {
                 response.Content = new StringContent("查找失败");
                 response.StatusCode = HttpStatusCode.NotFound;
-            }
-            else if(list.Count==0)
-            {
-                response.Content = new StringContent("查询列表空");
-                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {

@@ -15,27 +15,22 @@ namespace WebAPIs.Models
 {
     public class UserHelper
     {
-        private static int _cnt = 0;
-
         //SignUp as Patient
         public static string SignUp(SignUpUser item)
         {
             //check if the credit_num is used
-            string sqlStr =
-                @"select * from identity
-                  where credit_num = :credit_num";
+            string sqlStr = @"select count_credit(:credit_num) from dual";
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             cmd.Parameters.Add("credit_num", item.credit_num);
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                //查询语句不需要回滚
-                return "Already exise";
+                if (Convert.ToInt32(reader[0]) > 0)
+                    //查询语句不需要回滚
+                    return "Already exise";
             }
             //var strBirth = item.birth.ToString().Split(' ')[0];
-            DateTime dt = DateTime.Parse(item.birth.ToString());
             var strBirth = item.birth.Year.ToString() + "/" + item.birth.Month.ToString() + "/" + item.birth.Day.ToString();
             //sign up patient
             try
@@ -44,14 +39,18 @@ namespace WebAPIs.Models
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
                 cmd.CommandText = sqlStr;
+                cmd.Transaction = cmd.Connection.BeginTransaction();
 
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("name", item.name);
                 cmd.Parameters.Add("sex", item.sex);
                 cmd.ExecuteNonQuery();
+                cmd.Transaction.Commit();
 
-                sqlStr = "insert into patient values (null, :credit_num, :password)";
+
+                sqlStr = "insert into patient values (null, :credit_num, :password, null)";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.Transaction = cmd.Connection.BeginTransaction();
                 cmd.Parameters.Add("credit_num", item.credit_num);
                 cmd.Parameters.Add("password", item.passwd);
                 cmd.ExecuteNonQuery();
@@ -64,18 +63,15 @@ namespace WebAPIs.Models
                 cmd.Transaction.Rollback();
                 return "Insert failed, message:" + e.Message + " " + strBirth;
             }
-            string i = "d";
             return "Ok";
         }
 
-
-
+        
         public static string GetPwOfPatient(string id)
         {
-            string sqlStr = String.Format("select password from patient where patient_id='{0}'",
-                id);
-
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+            OracleCommand cmd = DatabaseHelper.GetInstance().conn.CreateCommand();
+            cmd.CommandText = "select get_pw(:id, 0) from dual";
+            cmd.Parameters.Add("id", OracleDbType.Varchar2, 9).Value = id;
 
             try
             {
@@ -88,17 +84,17 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
 
         public static string GetPwOfEmployee(string id)
         {
-            string sqlStr = String.Format("select password from employee where employee_id='{0}'",
-                id);
-            OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-
+            OracleCommand cmd = DatabaseHelper.GetInstance().conn.CreateCommand();
+            cmd.CommandText = "select get_pw(:id, 1) from dual";
+            cmd.Parameters.Add("id", OracleDbType.Varchar2, 5).Value = id;
+            
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
@@ -110,6 +106,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 //无需做任何操作
+                throw e;
             }
             return null;
         }
@@ -135,12 +132,12 @@ namespace WebAPIs.Models
                         reader[2].ToString(),
                         reader[3].ToString(),
                         reader[4].ToString(),
-                        Convert.ToDateTime(reader[5].ToString()));
+                        Formater.ToDateTime(reader, 5));
                 }
             }
             catch (Exception e)
             {
-                return null;
+                throw e;
             }
             return null;
         }
@@ -169,7 +166,7 @@ namespace WebAPIs.Models
                         Convert.ToDouble(reader[6].ToString()),
                         reader[7].ToString(),
                         reader[8].ToString(),
-                        Convert.ToDateTime(reader[9].ToString()),
+                        Formater.ToDateTime(reader, 9),
                         reader[10].ToString(),
                         reader[11].ToString(),
                         reader[12].ToString()
@@ -178,7 +175,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
@@ -188,7 +185,7 @@ namespace WebAPIs.Models
         /// <returns></returns>
         public static ArrayList GetAllEmployee()
         {
-            string sqlStr = @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth 
+            string sqlStr = @"select employee_id, credit_num, password, dept_name, clinic_name, post, salary, name, sex, birth, skill, profile, avatar_path 
                             from employee natural join identity";
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
             try
@@ -207,7 +204,7 @@ namespace WebAPIs.Models
                         Convert.ToDouble(reader[6].ToString()),
                         reader[7].ToString(),
                         reader[8].ToString(),
-                        Convert.ToDateTime(reader[9].ToString()),
+                        Formater.ToDateTime(reader, 9),
                         reader[10].ToString(),
                         reader[11].ToString(),
                         reader[12].ToString()
@@ -217,7 +214,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-
+                throw e;
             }
             return null;
         }
@@ -242,12 +239,12 @@ namespace WebAPIs.Models
                         reader[2].ToString(),
                         reader[3].ToString(),
                         reader[4].ToString(),
-                        Convert.ToDateTime(reader[5].ToString()));
+                        Formater.ToDateTime(reader, 5));
                 }
             }
             catch (Exception e)
             {
-                return null;
+                throw e;
             }
             return null;
         }
@@ -269,7 +266,7 @@ namespace WebAPIs.Models
             }
             catch (Exception e)
             {
-                return null;
+                throw e;
             }
             return null;
         }
@@ -295,6 +292,8 @@ namespace WebAPIs.Models
             }
             return null;
         }
+
+        
 
     }
 }

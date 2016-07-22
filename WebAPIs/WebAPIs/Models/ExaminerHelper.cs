@@ -20,7 +20,8 @@ namespace WebAPIs.Models
             string sqlStr =
                @"select exam_id,type,exam_time,pay,pay_time
                 from examination
-                where employee_id=:doc_id";
+                where employee_id=:doc_id and exam_id not in (select exam_id from
+                XRay union select exam_id from Blood union select exam_id from GASTROSCOPE)";
             cmd.CommandText = sqlStr;
             cmd.Parameters.Add("doc_id", OracleDbType.Varchar2, 5).Value = doc_id;
 

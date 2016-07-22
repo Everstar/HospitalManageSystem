@@ -51,7 +51,7 @@ namespace WebAPIs.Models
             {
                 string sqlStr =
                 @"update employee
-                 set department=:Pdep,clinic=:Pcl,post=:Ppos,salary=:Psal
+                 set dept_name=:Pdep,clinic_name=:Pcl,post=:Ppos,salary=:Psal
                  where employee_id=:Pemp";
                 cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("Pdep", department);
@@ -122,10 +122,10 @@ namespace WebAPIs.Models
                                 from evaluation join treatment on evaluation.treat_id=treatment.treat_id
                                 where treatment.end_time>to_date('{0}', 'yyyy-mm') and treatment.end_time<to_date('{1}', 'yyyy-mm')
                                 group by evaluation.employee_id)
-                        select employee.dept_name,employee.clinic_name,badDoc.id,identity.name,badDoc.rate
+                        select employee.dept_name,employee.clinic_name,badDoc.id,identity.name,(5-badDoc.rate)*20
                         from badDoc join employee on badDoc.id=employee.employee_id join identity on employee.credit_num=identity.credit_num
                         where rate<'{2}'",
-                        beginTime, endTime,percent);
+                        beginTime, endTime, percent);
             cmd.CommandText = sqlStr;
             OracleDataReader reader = cmd.ExecuteReader();
 
@@ -147,8 +147,7 @@ namespace WebAPIs.Models
             return null;
         }
 
-
-        public static bool SetDuty(Duty item)
+        public static bool insertDuty(Duty item)
         {
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
@@ -165,18 +164,95 @@ namespace WebAPIs.Models
             cmd.Parameters.Add("Pfri", item.Friday);
             cmd.Parameters.Add("Psat", item.Saturday);
             cmd.Parameters.Add("Psun", item.Sunday);
-            if (cmd.ExecuteNonQuery() == 1)
-            {
-                cmd.Transaction.Commit();
-                return true;
-                
-            }
-            else
+            if (cmd.ExecuteNonQuery() == 0)
             {
                 cmd.Transaction.Rollback();
                 return false;
             }
+            else
+            {
+                cmd.Transaction.Commit();
+                return true;
+            }
         }
+
+
+        //public static bool SetDuty(Duty item)
+        //{
+        //    OracleCommand cmd = new OracleCommand();
+        //    cmd.Connection = DatabaseHelper.GetInstance().conn;
+        //    cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+        //    string sqlStr =
+        //        @"insert into duty
+        //        values (null, :Proom_num, :Pmon, Ptue, Pwed, Pthu, Pfri, Psat, Psun)";
+        //    cmd.CommandText = sqlStr;
+        //    cmd.Parameters.Add("Proom_num", item.room_num);
+        //    cmd.Parameters.Add("Pmon", item.Monday);
+        //    cmd.Parameters.Add("Ptue", item.Tuesday);
+        //    cmd.Parameters.Add("Pwed", item.Wednesday);
+        //    cmd.Parameters.Add("Pthu", item.Thursday);
+        //    cmd.Parameters.Add("Pfri", item.Friday);
+        //    cmd.Parameters.Add("Psat", item.Saturday);
+        //    cmd.Parameters.Add("Psun", item.Sunday);
+        //    if (cmd.ExecuteNonQuery() == 1)
+        //    {
+        //        cmd.Transaction.Commit();
+        //        return true;
+
+        //    }
+        //    else
+        //    {
+        //        cmd.Transaction.Rollback();
+        //        return false;
+        //    }
+        //}
+        public static bool SetDuty(Duty item, string employee_id)
+        {
+            try
+            {
+                insertDuty(item);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            OracleCommand geetDutycmd = new OracleCommand();
+            geetDutycmd.Connection = DatabaseHelper.GetInstance().conn;
+            string sqlStr1 = @"select DUTY_INCREMENT.CURRVAL from dual";
+            geetDutycmd.CommandText = sqlStr1;
+            OracleDataReader reader1 = geetDutycmd.ExecuteReader();
+            string duty_id = "";
+            try
+            {
+                reader1.Read();
+                duty_id = reader1[0].ToString();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            OracleCommand cmd = new OracleCommand();
+            cmd.Connection = DatabaseHelper.GetInstance().conn;
+            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
+            string sqlStr = String.Format(@"update employee
+                            set duty_id={0}
+                            where employee_id=:employee", duty_id);
+            cmd.CommandText = sqlStr;
+            cmd.Parameters.Add("employee", OracleDbType.Varchar2, 5).Value = employee_id;
+            if (cmd.ExecuteNonQuery() != 1)
+            {
+                cmd.Transaction.Rollback();
+                return false;
+            }
+            else
+            {
+                cmd.Transaction.Commit();
+                return true;
+            }
+            return false;
+        }
+
+
         static public bool AddEmployee(Identity identity, Employee item)
         {
             try
@@ -193,9 +269,9 @@ namespace WebAPIs.Models
             try
             {
                 string sqlStr =
-                @"insert into employee(exployee_id, credit_num, password, dept_name, clinic_name, post, salary,duty_id)
-                  values (null, :credit_num, :password, :dept_name, :clinic_name, :post, :salary,null);
-                ";
+                @"Insert into EMPLOYEE (EMPLOYEE_ID,CREDIT_NUM,PASSWORD,DEPT_NAME,CLINIC_NAME,POST,SALARY,DUTY_ID,AVATAR_PATH,PROFILE,SKILL)
+                    values (null,:credit_num, :password, :dept_name, :clinic_name, :post, :salary,null,null,null,null)";
+                cmd.CommandText = sqlStr;
                 cmd.Parameters.Add("credit_num", OracleDbType.Varchar2, 18).Value = item.credit_num;
                 cmd.Parameters.Add("password", OracleDbType.Varchar2, 20).Value = item.password;
                 cmd.Parameters.Add("dept_name", OracleDbType.Varchar2, 20).Value = item.department;
@@ -204,15 +280,55 @@ namespace WebAPIs.Models
                 cmd.Parameters.Add("salary", OracleDbType.Double).Value = item.salary;
                 cmd.ExecuteNonQuery();
                 cmd.Transaction.Commit();
+
                 return true;
             }
             catch (Exception ex)
             {
                 cmd.Transaction.Rollback();
                 throw ex;
-                return false;
             }
             return false;
+        }
+        private string GetRandomAvatarPath()
+        {
+            string path = @"..\..\image\avatars\avatar (";
+            Random rand = new Random();
+            switch (rand.Next(1, 9))
+            {
+                case 1:
+                    path += "1";
+                    break;
+                case 2:
+                    path += "2";
+                    break;
+                    path += "3";
+                case 3:
+                    break;
+                    path += "4";
+                case 4:
+                    break;
+                    path += "5";
+                case 5:
+                    break;
+                    path += "6";
+                case 6:
+                    break;
+                    path += "7";
+                case 7:
+                    break;
+                    path += "8";
+                case 8:
+                    break;
+                    path += "9";
+                case 9:
+                    break;
+                default:
+                    path += "9";
+                    break;
+            }
+            path += @").jpg";
+            return path;
         }
         static public bool DeleteEmployee(string employee_id)
         {
@@ -281,21 +397,18 @@ namespace WebAPIs.Models
         public static string SignUpEmployee(Identity item)
         {
             //check if the credit_num is used
-            string sqlStr =
-                @"select * from identity
-                  where credit_num = :credit_num";
+            string sqlStr = @"select count_credit(:credit_num) from dual";
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-            cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
             cmd.Parameters.Add("credit_num", item.credit_num);
             OracleDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                //查询语句不需要回滚
-                throw new Exception("Already exise");
+                if (Convert.ToInt32(reader[0]) > 0)
+                    //查询语句不需要回滚
+                    throw new Exception("Already exise");
             }
 
-            DateTime dt = DateTime.Parse(item.birth.ToString());
             var strBirth = item.birth.Year.ToString() + "/" + item.birth.Month.ToString() + "/" + item.birth.Day.ToString();
             //sign up employee
             try
@@ -303,6 +416,7 @@ namespace WebAPIs.Models
                 sqlStr = "insert into identity values (:credit_num, :name, :sex, to_date('"
                     + strBirth + "', 'yyyy/mm/dd'))";
                 cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
+                cmd.Transaction = cmd.Connection.BeginTransaction();
                 cmd.CommandText = sqlStr;
 
                 cmd.Parameters.Add("credit_num", item.credit_num);
@@ -318,7 +432,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
-                throw new Exception( "Insert employee into identity table failed, message:" + e.Message + " Birth format:" + strBirth);
+                throw new Exception("Insert employee into identity table failed, message:" + e.Message + " Birth format:" + strBirth);
             }
             return "Ok";
         }

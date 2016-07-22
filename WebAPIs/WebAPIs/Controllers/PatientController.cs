@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Remoting.Contexts;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Http;
@@ -18,10 +19,60 @@ using WebAPIs.Providers;
 namespace WebAPIs.Controllers
 {
     // 权限设置
-    //[Authorize(Roles = "Patient")]
-    public class PatientController : BaseController
+    [Authorize(Roles = "Patient,Managementstaff")]
+    public class PatientController : ApiController
     {
+        [HttpPost]
+        [Route("api/Patient/PayFor")]
+        public HttpResponseMessage PayFor(dynamic obj)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+            string pay = "";
+            string id = "";
+            string type = "";
+            try
+            {
+                pay = obj.pay.Value;
+                id = obj.id.Value;
+                type = obj.type.Value;
+            }
+            catch (Exception e)
+            {
 
+            }
+            PayType typeP = PayType.Treat;
+            switch (int.Parse(type))
+            {
+                case 0:
+                    typeP = PayType.Treat;
+                    break;
+                case 1:
+                    typeP = PayType.Exam;
+                    break;
+                case 2:
+                    typeP = PayType.Pres;
+                    break;
+                case 3:
+                    typeP = PayType.Surg;
+                    break;
+                case 4:
+                    typeP = PayType.Hos;
+                    break;
+                default:
+                    typeP = PayType.Treat;
+                    break;
+            }
+            try
+            {
+                PayHelper.Pay(double.Parse(pay), typeP, id);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
+        }
         //done
         //获取所有科室名称
         public HttpResponseMessage GetAllClinic()
@@ -48,7 +99,7 @@ namespace WebAPIs.Controllers
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
                 response.StatusCode = HttpStatusCode.OK;
             }
-            
+
             return response;
         }
 
@@ -58,26 +109,32 @@ namespace WebAPIs.Controllers
         public HttpResponseMessage GetEmployee(string clinicName)
         {
             HttpResponseMessage response = new HttpResponseMessage();
+
             // 返回所有当前科室下所有医生的所有信息
             // employee表找到clinic符合的医生
             // 返回医生的所有信息
-            ArrayList list = PatientHelper.GetEmployeeOfClinic(clinicName);
+            ArrayList list = null;
+            try
+            {
+                list = PatientHelper.GetEmployeeOfClinic(clinicName);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message + " ClinicName:" + clinicName);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
 
             if (list == null)
             {
-                response.Content = new StringContent("查询失败,请检查科室名是否正确或服务器内部错误");
+                response.Content = new StringContent("查询失败,请检查科室名是否正确或服务器内部错误 ClinicName:" + clinicName);
                 response.StatusCode = HttpStatusCode.NotFound;
-            }
-            else if (list.Count == 0)
-            {
-                response.Content = new StringContent("查询列表空");
-                response.StatusCode = HttpStatusCode.OK;
             }
             else
             {
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(list));
                 response.StatusCode = HttpStatusCode.OK;
-            }            
+            }
 
             return response;
         }
@@ -112,13 +169,23 @@ namespace WebAPIs.Controllers
         //update needed
         //挂号
         [HttpPost]
-        [Route("api/Patient/Register/{employeeId}")]
-        public HttpResponseMessage Register([FromBody]string time)
+        [Route("api/Patient/Register")]
+        public HttpResponseMessage Register(dynamic obj)
         {
             HttpResponseMessage response = new HttpResponseMessage();
-            string url = Request.RequestUri.AbsolutePath;
-            string pattern = @"\d+";
-            string employeeId = Regex.Match(url, pattern, RegexOptions.IgnoreCase).Value;
+            string time;
+            string employeeId;
+            try
+            {
+                time = obj.time.Value;
+                employeeId = obj.doctorId.Value;
+            }
+            catch(Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
 
             string patientId = HttpContext.Current.User.Identity.Name;
 
@@ -149,7 +216,7 @@ namespace WebAPIs.Controllers
                 treatment.patient_id = patientId;
 
                 DateTime treatTime = Convert.ToDateTime(time);
-                DateTime treatEndTime = treatTime .AddHours(1);
+                DateTime treatEndTime = treatTime.AddHours(1);
 
                 treatment.start_time = treatTime;
                 treatment.end_time = treatEndTime;
@@ -157,9 +224,9 @@ namespace WebAPIs.Controllers
                 //添加医生Id
 
                 treatment.doc_id = employeeId;
-                
+
                 // 根据employeeId找到医生的科室
-               
+
                 treatment.clinic = employeeInfo.clinic;
                 // 设置挂号金额
                 Random ran = new Random();
@@ -181,10 +248,10 @@ namespace WebAPIs.Controllers
                 // 得到这条记录的主码
 
                 // takes表插入患者id treatment id 医生id设为空, 等接诊成功时再填充doc_id
-       
+
             }
             //response.Content = new StringContent(employeeId + " " + time);
-            
+
             return response;
         }
 
@@ -192,7 +259,7 @@ namespace WebAPIs.Controllers
         ///  //update needed
         /// </summary>
         /// <returns></returns>
-       
+
         //获取患者自己的医疗记录
         [HttpGet]
         [Route("api/Patient/GetTreatmentID")]
@@ -203,7 +270,18 @@ namespace WebAPIs.Controllers
             string patient_id = HttpContext.Current.User.Identity.Name;
 
             // treatment表调取数据
-            ArrayList list = PatientHelper.GetTreatmentInfo(patient_id);
+            ArrayList list = null;
+            try
+            {
+                list = PatientHelper.GetTreatmentInfo(patient_id);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+
             ArrayList returnList = new ArrayList();
 
             if (list == null)
@@ -213,13 +291,13 @@ namespace WebAPIs.Controllers
             }
             else if (list.Count == 0)
             {
-                response.Content = new StringContent("查询列表空");
+                response.Content = new StringContent(JsonObjectConverter.ObjectToJson(returnList));
                 response.StatusCode = HttpStatusCode.OK;
             }
             else
             {
 
-                for(int i = 0; i < list.Count; i++)
+                for (int i = 0; i < list.Count; i++)
                 {
                     Treatment treatment = (Treatment)list[i];
 
@@ -255,7 +333,17 @@ namespace WebAPIs.Controllers
         {
             HttpResponseMessage response = new HttpResponseMessage();
 
-            ArrayList list = PatientHelper.GetAllConsumption(treatmentId);
+            ArrayList list = new ArrayList();
+            try
+            {
+                list = PatientHelper.GetAllConsumption(treatmentId);
+            }
+            catch (Exception e)
+            {
+                response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
             ArrayList returnList = new ArrayList();
             if (list == null)
             {
@@ -269,28 +357,138 @@ namespace WebAPIs.Controllers
             }
             else
             {
-                for(int i = 1; i < list.Count; i++)
+                try
                 {
-                    ArrayList costList = (ArrayList)list[i];
-                    ArrayList payList = new ArrayList();
-                    for(int j = 0; j < costList.Count; j++)
+                    for (int i = 0; i < list.Count; i++)
                     {
-                        Examination examination = (Examination)payList[i];
-                        DetailCostInfo detailCostInfo = new DetailCostInfo();
-                        detailCostInfo.cost = examination.pay;
-                        detailCostInfo.costId = examination.exam_id;
-                        detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.employee_id);
-                        detailCostInfo.startTime = examination.exam_time.ToString();
-                        if (examination.pay_time.Year == 1)
+
+                        ArrayList costList = (ArrayList)list[i];
+                        ArrayList payList;
+                        switch (i)
                         {
-                            detailCostInfo.isPay = false;
+                            case 0:
+                                 payList = new ArrayList();
+                                for (int j = 0; j < costList.Count; j++)
+                                {
+                                    Treatment examination = (Treatment)costList[j];
+                                    DetailCostInfo detailCostInfo = new DetailCostInfo();
+                                    detailCostInfo.cost = examination.pay;
+                                    detailCostInfo.costId = examination.treat_id;
+                                    detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.doc_id);
+                                    detailCostInfo.startTime = examination.start_time.ToString();
+                                    if (examination.pay_time.Year == 1)
+                                    {
+                                        detailCostInfo.isPay = false;
+                                    }
+                                    else
+                                    {
+                                        detailCostInfo.isPay = true;
+                                    }
+                                    payList.Add(detailCostInfo);
+                                }
+                                returnList.Add(payList);
+                                break;
+                            case 1:
+                                payList = new ArrayList();
+                                for (int j = 0; j < costList.Count; j++)
+                                {
+                                    Examination examination = (Examination)costList[j];
+                                    DetailCostInfo detailCostInfo = new DetailCostInfo();
+                                    detailCostInfo.cost = examination.pay;
+                                    detailCostInfo.costId = examination.exam_id;
+                                    detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.employee_id);
+                                    detailCostInfo.startTime = examination.exam_time.ToString();
+                                    if (examination.pay_time.Year == 1)
+                                    {
+                                        detailCostInfo.isPay = false;
+                                    }
+                                    else
+                                    {
+                                        detailCostInfo.isPay = true;
+                                    }
+                                    payList.Add(detailCostInfo);
+                                }
+                                returnList.Add(payList);
+                                break;
+                            case 2:
+                                payList = new ArrayList();
+                                for (int j = 0; j < costList.Count; j++)
+                                {
+                                    Prescription examination = (Prescription)costList[j];
+                                    DetailCostInfo detailCostInfo = new DetailCostInfo();
+                                    detailCostInfo.cost = examination.pay;
+                                    detailCostInfo.costId = examination.pres_id;
+                                    detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.employee_id);
+                                    detailCostInfo.startTime = examination.make_time.ToString();
+                                    if (examination.pay_time.Year == 1)
+                                    {
+                                        detailCostInfo.isPay = false;
+                                    }
+                                    else
+                                    {
+                                        detailCostInfo.isPay = true;
+                                    }
+                                    payList.Add(detailCostInfo);
+                                }
+                                returnList.Add(payList);
+                                break;
+                            case 3:
+                                payList = new ArrayList();
+                                for (int j = 0; j < costList.Count; j++)
+                                {
+                                    Surgery examination = (Surgery)costList[j];
+                                    DetailCostInfo detailCostInfo = new DetailCostInfo();
+                                    detailCostInfo.cost = examination.pay;
+                                    detailCostInfo.costId = examination.surg_id;
+                                    //detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.);
+                                    detailCostInfo.docName = examination.surgery_name;
+                                    detailCostInfo.startTime = examination.start_time.ToString();
+                                    if (examination.pay_time.Year == 1)
+                                    {
+                                        detailCostInfo.isPay = false;
+                                    }
+                                    else
+                                    {
+                                        detailCostInfo.isPay = true;
+                                    }
+                                    payList.Add(detailCostInfo);
+                                }
+                                returnList.Add(payList);
+                                break;
+                            case 4:
+                                payList = new ArrayList();
+                                for (int j = 0; j < costList.Count; j++)
+                                {
+                                    Hospitalization examination = (Hospitalization)costList[j];
+                                    DetailCostInfo detailCostInfo = new DetailCostInfo();
+                                    detailCostInfo.cost = examination.pay;
+                                    detailCostInfo.costId = examination.hos_id;
+                                    detailCostInfo.docName = PatientHelper.GetDoctorNameById(examination.nurse_id);
+                                    detailCostInfo.startTime = examination.in_time.ToString();
+                                    if (examination.pay_time.Year == 1)
+                                    {
+                                        detailCostInfo.isPay = false;
+                                    }
+                                    else
+                                    {
+                                        detailCostInfo.isPay = true;
+                                    }
+                                    payList.Add(detailCostInfo);
+                                }
+                                returnList.Add(payList);
+                                break;
+                            default:
+                                break;
                         }
-                        else
-                        {
-                            detailCostInfo.isPay = true;
-                        }
+
                     }
-                    returnList.Add(payList);
+
+                }
+                catch (Exception e)
+                {
+                    response.Content = new StringContent(e.Message);
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    return response;
                 }
                 response.Content = new StringContent(JsonObjectConverter.ObjectToJson(returnList));
                 response.StatusCode = HttpStatusCode.OK;
@@ -306,14 +504,14 @@ namespace WebAPIs.Controllers
         //评价医生
         public HttpResponseMessage Comment(dynamic obj)
         {
-            
+
             string patient_id = HttpContext.Current.User.Identity.Name;
 
             HttpResponseMessage response = new HttpResponseMessage();
 
             // 向evaluation插入相关评价
             // 返回评价后的界面
-            
+
             //反序列化的过程
 
             Evaluation evaluation = new Evaluation();
@@ -321,7 +519,7 @@ namespace WebAPIs.Controllers
             {
                 evaluation = JsonConvert.DeserializeAnonymousType(JsonObjectConverter.ObjectToJson(obj), evaluation);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 response.Content = new StringContent("参数传递出错，反序列化失败！");
                 response.StatusCode = HttpStatusCode.Forbidden;
@@ -330,17 +528,25 @@ namespace WebAPIs.Controllers
             evaluation.patient_id = patient_id;
 
             //数据库更新相关评论
-            if (!PatientHelper.Comment(evaluation))
+            //多次评价限制
+            try
             {
-                response.Content = new StringContent("由于某些原因，评价失败~");
-                response.StatusCode = HttpStatusCode.Forbidden;
+                if (!PatientHelper.Comment(evaluation))
+                {
+                    response.Content = new StringContent("由于某些原因，评价失败~");
+                    response.StatusCode = HttpStatusCode.Forbidden;
+                }
+                else
+                {
+                    response.Content = new StringContent("评价成功~");
+                    response.StatusCode = HttpStatusCode.OK;
+                }
             }
-            else
+            catch (Exception e)
             {
-                response.Content = new StringContent("评价成功~");
-                response.StatusCode = HttpStatusCode.OK;
+                response.Content = new StringContent("只能评价一次哦~");
+                response.StatusCode = HttpStatusCode.BadRequest;
             }
-            
             
             return response;
         }
@@ -407,7 +613,7 @@ namespace WebAPIs.Controllers
             {
                 response.Content = new StringContent("未找到医生");
                 response.StatusCode = HttpStatusCode.NotFound;
-                
+
             }
             else
             {

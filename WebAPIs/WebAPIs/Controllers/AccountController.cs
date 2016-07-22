@@ -18,14 +18,15 @@ using Newtonsoft.Json;
 
 namespace WebAPIs.Controllers
 {
-    public class AccountController : BaseController
+    public class AccountController : ApiController
     {
         /// <summary>
-        /// Test Passed
         /// 登陆
         /// </summary>
         /// <param name="user">用户账号、密码构成的Json</param>
         /// <returns></returns>
+        /// Test Passed
+        /// 
         [HttpPost]
         public HttpResponseMessage SignIn(dynamic user)
         {
@@ -73,11 +74,12 @@ namespace WebAPIs.Controllers
             }
         }
         /// <summary>
-        /// Test Passed
         /// 获取用户的信息
         /// </summary>
         /// <returns></returns>
-        //[Authorize]
+        /// Test Passed
+        /// 
+        [Authorize]
         [HttpGet]
         [Route("api/Account/GetUserInfo")]
         public HttpResponseMessage GetUserInfo()
@@ -126,11 +128,12 @@ namespace WebAPIs.Controllers
             }
         }
         /// <summary>
-        /// Test Passed
         /// 注册
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
+        /// Test Passed
+        /// 
         [HttpPost]
         public HttpResponseMessage SignUp(dynamic user)
         {
@@ -170,16 +173,18 @@ namespace WebAPIs.Controllers
             return response;
         }
         /// <summary>
-        /// Test Passed
         /// 登出，通过Cookie判断用户
         /// </summary>
         /// <returns></returns>
+        /// Test Passed
+        /// 
         [HttpGet]
         public HttpResponseMessage SignOut()
         {
             var accountModel = new AccountModel();
             accountModel.Logout();
-            return Request.CreateResponse(HttpStatusCode.Moved);
+            var response = Request.CreateResponse(HttpStatusCode.Moved);
+            return response;
         }
     }
 }

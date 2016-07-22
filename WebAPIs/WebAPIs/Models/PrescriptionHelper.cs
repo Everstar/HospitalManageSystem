@@ -21,11 +21,11 @@ namespace WebAPIs.Models
     /// <summary>
     /// this part is finished!
     /// </summary>
-    
+
     public class PrescriptionHelper
     {
 
-        
+
 
         //done
         //根据药剂师id获取所有有关的处方id和相关病人姓名，性别
@@ -34,35 +34,33 @@ namespace WebAPIs.Models
             ArrayList list = new ArrayList();
 
             string sqlStr = String.Format(
-                    @" with prewithdoc(pres_id) as
-                         (select pres_id
+                    @"with prewithdoc(pres_id,treat_id) as
+                         (select pres_id,treat_id
                           from prescription ,employee
                           where employee.employee_id = '{0}'and employee.employee_ID=prescription.employee_ID and prescription.done_time is null)
                        select unique pres_id, sex, name 
-                       from identity natural join patient natural join treatment natural join prewithdoc", pharmacistId);
+                       from identity natural join patient natural join treatment,prewithdoc
+                       where treatment.treat_id=prewithdoc.treat_id", pharmacistId);
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-           
-
-            
 
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    list.Add(new AllPrescription(reader[0].ToString(), reader[1].ToString(), reader[2].ToString()));           
-                }            
+                    list.Add(new AllPrescription(reader[0].ToString(), reader[1].ToString(), reader[2].ToString()));
+                }
                 return list;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
             }
             return null;
         }
 
-        public static  ArrayList Prescribe(string pres_id)
+        public static ArrayList Prescribe(string pres_id)
         {
             ArrayList list = new ArrayList();
 
@@ -73,19 +71,19 @@ namespace WebAPIs.Models
 
 
             OracleCommand cmd = new OracleCommand(sqlStr, DatabaseHelper.GetInstance().conn);
-  
+
 
             try
             {
                 OracleDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
-                {  
-                        list.Add(new MedicInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString()));    
-                } 
+                {
+                    list.Add(new MedicInfo(reader[0].ToString(), reader[1].ToString(), reader[2].ToString()));
+                }
                 return list;
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
             }
@@ -97,12 +95,12 @@ namespace WebAPIs.Models
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = DatabaseHelper.GetInstance().conn;
             cmd.Transaction = DatabaseHelper.GetInstance().conn.BeginTransaction();
-            string sqlStr = 
+            string sqlStr =
                 @" update prescription
                    set done_time = systimestamp
                    where pres_id =:Pres_id";
             cmd.CommandText = sqlStr;
-           
+
             cmd.Parameters.Add("Pres_id", pres_id);
             try
             {
@@ -115,7 +113,7 @@ namespace WebAPIs.Models
                 cmd.Transaction.Rollback();
             }
             return false;
-           
+
         }
 
     }

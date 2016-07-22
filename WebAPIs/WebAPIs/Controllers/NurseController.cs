@@ -22,7 +22,7 @@ namespace WebAPIs.Controllers
     /// is finished
     /// </summary>
     //[Authorize(Roles = "Nurse")]
-    public class NurseController : BaseController
+    public class NurseController : ApiController
     {
         /// <summary>
         /// Test Passed
@@ -47,9 +47,9 @@ namespace WebAPIs.Controllers
             try
             {
                 list = NurseHelper.GetHospitalizationInfo(nurseId);
-                if (list.Count == 0)
+                if (list == null)
                 {
-                    response.Content = new StringContent("未找到相关信息");
+                    response.Content = new StringContent("查询出现错误！");
                     response.StatusCode = HttpStatusCode.NotFound;
                 }
                 else
@@ -60,7 +60,8 @@ namespace WebAPIs.Controllers
                         obj.Add("hosp_id", item.hos_id);
                         string patient_id = UserHelper.GetPatientIdByTreatmentId(item.treat_id);
                         PatientInfo user_info = UserHelper.GetPatientInfo(patient_id);
-                        obj.Add("patient_name", user_info.name);
+                        if (user_info != null)
+                            obj.Add("patient_name", user_info.name);
                         obj.Add("bed_num", item.bed_num);
                         obj.Add("nursing_rank", item.rank);
                         obj.Add("in_hosp_time", item.in_time);
@@ -74,9 +75,9 @@ namespace WebAPIs.Controllers
             catch (Exception e)
             {
                 response.Content = new StringContent(e.Message);
+                response.StatusCode = HttpStatusCode.BadRequest;
             }
-
-           
+            
             return response;
         }
 

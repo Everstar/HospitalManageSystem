@@ -29,35 +29,35 @@ namespace WebAPIs.Models
                 switch (type)
                 {
                     case PayType.Treat:
-                        sqlStr = @"update treatment set pay=:pay and pay_time=systimestamp where treat_id=:treat_id";
+                        sqlStr = @"update treatment set pay=:pay , pay_time=systimestamp where treat_id=:treat_id";
                         cmd.CommandText = sqlStr;
                         cmd.Parameters.Add("pay", OracleDbType.Double).Value = pay;
                         cmd.Parameters.Add("treat_id", OracleDbType.Varchar2, 20).Value = id;
                         cmd.ExecuteNonQuery();
                         break;
                     case PayType.Exam:
-                        sqlStr = @"update examination set pay=:pay and pay_time=systimestamp where exam_id=:exam_id";
+                        sqlStr = @"update examination set pay=:pay , pay_time=systimestamp where exam_id=:exam_id";
                         cmd.CommandText = sqlStr;
                         cmd.Parameters.Add("pay", OracleDbType.Double).Value = pay;
                         cmd.Parameters.Add("exam_id", OracleDbType.Varchar2, 20).Value = id;
                         cmd.ExecuteNonQuery();
                         break;
                     case PayType.Pres:
-                        sqlStr = @"update prescription set pay=:pay and pay_time=systimestamp where pres_id=:pres_id";
+                        sqlStr = @"update prescription set pay=:pay , pay_time=systimestamp where pres_id=:pres_id";
                         cmd.CommandText = sqlStr;
                         cmd.Parameters.Add("pay", OracleDbType.Double).Value = pay;
                         cmd.Parameters.Add("pres_id", OracleDbType.Varchar2, 20).Value = id;
                         cmd.ExecuteNonQuery();
                         break;
                     case PayType.Surg:
-                        sqlStr = @"update surgery set pay=:pay and pay_time=systimestamp where surg_id=:surg_id";
+                        sqlStr = @"update surgery set pay=:pay , pay_time=systimestamp where surg_id=:surg_id";
                         cmd.CommandText = sqlStr;
                         cmd.Parameters.Add("pay", OracleDbType.Double).Value = pay;
                         cmd.Parameters.Add("surg_id", OracleDbType.Varchar2, 20).Value = id;
                         cmd.ExecuteNonQuery();
                         break;
                     case PayType.Hos:
-                        sqlStr = @"update hospitalization set pay=:pay and pay_time=systimestamp where hos_id=:hos_id";
+                        sqlStr = @"update hospitalization set pay=:pay , pay_time=systimestamp where hos_id=:hos_id";
                         cmd.CommandText = sqlStr;
                         cmd.Parameters.Add("pay", OracleDbType.Double).Value = pay;
                         cmd.Parameters.Add("hos_id", OracleDbType.Varchar2, 20).Value = id;
@@ -70,6 +70,7 @@ namespace WebAPIs.Models
             catch (Exception e)
             {
                 cmd.Transaction.Rollback();
+                throw e;
             }
             return false;
         }
