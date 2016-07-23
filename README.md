@@ -1,9 +1,24 @@
 # HospitalManageSystem
 School Database Course Design Project.
 
-[HospitalManageSystem](http://114.215.117.147/hospital/)
-
+##Configuration
 
 Database : Oracle 12c
 
-Web : ASP.NET
+Backend : ASP.NET Web API
+
+FrontEnd : Html5 CSS3 JavaScript(JQuery)
+
+##Role
+
+###Patient
+
+###Doctor
+
+###Nurse
+
+###Pharmacist
+
+###Examiner
+
+###ManagementStaff

@@ -1,0 +1,22 @@
+.rating>li
+{
+  cursor: default;
+  display: inline-block;
+  font-size: 60px;
+  list-style-type: none;
+}
+
+.star,
+.rating:not(.vote-cast):hover .star:hover ~ .star,
+.rating.vote-cast .star.selected ~ .star
+{
+  /* normal state */
+  color: black;
+}
+
+.rating:hover .star,
+.rating.vote-cast .star
+{
+  /* highlighted state */
+  color: blue;
+}

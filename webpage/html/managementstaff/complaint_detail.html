@@ -1,0 +1,80 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css"ss>
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/jquery.cookie.js"></script>
+	<script src="../../js/management_index.js"></script>
+	<script>
+		$(document).ready(function(){
+
+			employee_id = $.cookie("complaint_employee_id");
+			var uri = '../../../api/Patient/GetSingleEmployee/16711';
+
+
+	        
+	        $.ajax({
+	            type: "get",
+	            url: uri,
+	            contentType: "application/json",
+	            success: function(data, status) {
+	                //正确则跳转
+	                console.log(data);
+	               
+                	
+            	}
+        	});
+		});
+	</script>
+</head>
+<body>
+	<div class="nav">
+		<div 
+		class="nav_title">
+			<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+		</div>
+	</div>
+	<div class="main row">
+		<div class="siderbar col-xs-2 col-sm-3">
+			<ul class="menu unstyled">
+				<li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息&nbsp;&nbsp;&nbsp;</a></li>
+
+				<li class="siderbar_selected"><a href="complaint_rate.html"><span class="glyphicon glyphicon-star"></span>投诉率查询</a></li>
+				
+				<li><a href="personnel_multipletext.html"><span class="glyphicon glyphicon-plus"></span>人员管理&nbsp;&nbsp;&nbsp;</a></li>
+				
+				<li><a href="duty.html"><span class="glyphicon glyphicon-wrench"></span>值班表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+			</ul>
+		</div>
+		<div class="container col-xs-10 col-sm-9">
+			<div style="margin-top: 10px;">
+				<a class="pull-right btn btn-primary " href="complaint_rate.html" style="margin-right:30px">返回</a>
+			
+				<table class="table table-striped" style="margin-left:-30px;">
+				  <tr>
+
+				    <th>评价等级</th>
+				    <th>评价内容</th>
+				  </tr>
+				  <tr>
+				    <td><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span></td>
+				    <td>医术高明</td>
+				  </tr>
+				</table>
+			</div>
+		</div>	
+	</div>
+    <script src="../../js/employee_info.js"></script>
+</body>
+</html>

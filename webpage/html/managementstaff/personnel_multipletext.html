@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css"ss>
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/management_index.js"></script>
+	<script src="../../js/personal_multipletext.js"></script>
+</head>
+<body>
+	<div class="nav">
+		<div class="nav_title">
+			<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+		</div>
+	</div>
+	<div class="main row">
+		<div class="siderbar col-xs-2 col-sm-3">
+			<ul class="menu unstyled">
+				<li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息&nbsp;&nbsp;&nbsp;</a></li>
+
+				<li><a href="complaint_rate.html"><span class="glyphicon glyphicon-star"></span>投诉率查询</a></li>
+				
+				<li class="siderbar_selected"><a href="personnel_multipletext.html"><span class="glyphicon glyphicon-plus"></span>人员管理&nbsp;&nbsp;&nbsp;</a></li>
+				
+				<li><a href="duty.html"><span class="glyphicon glyphicon-wrench"></span>值班表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+			</ul>
+		</div>
+		<div class="content col-xs-10 col-sm-9 row">
+			<select name="" id="department_name" class="col-xs-1 col-md-2" id="personnel_multipletext_department" style="margin-top:20px">
+				<option value="" id="">部门</option>
+				<option value="" id="">行政部</option>
+				<option value="" id="">后勤部</option>
+				<option value="" id="">门诊部</option>
+			</select>
+			<select name="" id="clinic_name" class="col-xs-1 col-md-2" id="personnel_multipletext_clinic" style="margin-top:20px">
+				<option value="" >科室</option>
+			</select>
+			<a class="btn btn-primary" href="add_employee.html" style="margin-left: 550px;">新增职工</a>
+
+		</div>
+		<div class="content col-xs-10 col-sm-9 row">
+			<div class="container col-xs-12" style="margin-top: 30px;margin-left:-30px;">
+				<table class="table table-striped" id="imployee_table">
+				  <tr>
+				    <th>ID</th>
+				    <th>姓名</th>
+				    <th>部门</th>
+				    <th>科室</th>
+				    <th>岗位</th>
+				    <th>工资</th>
+
+				    <th>操作</th>
+				   
+				  </tr>
+				  <!-- <tr>
+				    <td class="id">12345</td>
+				    <td class="name">胡淦森</td>
+				    <td class="department">门诊部</td>
+				    <td class="clinic">妇产科</td>
+				    <td class="doctor">主任医师</td>
+				    <td class="salary">7000</td>
+				    <td class="change"><a class="btn btn-primary personal_change">修改</a>
+				    				   <a class="btn btn-primary personal_delete">删除</a></td>
+     				  </tr>
+				  <tr>
+				    <td class="id">78954</td>
+				    <td class="name">李萍萍</td>
+				    <td class="department">门诊部</td>
+				    <td class="clinic">口腔科</td>
+				    <td class="doctor">副主任医师</td>
+				    <td class="salary">7000</td>
+				    <td class="change"><a class="btn btn-primary personal_change">修改</a>
+				    				   <a class="btn btn-primary personal_delete">删除</a></td>
+				  </tr>
+				  <tr>
+				    <td class="id">16879</td>
+				    <td class="name">曾嘉星</td>
+				    <td class="department">门诊部</td>
+				    <td class="clinic">妇产科</td>
+				    <td class="doctor">主任医师</td>
+				    <td class="salary">7000</td>
+				    <td class="change"><a class="btn btn-primary personal_change">修改</a>
+				    				   <a class="btn btn-primary personal_delete">删除</a></td>
+				  </tr> -->
+				</table>
+			</div>
+		</div>	
+	</div>
+    <script src="../../js/employee_info.js"></script>
+</body>
+</html>

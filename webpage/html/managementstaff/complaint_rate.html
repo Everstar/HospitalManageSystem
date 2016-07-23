@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css"ss>
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/jquery.cookie.js"></script>
+	<script src="../../js/management_index.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			// var uri = '../../../api/ManagementStaff/GetAllEmployee';
+
+			// $.ajax({
+	  //           type: "get",
+	  //           url: uri,
+	  //           contentType: "application/json",
+	  //           success: function(data, status) { 
+ 		// 			var jsonarray= $.parseJSON(data);
+
+	  //           	console.log(data);
+
+			// 		$.each(jsonarray,function (i, n){
+			// 			$(".complaint_table").append(
+			// 	    		"<tr>"+
+			// 		    	"<td class='id'>"+n.department+"</td>"+
+			// 			    "<td class='name'>"+n.clinic+"</td>"+
+			// 			    "<td class='department'>"+n.employee_id+"</td>"+
+			// 			    "<td class='clinic'>"+n.name+"</td>"+
+			// 			    "<td class='doctor'>"+n.complaint_rate+"</td>"+
+			// 			    "<td><a class='btn btn-primary' href='complaint_detail.html'>查看</a></td>"+
+	 	// 			        "</tr>"
+ 		// 		    	);
+
+			// 		});
+			// 	}
+   //          });
+
+            $("#complaint_rate_require").click(function(){
+				$(".complaint_table tr:gt(0)").remove();
+				$.cookie("complaint_employee_id","16680");
+            	year=$(".complaint_rate_year option:selected").text();
+            	month=$(".complaint_rate_month option:selected").text();
+            	begin_=$(".complaint_rate_begin option:selected").text();
+				var begin=begin_.substring(0,begin_.length-1);
+
+
+				console.log("complaint_rate_require---clicked");
+				var uri = '../../../api/ManagementStaff/GetComplaintedDoctor/'+year+'/'+month+'/'+begin;
+				console.log(uri);
+
+		        // console.log("2016年07月21日10:55:09");
+
+		        // var postData = {year: "2014",month: "3",percent:"14"};
+		        // 
+		        // 
+		        // var postData = "2013/4/12";
+
+		        $.ajax({
+		            type: "get",
+		            url: uri,
+		            contentType: "application/json",
+		            // data: postData,
+		            // data: JSON.stringify(postData),
+		            success: function(data, status) {
+		            	console.log(data);
+		                //正确则跳转
+    					var jsonarray= $.parseJSON(data);
+    					if(jsonarray[0] === "0") {
+    						return;
+    					}else {
+    						for(var k = 1; k < jsonarray.length; k++) {
+    							$(".complaint_table").append(
+						    		"<tr>"+
+							    	"<td class='id'>"+jsonarray[k].department+"</td>"+
+								    "<td class='name'>"+jsonarray[k].clinic+"</td>"+
+								    "<td class='department'>"+jsonarray[k].id+"</td>"+
+								    "<td class='clinic'>"+jsonarray[k].name+"</td>"+
+								    "<td class='doctor'>"+jsonarray[k].compliant_rate+"</td>"
+		 				    	);
+    						}
+    					}
+
+    		// 			$.each(jsonarray,function (i, n){
+						// $(".complaint_table").append(
+				  //   		"<tr>"+
+					 //    	"<td class='id'>"+n.department+"</td>"+
+						//     "<td class='name'>"+n.clinic+"</td>"+
+						//     "<td class='department'>"+n.id+"</td>"+
+						//     "<td class='clinic'>"+n.name+"</td>"+
+						//     "<td class='doctor'>"+n.compliant_rate+"</td>"
+ 				 //    	);
+
+					}
+
+		                
+	                
+	                
+	            	
+	        	});
+			});
+        });
+	</script>
+</head>
+<body>
+	<div class="nav">
+		<div 
+		class="nav_title">
+			<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+		</div>
+	</div>
+	<div class="main row">
+		<div class="siderbar col-xs-2 col-sm-3">
+			<ul class="menu unstyled">
+				<li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息&nbsp;&nbsp;&nbsp;</a></li>
+
+				<li class="siderbar_selected"><a href="complaint_rate.html"><span class="glyphicon glyphicon-star"></span>投诉率查询</a></li>
+				
+				<li><a href="personnel_multipletext.html"><span class="glyphicon glyphicon-plus"></span>人员管理&nbsp;&nbsp;&nbsp;</a></li>
+				
+				<li><a href="duty.html"><span class="glyphicon glyphicon-wrench"></span>值班表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+			</ul>
+		</div>
+		<div class="container col-xs-10 col-sm-9">
+			<div style="margin-top: 20px;" class="container col-xs-12">
+				<select class="complaint_rate_year">
+				  	<option value ="1">请选择年份</option>
+				</select>
+				<select class="complaint_rate_month">
+				  	<option value ="1">请选择月份</option>
+				</select>
+				--------------------投诉率大于
+				<select class="complaint_rate_begin">
+				  	<option value ="1"></option>
+				</select>
+				<!-- ~
+				<select class="complaint_rate_end" >
+				 	<option value="4">止</option>
+				</select> -->
+				<button id="complaint_rate_require">查询</button>
+			</div>
+
+			<div class="container col-xs-12" style="margin-top: 20px;">
+				<table class="table table-striped complaint_table" style="margin-left:-40px">
+				  <tr>
+				    <th>部门</th>
+				    <th>科室</th>
+				    <th>ID</th>
+				    <th>姓名</th>
+				    <th>被投诉率</th>
+				    <!-- <th>患者评价</th> -->
+				  </tr>
+				  <!-- <tr>
+				    <td>门诊部</td>
+				    <td>妇产科</td>
+				    <td>12345</td>
+				    <td>胡淦森</td>
+				    <td>100%</td>
+				    <td><a class="btn btn-primary" href="complaint_detail.html">查看</a></td>
+				  </tr>
+				  <tr>
+				    <td>门诊部</td>
+				    <td>口腔科</td>
+				    <td>78954</td>
+				    <td>李萍萍</td>
+				    <td>10%</td>
+				    <td><a class="btn btn-primary" href="complaint_detail.html">查看</a></td>
+				  </tr>
+				  <tr>
+				    <td>门诊部</td>
+				    <td>妇产科</td>
+				    <td>16879</td>
+				    <td>曾嘉星</td>
+				    <td>1%</td>
+				    <td><a class="btn btn-primary" href="complaint_detail.html">查看</a></td>
+				  </tr> -->
+				</table>
+			</div>
+		</div>	
+	</div>
+
+    <script src="../../js/employee_info.js"></script>
+</body>
+</html>

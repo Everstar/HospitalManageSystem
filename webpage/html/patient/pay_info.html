@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>暴走医疗管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../css/ace.css">
+    <link rel="stylesheet" type="text/css" href="../../css/rating.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+    <script src="../../js/jquery-3.1.0.min.js"></script>
+    <script src="../../js/parse_parameter.js"></script>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="nav_title">
+            <img class="title_image" src="../../image/title_img.png" alt="">
+            <div class="title">
+                暴走医疗管理系统
+            </div>
+        </div>
+        <div class="nav_right">
+            <span>欢迎，</span>
+            <span id="titlename">名字</span>
+            <button id="signout" class="btn btn-primary" style="margin-left:15px;">退出</button>
+        </div>
+    </div>
+    <div class="main">
+        <div class="siderbar">
+            <ul class="menu unstyled">
+                <li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+                <li><a href="register.html"><span class="glyphicon glyphicon-plus"></span>预约挂号</a></li>
+                <li class="siderbar_selected"><a href="treatment.html"><span class="glyphicon glyphicon-star"></span>就诊记录</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="page-header">
+                        <h1>信息中心
+						<small>>>医疗记录>>查看付费详情</small>
+						</h1>
+                    </div>
+                    <!-- /.page-header -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <ul class="breadcrumb">
+                        <li>
+                            医疗流水号 <span id="treatment_id">20160718103700000021</span>
+                        </li>
+                    </ul>
+                    <!-- .breadcrumb -->
+                </div>
+                <table class="table table-striped table-bordered table-hover" id="pay_info">
+                    <thead>
+                        <tr>
+                            <th>相关流水号</th>
+                            <th>负责人</th>
+                            <th>应付款金额</th>
+                            <th>付款状态</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="treatmentRecord">
+<!--                         <tr>
+                            <td class="treatment_id">20160716222100000000</td>
+                            <td>吕金华</td>
+                            <td>￥20</td>
+                            <td>已付款</td>
+                            <td>
+                                <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                    <button class="black">
+                                        评价
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="treatment_id">20160716222100000012</td>
+                            <td>李萍萍</td>
+                            <td>￥30</td>
+                            <td>未付款</td>
+                            <td>
+                                <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                    <button class="black">
+                                        评价
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="treatment_id">20160716222100000042</td>
+                            <td>张兆龙</td>
+                            <td>￥15</td>
+                            <td>未付款</td>
+                            <td>
+                                <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                    <button class="black">
+                                        评价
+                                    </button>
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <button class="comment btn btn-primary">评价</button>
+            </div>
+            <script src="../../js/employee_info.js"></script>
+            <script type="text/javascript">
+            $(document).ready(function() {
+                $("#treatment_id").html(GetQueryString("treatment_id"));
+            });
+
+            $.getJSON("../../../api/patient/GetAllCost/" + GetQueryString("treatment_id"))
+                .done(function(data) {
+                    // var info = JSON.parse(data);
+                    console.log(data);
+                    console.log(data.length);
+
+                    for (var i = 0; i < data.length; i++) {
+                        console.log(data[i]);
+                        for (var j = 0; j < data[i].length; j++) {
+                            var row = "<tr>";
+                            row += "<td class=\"pay_info_id\" alt=\"" + i + "\"" + ">" + data[i][j].costId + "</td>";
+                            row += "<td>" + data[i][j].docName + "</td>";
+                            row += "<td class=\"pay_cost\">" + data[i][j].cost + "</td>";
+                            if (data[i][j].isPay === true) {
+                                row += "<td>已付款</td>";
+                            } else {
+                                row += "<td>未付款</td>";
+                                row += "<td><button class=\"pay\">支付</button></td>"
+                            }
+
+                            $("#treatmentRecord").append(row);
+                        }
+
+                    }
+                    $(".pay").click(function(){
+                        var _type = $(this).parent().parent().find(".pay_info_id").attr("alt");
+                        var _id = $(this).parent().parent().find(".pay_info_id").html();
+                        var _pay = $(this).parent().parent().find(".pay_cost").html();
+                        var postData = {pay : _pay, type : _type, id : _id};
+                        $.ajax({
+                            type: "post",
+                            url: "../../../api/Patient/PayFor",
+                            contentType: "application/json",
+                            data: JSON.stringify(postData),
+                            success: function(data, status) {
+                                var patient_id = data;
+                                alert("你的病人账号为 :" + patient_id + "\n请重新登录。");
+                                window.location.reload();
+                            }
+                        });
+                    });
+                })
+                .fail(function(data) {
+                    console.log(data);
+                });
+
+            $(".comment").click(function() {
+
+                window.location.href = "./comment.html?treatment_id=" + GetQueryString("treatment_id");
+                // var dgtable = document.getElementById('pay_info').rows;
+                // var p = window.event.srcElement;
+                // for (var i = 0; i < dgtable.length; i++) {
+                //     if (p == dgtable[i].cells[4].getElementsByTagName("button")[0]) {
+                //         if (dgtable[i].cells[3].innerText === "未付款") {
+                //             alert("请先付款！");
+                //         } else {
+                //             window.location.href = "./comment.html?treatment_id=" + GetQueryString("treatment_id");
+                //         }
+                //     }
+                // }
+            });
+            </script>
+</body>
+
+</html>

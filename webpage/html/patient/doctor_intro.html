@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>暴走医疗管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../css/ace.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+    <link rel="stylesheet" type="text/css" href="../../css/rating.css">
+    <script src="../../js/jquery-3.1.0.min.js"></script>
+    <script src="../../js/parse_parameter.js"></script>
+    <!--<script src="../../js/index.js"></script>-->
+
+
+</head>
+<body>
+<div class="nav">
+    <div class="nav_title">
+        <img class="title_image" src="../../image/title_img.png" alt="">
+        <div class="title">
+            暴走医疗管理系统
+        </div>
+    </div>
+    <div class="nav_right">
+        <span>欢迎，</span>
+        <span>名字</span>
+    </div>
+</div>
+<div class="main">
+    <div class="siderbar">
+        <ul class="menu unstyled">
+            <li class="siderbar_selected"><span class="glyphicon glyphicon-user"></span><a
+                    href="../doctor/user_info.html">医生信息</a></li>
+
+        </ul>
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1>信息中心
+                        <small>>>医生资料</small>
+                    </h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="user-profile row">
+                    <div class="col-xs-12 col-sm-3 center">
+                        <div>
+								<span class="profile-picture">
+									<img id="avatar" class="editable img-responsive" alt="Avatar"
+                                         src="../../image/avatars/1452667.jpg"/>
+								</span>
+                            <div class="space-4"></div>
+                        </div>
+
+                        <div class="space-6"></div>
+
+
+                        <div class="hr hr16 dotted"></div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-9">
+
+                        <div class="space-12"></div>
+
+                        <div class="profile-user-info profile-user-info-striped">
+
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 姓名</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable" id="employee_name">许迪文</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 工号</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable" id="employee_id">14535</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 性别</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable" id="employee_sex">男</span>
+                                </div>
+                            </div>
+
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 科室</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable" id="employee_clinic"> 皮肤科 </span>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 职务</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable" id="employee_post">医生</span>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 医生简介</div>
+
+                                <div class="profile-info-value">
+                                    <span class="editable" id="employee_intro">医学博士、医学哲学博士、教授、主任医师、博士生导师，北京 同仁医院院长、北京市耳鼻咽喉科研究所所长、首都医科大学耳鼻咽喉科学院院长、世界卫生组织防聋合作中心主任，兼任中华医学会耳鼻咽喉头颈外科学分会主任委员，中国医师协会耳鼻咽喉科医师分会会长，世界华人耳鼻咽喉头颈外科学会会长。 主持研究的“慢性鼻窦炎鼻息肉诊治研究”、 “人工耳蜗技术的临床应用及研究”、“阻塞性睡眠呼吸暂停低通气综合征研究与诊治”分别于2001年、2006年、2009年获得国家科技进步奖二等奖，2007年获何梁何利科学与技术进步奖。 </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-sm-6">
+                <div class="widget-box ">
+                    <div class="widget-header">
+                        <h4 class="lighter smaller">
+                            <i class="icon-comment blue"></i>
+                            评价
+                        </h4>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main no-padding">
+                            <div class="dialogs" id="comment">
+                                <div class="itemdiv dialogdiv">
+                                    <div class="user">
+                                        <img alt="Alexa's Avatar" src="../../image/avatars/1452666.jpg"/>
+                                    </div>
+
+                                    <div class="body">
+                                        <!--<div class="time">-->
+                                            <!--<i class="icon-time"></i>-->
+
+                                        <!--</div>-->
+
+                                        <div class="name">
+                                            <a href="#">Alexa</a>
+                                        </div>
+                                        <div class="time">12:30</div>
+                                        <div class="text">大家好啊</div>
+
+                                        <div class="tools">
+                                            <a href="#" class="btn btn-minier btn-info">
+                                                <i class="icon-only icon-share-alt"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="itemdiv dialogdiv">
+                                    <div class="user">
+                                        <img alt="John's Avatar" src="assets/avatars/avatar.png"/>
+                                    </div>
+
+                                    <div class="body">
+                                        <div class="time">
+                                            <i class="icon-time"></i>
+
+                                        </div>
+
+                                        <div class="name">
+                                            <a href="#">John</a>
+                                        </div>
+                                        <div class="text">框架很好用嘛</div>
+
+                                        <div class="tools">
+                                            <a href="#" class="btn btn-minier btn-info">
+                                                <i class="icon-only icon-share-alt"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div><!-- /widget-main -->
+                    </div><!-- /widget-body -->
+                </div><!-- /widget-box -->
+            </div><!-- /span -->
+        </div><!-- /row -->
+
+
+    </div>
+
+</div>
+
+
+<!--</div>-->
+<!--</div>-->
+
+<!--<script>-->
+    <!--console.log("testsdaklfjlkadjsglkhfadklhsakldjfakl;sJF;LKASHDGLHNAFHN");-->
+    <!--var id = GetQueryString("id");-->
+    <!--console.log("id:" + id);-->
+<!--</script>-->
+
+<script src="../../js/doctor_intro.js"></script>
+
+</body>
+</html>

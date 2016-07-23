@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" type="text/css" href="../../css/ace.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/parse_parameter.js"></script>
+</head>
+<body>
+	<div class="nav">
+		<div class="nav_title">
+			<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+			<button id="signout" class="btn btn-primary" style="margin-left:15px;">退出</button>
+		</div>
+	</div>
+	<div class="main">
+		<div class="siderbar">
+			<ul class="menu unstyled">
+				<li class="siderbar_selected"><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+				<li><a href="register.html"><span class="glyphicon glyphicon-plus"></span>预约挂号</a></li>
+				<li><a href="treatment.html"><span class="glyphicon glyphicon-star"></span>就诊记录</a></li>
+				<li><a href="payment.html"><span class="glyphicon glyphicon-yen"></span>交&emsp;&emsp;费</a></li>
+			</ul>
+		</div>
+		<div class="content">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="page-header">
+						<h1>信息中心
+						<small>>>交费</small>
+						</h1>
+					</div><!-- /.page-header -->
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="row">
+						
+						<div class="col-xs-12">
+							<div class="table-header">
+							</div>
+
+							<div class="table-responsive">
+								<table id="sample-table-2" class="table table-striped table-bordered table-hover">
+									<thead>
+										<tr>
+											<th class="hidden-480">流水号</th>
+											<th>项目</th>
+											<th>金额</th>
+											<th></th>
+										</tr>
+									</thead>
+
+									<tbody id="treatmentRecord">
+										<tr>
+											<td class="treatment_id hidden-480">20160716222100000000</td>
+											<td>挂号</td>
+											<td>¥12</td>
+
+											<td class="hidden-480">
+												<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+													<button class="blue pay">交费</button>
+												</div>
+											</td>
+
+										</tr>
+
+										<tr>
+											<td class="treatment_id hidden-480">20160716222100000012</td>
+											<td>验血</td>
+											<td>¥60</td>
+											<td>
+												<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+													<button class="blue pay">交费</button>
+												</div>
+											</td>
+
+										</tr>
+
+										<tr>
+											<td class="treatment_id hidden-480">20160716222100000042</td>
+											<td>住院</td>
+											<td>¥1600</td>
+
+											<td>
+												<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+													<button class="blue pay">交费</button>
+												</div>
+											</td>
+
+										</tr>
+									</tbody>
+									
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+    <script src="../../js/employee_info.js"></script>
+	<script type="text/javascript">
+		var addListener = function() {
+			$(".pay").click(function(){
+		        $.getJSON('api/Patient/pay/' + "")
+	        		.done(function (data) {
+	              	  	console.log(data);
+	    					if(data === null) {
+							}
+						}
+	    	    	);
+			});
+		}
+
+		var addData = function(treatment_id, type, price){
+			var record = "<tr><td class=\"treatment_id hidden-480\">" + treatment_id + "</td><td>"+ type +"</td><td>¥" + price + "</td><td class=\"hidden-480\"><div class=\"visible-md visible-lg hidden-sm hidden-xs action-buttons\"><button class=\"blue pay\">交费</button></div></td></tr>"
+
+			$("#treatmentRecord").append(record);
+		}
+
+		$("#titlename").click(function() {
+			addData("20160720222512211221", "挂号", 23);
+		});
+
+        $(document).ready(function () {
+	    //     $.getJSON('api/Patient/')
+     //    		.done(function (data) {
+     //          	  	console.log(data);
+    	// 				if(data === null) {
+					// 	}
+					// }
+    	//     	);
+            });
+	</script>
+</body>
+</html>

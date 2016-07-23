@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>暴走医疗管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../css/ace.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+    <script src="../../js/jquery-3.1.0.min.js"></script>
+    <!--<script src="../../js/index.js"></script>-->
+
+    <!--datetimepicker-required-->
+    <link rel="stylesheet" href="../../plug-in/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.css">
+    <script src="../../plug-in/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+    <script src="../../plug-in/bootstrap-datetimepicker-master/js/locales/bootstrap-datetimepicker.fr.js"
+            charset="UTF-8"></script>
+</head>
+
+<body>
+<div class="nav">
+    <div class="nav_title">
+        <img class="title_image" src="../../image/title_img.png" alt="">
+        <div class="title">
+            暴走医疗管理系统
+        </div>
+    </div>
+    <div class="nav_right">
+        <span>欢迎，</span>
+        <span>名字</span>
+    </div>
+</div>
+<div class="main">
+    <div class="siderbar">
+        <ul class="menu unstyled">
+            <li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+            <li class="siderbar_selected"><a href="register.html"><span class="glyphicon glyphicon-plus"></span>预约挂号</a>
+            </li>
+            <li><a href="treatment.html"><span class="glyphicon glyphicon-star"></span>就诊记录</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1>信息中心
+                        <small>>>挂号 >> 选择科室 七天内可预约挂号</small>
+                    </h1>
+                </div><!-- /.page-header -->
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- PAGE CONTENT BEGINS -->
+
+                <form class="form-horizontal" role="form" action="" onsubmit="return false;" id="content-choose-clinic">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right"
+                               for="clinic-name-list">科室</label>
+
+                        <div class=" col-xs-8 col-sm-4">
+                            <select class="form-control" id="clinic-name-list">
+                                <option disabled selected> -- 选择科室 --</option>
+                                <!--<option value="f">j</option>-->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-4"></div>
+
+                    <button class="btn btn-info col-sm-offset-6" type="submit" id="btn-jump-to-choose-doctor">
+                        <i class="icon-ok bigger-110"></i>
+                        选择该科室
+                    </button>
+                    <!--<button class="btn btn-primary btn-jump-to-choose-time">test</button>-->
+                    <!--<div class="form-group">-->
+                    <!--<div class="col-md-12 no-padding-right ">-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                </form>
+
+                <div class="page-content" id="content-choose-doctor" style="display: none;">
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <!-- PAGE CONTENT BEGINS -->
+
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-sm-6">
+                                        <h3 class="header smaller lighter blue">该科室 医生</h3>
+                                    </div>
+                                    <!--<div class="col-sm-6 no-padding-right">-->
+                                    <!--<button type="button" class="btn btn-primary" id="">-->
+                                    <!--添加医生-->
+                                    <!--</button>-->
+                                    <!--</div>-->
+                                    <!--<div class="table-header">-->
+                                    <!--Results for "Latest Registered Domains"-->
+                                    <!--</div>-->
+
+                                    <div class="table-responsive">
+                                        <table id="sample-table-2"
+                                               class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th>医生</th>
+                                                <th>擅长</th>
+                                                <th>
+                                                    <i class="icon-time bigger-110 hidden-480"></i>
+                                                    评价
+                                                </th>
+                                                <th>选择</th>
+                                            </tr>
+                                            </thead>
+
+                                            <tbody id="doctor-table">
+                                            <!--<tr>-->
+                                                <!--<td>-->
+                                                    <!--<div class="col-sm-6">-->
+                                                        <!--<img src="../../image/avatars/1452656.jpg" class="img-circle"-->
+                                                             <!--alt="医生 头像" width="80">-->
+                                                    <!--</div>-->
+                                                    <!--<div>-->
+                                                        <!--<p><a href="./doctor_intro.html?id=12345">吕金华</a></p>-->
+                                                        <!--<p>主任医师</p>-->
+                                                    <!--</div>-->
+                                                <!--</td>-->
+                                                <!--<td>肺癌，咽喉癌</td>-->
+                                                <!--<td>-->
+                                                    <!--平均星级：5-->
+                                                <!--</td>-->
+                                                <!--<td>-->
+                                                    <!--<div class="center">-->
+                                                        <!--<button class="btn btn-primary btn-jump-to-choose-time">挂号</button>-->
+                                                    <!--</div>-->
+                                                <!--</td>-->
+                                            <!--</tr>-->
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+
+            <div class="page-content" id="content-choose-time" style="display:none;">
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+
+                        <form class="form-horizontal" role="form" action="#" onsubmit="return false;">
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right"
+                                       for="datetimepicker">时间</label>
+
+                                <div class=" col-xs-8 col-sm-4">
+                                    <!--<select class="form-control" id="form-field-select-0">-->
+                                    <!--<option value="">&nbsp;</option>-->
+                                    <!--<option value="AL">儿科</option>-->
+                                    <!--<option value="AK">五官科</option>-->
+                                    <!--<option value="AK">外科</option>-->
+                                    <!--</select>-->
+                                    <input type="text" id="datetimepicker">
+                                </div>
+                            </div>
+
+                            <!--<div class="space-4"></div>-->
+
+                            <!--<div class="col-sm-12 input-append date" id="datetimepicker"></div>-->
+
+                            <div class="space-4"></div>
+
+                            <button class="btn btn-info col-sm-offset-6" id="submit-register">
+                                <i class="icon-ok bigger-110"></i>
+                                预约挂号
+                            </button>
+                            <!--<div class="form-group">-->
+                            <!--<div class="col-md-12 no-padding-right ">-->
+                            <!--</div>-->
+                            <!--</div>-->
+
+                        </form>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+
+            </div>
+
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+
+</div>
+</div>
+
+<script src="../../js/register.js"></script>
+
+</body>
+</html>

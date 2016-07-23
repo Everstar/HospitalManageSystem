@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>暴走医疗管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../css/ace.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+    <script src="../../js/jquery-3.1.0.min.js"></script>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="nav_title">
+            <img class="title_image" src="../../image/title_img.png" alt="">
+            <div class="title">
+                暴走医疗管理系统
+            </div>
+        </div>
+        <div class="nav_right">
+            <span>欢迎，</span>
+            <span id="titlename">名字</span>
+            <button id="signout" class="btn btn-primary" style="margin-left:15px;">退出</button>
+        </div>
+    </div>
+    <div class="main">
+        <div class="siderbar">
+            <ul class="menu unstyled">
+                <li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+                <li><a href="register.html"><span class="glyphicon glyphicon-plus"></span>预约挂号</a></li>
+                <li class="siderbar_selected"><a href="treatment.html"><span class="glyphicon glyphicon-star"></span>就诊记录</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="page-header">
+                        <h1>信息中心
+						<small>>>医疗记录</small>
+						</h1>
+                    </div>
+                    <!-- /.page-header -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="table-header">
+                                <span id="currentYear">2016</span>年
+                                <span id="currentMonth">7</span>月
+                            </div>
+                            <div class="table-responsive">
+                                <div class="col-xs-12 searchMonth">
+                                    查询年月
+                                    <input type="month" id="searchMonth" onChange="match(this)">
+                                </div>
+                                <table class="table table-striped table-bordered table-hover" id="list">
+                                    <thead>
+                                        <tr>
+                                            <th>医疗流水号</th>
+                                            <th>挂号科室</th>
+                                            <th>挂号医生</th>
+                                            <th>挂号时间</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="treatmentRecord">
+                                        <!-- 										<tr>
+											<td class="treatment_id">20160716222100000000</td>
+											<td>内科</td>
+											<td class="doc_name" alt="16023">吕金华</td>
+											<td>2016-07-16 17:31</td>
+											
+
+											<td>
+												<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+													<button class="black" >
+														查看付费详情
+													</button>
+												</div>
+											</td>
+
+										</tr>
+
+										<tr>
+											<td class="treatment_id">20160716222100000012</td>
+											<td>外科</td>
+											<td class="doc_name" alt="16034">李萍萍</td>
+											<td>2016-07-16 16:21</td>
+											
+
+											<td>
+												<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+													<button class="black" >
+														查看付费详情
+													</button>
+												</div>
+											</td>
+
+										</tr>
+
+										<tr>
+											<td class="treatment_id">20160716222100000042</td>
+											<td>妇产科</td>
+											<td class="doc_name" alt="16054">张兆龙</td>
+											<td>2016-07-17 11:21</td>
+											
+											<td>
+												<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+													<button class="black" >
+													查看付费详情
+													</button>
+												</div>
+											</td>
+
+										</tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../js/employee_info.js"></script>
+    <script type="text/javascript">
+    var addListener = function() {
+        $("button").click(function() {
+
+            var dgtable = document.getElementById('list').rows;
+            var p = window.event.srcElement;
+            for (var i = 0; i < dgtable.length; i++) {
+                if (p == dgtable[i].cells[4].getElementsByTagName("button")[0]) {
+                    console.log("%s", dgtable[i].cells[0].innerText);
+                    window.location.href = "./pay_info.html?treatment_id=" + dgtable[i].cells[0].innerText;
+                }
+            }
+        });
+    }
+
+
+    $.getJSON("../../../api/Patient/GetTreatmentID")
+        .done(function(data) {
+
+            for (var i = 0; i < data.length; i++) {
+                var row = "<tr>";
+                row += "<td>" + data[i].treatId + "</td>";
+                row += "<td>" + data[i].clinicName + "</td>";
+                row += "<td>" + data[i].docName + "</td>";
+                row += "<td>" + data[i].treatTime + "</td>";
+                row += "<td><button>" + "查看付费详情" + "</button></td>";
+                $("#treatmentRecord").append(row);
+
+            }
+            addListener();
+        })
+        .fail(function(data) {
+            console.log(data);
+        });
+
+
+
+
+
+
+    function match(obj) {
+        console.log("%s", obj.value);
+        setTimeout(function() {
+            var search = document.getElementById('list');
+
+            var month = obj.value;
+
+            var searchCol = 3;
+
+            for (var i = 1; i < search.rows.length; i++) {
+                var searchText = search.rows[i].cells[searchCol].innerText;
+
+                if (searchText.match(month)) {
+                    search.rows[i].style.display = 'table-row';
+                } else {
+                    search.rows[i].style.display = 'none';
+                }
+            }
+        }, 200);
+    }
+    </script>
+</body>
+
+</html>

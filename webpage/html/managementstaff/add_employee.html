@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css"ss>
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/management_index.js"></script>
+	<script src="../../js/personal_multipletext.js"></script>
+	<script>
+		$(document).ready(function(){
+
+
+
+
+			$("#submit").click(function(){
+			var uri = '../../../api/ManagementStaff/AddEmployee';
+
+				new_employee_id=$("#new_employee_id").val();
+				new_employee_sex=$("#new_employee_sex").val();
+				new_employee_name=$("#new_employee_name").val();
+				new_employee_password=$("#new_employee_password").val();
+				new_employee_post=$("#new_employee_post").val();
+				new_employee_clinic=$("#new_employee_clinic").val();
+				new_employee_birth=$("#new_employee_birth").val();
+				new_employee_credit=$("#new_employee_credit").val();
+				new_employee_department=$("#new_employee_department").val();
+				new_employee_salary=$("#new_employee_salary").val();
+
+
+	        var postData = {
+	        	// id: new_employee_id,
+	        	sex: new_employee_sex,
+	        	name: new_employee_name,
+	        	password:new_employee_password,
+	        	post: new_employee_post,
+	        	clinic_name:new_employee_clinic,
+	        	credit_num: new_employee_credit,
+	        	salary:new_employee_salary,
+	        	dept_name:new_employee_department,
+	        	birth:new_employee_birth
+	        };
+
+	        $.ajax({
+	            type: "post",
+	            url: uri,
+	            contentType: "application/json",
+	            data: JSON.stringify(postData),
+	            success: function(data, status) {
+	                //正确则跳转
+	                console.log(data);
+	                alert("插入成功");
+	               
+                	
+            	}
+        	});
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div class="nav">
+		<div class="nav_title">
+			<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+		</div>
+	</div>
+	<div class="main">
+		<div class="siderbar" col-xs-2 col-sm-3>
+			<ul class="menu unstyled">
+				<li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息&nbsp;&nbsp;&nbsp;</a></li>
+
+				<li><a href="complaint_rate.html"><span class="glyphicon glyphicon-star"></span>投诉率查询</a></li>
+				
+				<li class="siderbar_selected"><a href="personnel_multipletext.html"><span class="glyphicon glyphicon-plus"></span>人员管理&nbsp;&nbsp;&nbsp;</a></li>
+				
+				<li><a href="duty.html"><span class="glyphicon glyphicon-wrench"></span>值班表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+			</ul>
+		</div>
+		<div class="content" col-xs-10 col-sm-9>
+			<a class="btn btn-primary "  href="personnel_multipletext.html" style="margin-top:20px ;margin-right:20px;">返回</a>	
+			<form class="form-horizontal" role="form"> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">ID</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control"  id="new_employee_id" placeholder="输入ID"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">姓名</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control"  id="new_employee_name" placeholder="输入姓名"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">性别</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control"  id="new_employee_sex" placeholder="输入性别"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">密码</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control"  id="new_employee_password" placeholder="输入密码"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">身份证</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control"  id="new_employee_credit" placeholder="输入身份证号码"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">生日</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control"  id="new_employee_birth" placeholder="输入生日 YYYY/MM/DD"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">部门</label> 
+			    <div class="col-sm-4"> 
+			      <input  class="form-control" id="new_employee_department" placeholder="输入部门"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">科室</label> 
+			    <div class="col-sm-4"> 
+			      <input type="" class="form-control" id="new_employee_clinic" placeholder="输入科室"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">岗位</label> 
+			    <div class="col-sm-4"> 
+			      <input type="" class="form-control" id="new_employee_post" placeholder="输入岗位"> 
+			    </div> 
+			  </div> 
+			  <div class="form-group"> 
+			    <label for="" class="col-sm-2 control-label">工资</label> 
+			    <div class="col-sm-4"> 
+			      <input type="" class="form-control" id="new_employee_salary" placeholder="输入工资"> 
+			    </div> 
+			  </div> 
+			  
+			  <div class="form-group"> 
+			    <div class="col-sm-offset-2 col-sm-10"> 
+			      <button type="submit" class="btn btn-default" id="submit">新增</button> 
+			    </div> 
+			  </div> 
+			</form> 
+		</div>
+	</div>
+	 <script src="../../js/employee_info.js"></script>
+</body>
+</html>

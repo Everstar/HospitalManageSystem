@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" type="text/css" href="../../css/ace.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css"ss>
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/parse_parameter.js"></script>
+	
+</head>
+<body>
+	<div class="nav">
+		<div class="nav_title">
+		<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+			<button id="signout" class="btn btn-primary" style="margin-left:15px;">退出</button>
+		</div>
+	</div>
+	<div class="main">
+		<div class="siderbar">
+			<ul class="menu unstyled">
+				 <li class="siderbar_selected"><span class="glyphicon glyphicon-user"></span><a>个人信息</a></li>
+                <li><a ><span class="glyphicon glyphicon-plus"></span>接&emsp;&emsp;诊</a></li>
+			</ul>
+		</div>
+		<div class="content">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="page-header">
+						<h1>信息中心
+						<small>病人检查>>胃镜检查</small>
+						</h1>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 检查记录ID </label>
+							<div class="col-sm-9">
+								<input type="text" id="exam_id" placeholder="exam_id" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 姓名 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="patient_name" placeholder="name" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 性别 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="patient_sex" placeholder="gender" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 白细胞 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="wbc" placeholder="wbc" class="col-xs-10 col-sm-5" disabled="disabled" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 中性细胞百分比 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="neut_percent" placeholder="neut%" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 淋巴细胞百分比 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="lymph_percent" placeholder="lymph%" class="col-xs-10 col-sm-5" disabled="disabled"  />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 单核细胞百分比 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="mono_percent" placeholder="mono%" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 嗜酸性细胞百分比 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="eo_percent" placeholder="eo%" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 嗜碱性细胞百分比 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="baso_percent" placeholder="baso%" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 中性粒细胞数 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="neut_num" placeholder="neut#" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 淋巴细胞数 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="lymph_num" placeholder="lymph#" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 单核细胞数 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="mono_num" placeholder="mono#" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 嗜酸性细胞数 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="eo_num" placeholder="eo#" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 嗜碱性细胞数 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="baso_num" placeholder="baso#" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 红细胞 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="rbc" placeholder="rbc" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 血红蛋白 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="hgb" placeholder="hgb" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 红细胞压积 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="hct" placeholder="hct" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 平均红细胞体积 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="mcv" placeholder="mcv" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 平均血红蛋白含量 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="mch" placeholder="mch" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 平均血红蛋白浓度 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="mchc" placeholder="mchc" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 红细胞分布宽度CV值 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="rdw_cv" placeholder="rdw_cv" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 红细胞分布宽度SD值 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="rdw_sd" placeholder="rdw_sd" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 血小板 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="plt" placeholder="plt" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 平均血小板体积 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="mpv" placeholder="mpv" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 血小板分布宽度 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="pdw" placeholder="pdw" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right" > 血小板压积 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="pct" placeholder="pct" class="col-xs-10 col-sm-5" disabled="disabled"/>
+							</div>
+						</div>
+												
+						
+					</form>
+				</div>
+			</div>
+		</div>	
+	</div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#exam_id").val(GetQueryString("exam_id"));
+			$("#patient_name").val(GetQueryString("patient_name"));
+			$("#patient_sex").val(GetQueryString("patient_sex"));
+		});
+
+
+      
+	</script>
+</body>
+</html>

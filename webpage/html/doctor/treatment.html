@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>暴走医疗管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../css/ace.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+    <script src="../../js/jquery-3.1.0.min.js"></script>
+</head>
+<body>
+<div class="nav">
+    <div class="nav_title">
+        <img class="title_image" src="../../image/title_img.png" alt="">
+        <div class="title">
+            暴走医疗管理系统
+        </div>
+    </div>
+    <div class="nav_right">
+        <span>欢迎，</span>
+        <span id="titlename">名字</span>
+    </div>
+</div>
+<div class="main">
+    <div class="siderbar">
+        <ul class="menu unstyled">
+            <li><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+            <li class="siderbar_selected"><a href="treatment.html"><span class="glyphicon glyphicon-plus"></span>接&emsp;&emsp;诊</a>
+            </li>
+        </ul>
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header">
+                    <h1>信息中心
+                        <small>>>接诊</small>
+                    </h1>
+                </div><!-- /.page-header -->
+            </div>
+        </div>
+        <div class="row" id="list-of-registraiton">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="table-header">
+                            <span id="currentYear">2016</span>年
+                            <span id="currentMonth">7</span>月
+                            <span id="currentMonth">17</span>日
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>医疗流水号</th>
+                                    <th>患者姓名</th>
+                                    <th>挂号科室</th>
+                                    <th>挂号医生</th>
+                                    <th>预约时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+
+                                <tbody id="treatmentRecord">
+<!--                                 <tr>
+                                    <td>20160716222100000000</td>
+                                    <td>杰克</td>
+                                    <td>皮肤科</td>
+                                    <td>许迪文</td>
+                                    <td>2016/07/16 17:31</td>
+
+                                    <td class="label_takes">
+                                        <span class="label label-sm label-warning">未接诊</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                            <button class="btn-success button_takes">接诊</button>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td>20160716222100000012</td>
+                                    <td>罗斯</td>
+                                    <td>皮肤科</td>
+                                    <td>许迪文</td>
+                                    <td>2016/07/16 16:21</td>
+
+                                    <td class="label_takes">
+                                        <span class="label label-sm label-success">已接诊</span>
+                                    </td>
+
+                                    <td>
+                                        <div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">
+                                            <button class="blue btn-prescription">开处方</button>
+                                            <button class="blue btn-examination">开检查</button>
+                                            <button class="blue btn-operation">安排手术</button>
+                                            <button class="blue btn-hospitalization">安排住院</button>
+                                        </div>
+                                    </td>
+
+                                </tr> -->
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="display: none;" id="write-prescription">
+            <div class="col-sm-12">
+                <form class="form-horizontal" role="form" action="#" onsubmit="return false;">
+
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right">
+                                医疗流水号
+                            </label>
+                            <div class="col-xs-8 col-sm-5">
+                                <input type="text" value="0" id="treatment-id-in-prescription" size="23"
+                                       readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="space-12"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 no-padding-right">
+                                <div class="row">
+                                    <label class="col-sm-6 control-label"
+                                           for="medicine-name-list">药品名称</label>
+                                    <div class="col-sm-6">
+                                        <select name="medicine" id="medicine-name-list">
+                                            <option disabled selected value> -- 选择药品 --</option>
+                                            <option value="阿莫西林">阿莫西林</option>
+                                            <option value="三九感冒灵">三九感冒灵</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <label class="col-sm-6 col-xs-8 control-label no-padding-right"
+                                           for="medicine-number">药品数量</label>
+                                    <input class="col-sm-4 col-sm-offset-2" type="number" id="medicine-number">
+                                </div>
+                            </div>
+                            <div class="col-sm-2 no-padding-left">
+                                <button class="btn btn-info col-sm-offset-6" type="submit" id="add-medicine">
+                                    <i class="icon-ok bigger-110"></i>
+                                    添加药品
+                                </button>
+                            </div>
+                            <div class="col-sm-4"></div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="space-4"></div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <th>药品名称</th>
+                        <th>数量</th>
+                        <th>单位</th>
+                        </thead>
+
+                        <tbody id="presciption-table">
+                        <!--                         <tr>
+                                                    <td>阿莫西林</td>
+                                                    <td>32</td>
+                                                    <td>盒</td>
+                                                </tr> -->
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-5"></div>
+                    <div class="col-sm-6">
+                        <button class="btn btn-info center" id="submitPrescription">
+                            <i class="icon-ok bigger-110"></i>
+                            提交处方
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="display: none;" id="write-examination">
+            <div class="col-sm-12">
+                <form class="form-horizontal" role="form" action="#" onsubmit="return false;">
+
+                    <div class="fo  rm-group">
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right">
+                                医疗流水号
+                            </label>
+                            <div class="col-xs-8 col-sm-4">
+                                <input type="text" value="0" id="treatment-id-in-examinaton" size="23">
+                            </div>
+                        </div>
+                        <div class="space-12"></div>
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right"
+                                   for="form-field-select-0">检查类型</label>
+                            <div class="col-sm-6">
+                                <select name="exam" id="examine-list">
+                                    <option disabled selected value> -- 选择检查类型 --</option>
+                                    <option value="0">验血</option>
+                                    <option value="1">胃镜</option>
+                                    <option value="2">X光</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="space-4"></div>
+
+                    <button class="btn btn-info col-sm-offset-6" type="submit" id="submit-exam-list">
+                        <i class="icon-ok bigger-110"></i>
+                        提交检查单
+                    </button>
+
+                </form>
+            </div>
+        </div>
+        <div class="row" style="display: none;" id="write-surgery">
+            <div class="col-sm-12">
+                <form class="form-horizontal" role="form" action="#" onsubmit="return false;"
+                      id="content-choose-clinic">
+
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right"
+                                   for="form-field-select-0">手术名称</label>
+                            <div class="col-xs-8 col-sm-4">
+                                <input type="text" id="surgey-name">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right">
+                                医疗流水号
+                            </label>
+                            <div class="col-xs-8 col-sm-4">
+                                <input type="text" value="0" id="treatment-id-in-surgey" size="23" disabled="disabled">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-4"></div>
+
+                    <button class="btn btn-info col-sm-offset-6" id="submit-surgey">
+                        <i class="icon-ok bigger-110"></i>
+                        提交手术单
+                    </button>
+
+                </form>
+            </div>
+        </div>
+        <div class="row" style="display: none;" id="write-hospitalization">
+            <div class="col-sm-12">
+                <form class="form-horizontal" role="form" action="#" onsubmit="return false;">
+
+                    <div class="form-group">
+
+                        <div class="col-sm-12">
+                            <label class="col-sm-3 control-label no-padding-right">
+                                医疗流水号
+                            </label>
+                            <div class="col-xs-8 col-sm-4">
+                                <input type="text" value="0" id="treatment-id-in-hospitalization" size="23"
+                                       disabled="disabled">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="space-4"></div>
+
+                    <button class="btn btn-info col-sm-offset-6" id="submit-hospitalization">
+                        <i class="icon-ok bigger-110"></i>
+                        提交住院单
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<script src="../../js/treatment_doctor.js"></script>-->
+<script src="../../js/employee_info.js"></script>
+<script src="../../js/treatment.js"></script>
+
+
+<!--<script>-->
+<!--$(document).ready(function () {-->
+<!---->
+<!--})-->
+<!--</script>-->
+</body>
+</html>

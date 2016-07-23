@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>暴走医疗管理系统</title>
+	<link rel="stylesheet" type="text/css" href="../../css/index.css">
+	<link rel="stylesheet" type="text/css" href="../../css/ace.css">
+	<link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+	<script src="../../js/jquery-3.1.0.min.js"></script>
+	<script src="../../js/parse_parameter.js"></script>
+	
+</head>
+<body onload="showImage()">
+	<div class="nav">
+		<div class="nav_title">
+		<img class="title_image" src="../../image/title_img.png" alt="">
+			<div class="title">
+				暴走医疗管理系统
+			</div>
+		</div>
+		<div class="nav_right">
+			<span>欢迎，</span>
+			<span id="titlename">名字</span>
+			<button id="signout" class="btn btn-primary" style="margin-left:15px;">退出</button>
+		</div>
+	</div>
+	<div class="main">
+		<div class="siderbar">
+			<ul class="menu unstyled">
+				<li class="siderbar_selected"><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+                <li><a href="treatment.html"><span class="glyphicon glyphicon-plus"></span>接&emsp;&emsp;诊</a></li>
+			</ul>
+		</div>
+		<div class="content">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="page-header">
+						<h1>信息中心
+						<small>>>胃镜检查单</small>
+						</h1>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right"> 检查记录ID </label>
+							<div class="col-sm-9">
+								<input type="text" id="exam_id" placeholder="exam_id" class="col-xs-10 col-sm-5" disabled="disabled" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right"> 姓名 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="patient_name" placeholder="name" class="col-xs-10 col-sm-5" disabled="disabled" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right"> 性别 </label>
+
+							<div class="col-sm-9">
+								<input type="text" id="patient_sex" placeholder="gender" class="col-xs-10 col-sm-5" disabled="disabled" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right"> 检查所见 </label>
+
+							<div class="col-sm-9">
+								<textarea id="exam_mirror" name="textarea" cols="50" rows="10" disabled="disabled"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right"> 镜下诊断 </label>
+							<div class="col-sm-9">
+								<textarea id="exam_result" name="textarea" cols="50" rows="10" disabled="disabled"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right"> 图像 </label>
+							
+							<div class="col-sm-4">
+								<div class="widget-box">
+									
+
+									<div class="widget-body">
+										<div class="widget-main" id =image_info>
+											<img id="exam_img" />
+											
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+							
+						
+					</form>
+				</div>
+			</div>
+		</div>	
+	</div>
+    <script src="../../js/employee_info.js"></script>
+	<script type="text/javascript" language='javascript'>
+		$(document).ready(function() {
+			$("#exam_id").val(GetQueryString("exam_id"));
+			$("#patient_name").val(GetQueryString("patient_name"));
+			$("#patient_sex").val(GetQueryString("patient_sex"));
+		});
+
+		var uri = "http://221.239.197.176/api/Examiner/MakeGastroscopeExamination";
+
+
+		
+		function showImage(){    
+			path="../../image/avatars/1452666.jpg";
+			
+			console.log("%s",path);
+			var img = document.getElementById('exam_img'); 
+			img.src = path;
+	
+			document.getElementById('image_info').appendChild(img);
+			img.width=300;
+			img.height=300;
+        } 
+         
+
+	</script>
+</body>
+</html>

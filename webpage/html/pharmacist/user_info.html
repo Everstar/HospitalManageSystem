@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>暴走医疗管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../css/ace.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../../bootstrap/dist/css/bootstrap-theme.css">
+    <script src="../../js/jquery-3.1.0.min.js"></script>
+    <script src="../../js/parse_parameter.js"></script>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="nav_title">
+            <img class="title_image" src="../../image/title_img.png" alt="">
+            <div class="title">
+                暴走医疗管理系统
+            </div>
+        </div>
+        <div class="nav_right">
+            <span>欢迎，</span>
+            <span id="titlename">名字</span>
+            <button id="signout" class="btn btn-primary" style="margin-left:15px;">退出</button>
+        </div>
+    </div>
+    <div class="main">
+        <div class="siderbar">
+            <ul class="menu unstyled">
+                <li class="siderbar_selected"><span class="glyphicon glyphicon-user"></span><a href="user_info.html">个人信息</a></li>
+                <li><a href="prescribe.html"><span class="glyphicon glyphicon-plus"></span> 配药 </a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="page-header">
+                        <h1>信息中心
+						<small>>>个人资料</small>
+						</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="user-profile row">
+                        <div class="col-xs-12 col-sm-3 center">
+                            <div>
+                                <span class="profile-picture">
+									<img id="avatar" class="editable img-responsive" alt="Avatar" src="" />
+								</span>
+                                <div class="space-4"></div>
+                            </div>
+                            <div class="space-6"></div>
+                            <div class="clearfix">
+                                <button class="btn btn-primary"> 更 换 头 像 </button>
+                            </div>
+                            <div class="hr hr16 dotted"></div>
+                        </div>
+                        <div class="col-xs-12 col-sm-9">
+                            <div class="space-12"></div>
+                            <div class="profile-user-info profile-user-info-striped">
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 工号 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_id">null</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 姓名 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_name">null</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 性别 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_sex">null</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 出生日期 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_birth">DD/MM/YYYY</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 身份证号 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_cred_ID"> XXXXXXYYYYMMDDZZZZ </span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 部门 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_department">null</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 科室 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_clinic"> 药剂科 </span>
+                                    </div>
+                                </div>
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 职务 </div>
+                                    <div class="profile-info-value">
+                                        <span class="editable" id="employee_post">药剂师</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../js/employee_info.js"></script>
+    <script type="text/javascript">
+    var uri = 'api/Account/GetUserInfo';
+
+    var setData = function(name, sex, birth, ID, department, clinic, post) {
+        $("#employee_name").html(name);
+        $("#employee_sex").html(sex);
+        $("#employee_birth").html(birth);
+        $("#employee_cred_ID").html(ID);
+        $("#employee_department").html(department);
+        $("#employee_clinic").html(clinic);
+        $("#employee_post").html(post);
+    }
+
+    $(document).ready(function() {
+        $.getJSON('../../../api/Account/GetUserInfo')
+            .done(function (data) {
+                console.log(data);
+                if (data === null) {
+                    $("#employee_id").html("无此人");
+                    setData("null", "null", "null", "null", "null", "null", "null");
+                    return;
+                }else if(data.post === undefined || data.post != "Pharmacist") {
+                    alert("无权限。")
+                }else {
+                    $("#employee_id").html(data.employee_id);
+                    setData(data.name, data.sex === "M" ? "男" : "女", data.birth.slice(0, 10), data.credit_num, data.department, "药剂科", "药剂师");
+                    $("#avatar").attr("src", "../../image/avatars/1452" + data.employee_id.slice(2) + ".jpg");
+                }
+        });
+
+    });
+    </script>
+</body>
+
+</html>
